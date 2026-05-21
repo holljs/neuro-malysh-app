@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Нейро-Малыш</title>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <style>
+        /* Сенсорно-безопасные цвета: пастельные, без резких контрастов */
+        :root {
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-color: #4A4A4A;
+            --accent-color: #FFD166; /* Теплый желтый цвет Ути */
+            --accent-hover: #FFC233;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* Запрещаем случайный скролл */
+            user-select: none; /* Запрещаем выделение текста малышом */
+        }
+
+        .header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #8ECAE6; /* Мягкий голубой */
+        }
+
+        /* Центральный персонаж - Утя */
+        .character-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .utya-btn {
+            background-color: var(--card-bg);
+            border: 4px solid var(--accent-color);
+            border-radius: 40px;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05); /* Очень мягкая тень */
+            transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .utya-btn:active {
+            transform: scale(0.95); /* Эффект нажатия (тактильный отклик) */
+            background-color: #FFF9E6;
+        }
+
+        .utya-image {
+            font-size: 80px; /* Пока используем эмодзи утки, потом заменим на картинку */
+            margin-bottom: 10px;
+        }
+
+        .utya-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        /* Зона карточек действий */
+        .cards-area {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            background-color: #E9ECEF;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+        }
+
+        .action-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 15px;
+            width: 40%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+        
+        .action-card.water { border-color: #8ECAE6; }
+        .action-card.play { border-color: #95D5B2; }
+    </style>
+</head>
+<body>
+
+    <div class="header">Нейро-Малыш</div>
+
+    <div class="character-container">
+        <div class="utya-btn" id="utyaBtn">
+            <div class="utya-image">🦆</div>
+            <div class="utya-text">Утя здесь!</div>
+        </div>
+    </div>
+
+    <div class="cards-area">
+        <div class="action-card water" onclick="playAction('пить')">Хочу пить</div>
+        <div class="action-card play" onclick="playAction('играть')">Играть</div>
+    </div>
+
+    <script>
+        // Инициализация VK Mini Apps
+        vkBridge.send('VKWebAppInit');
+
+        const utyaBtn = document.getElementById('utyaBtn');
+
+        // Обработка нажатия на Утю
+        utyaBtn.addEventListener('click', () => {
+            // В будущем здесь будет запрос к нашему бэкенду на порту 8015
+            console.log("Отправляем запрос на сервер: малыш нажал на Утю!");
+            
+            // Легкая вибрация телефона при нажатии (Haptic Feedback), если телефон поддерживает
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"});
+        });
+
+        // Функция для карточек действий
+        function playAction(actionType) {
+            console.log(`Малыш выбрал карточку: ${actionType}`);
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"});
+            // Сюда добавим проигрывание сгенерированного .wav файла
+        }
+    </script>
+</body>
+</html>
