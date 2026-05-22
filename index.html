@@ -6,156 +6,90 @@
     <title>Нейро-Малыш</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
-        /* Спокойные, приглушенные пастельные тона */
         :root {
-            --bg-color: #F7F5F0; /* Теплый молочный фон */
+            --bg-color: #F7F5F0; 
             --card-bg: #FFFFFF;
-            --text-color: #5C5552; /* Мягкий серо-коричневый текст */
+            --text-color: #5C5552; 
             
-            /* Цвета комнат: мягкие заливки вместо ярких рамок */
-            --wants-color: #E3E9E5; /* Приглушенный мятный */
-            --animals-color: #F2EBE5; /* Пыльно-персиковый */
-            --letters-color: #E8EBF0; /* Спокойный серо-голубой */
-            --numbers-color: #F0EAE1; /* Мягкий песочный */
+            --wants-color: #E3E9E5; 
+            --animals-color: #F2EBE5; 
+            --letters-color: #E8EBF0; 
+            --numbers-color: #F0EAE1; 
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: var(--bg-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden; 
-            user-select: none; 
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; user-select: none; 
         }
 
-        /* Общие стили шапки */
         .header {
-            width: 100%;
-            padding: 25px 0 15px 0;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 600;
-            color: #7A90A4; /* Приглушенный синий */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            width: 100%; padding: 25px 20px 15px 20px;
+            text-align: center; font-size: 22px; font-weight: 600;
+            color: #7A90A4; display: flex;
+            justify-content: space-between; align-items: center;
+            box-sizing: border-box;
         }
 
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 10px 15px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            color: var(--text-color);
+        .back-btn, .quiz-toggle {
+            font-size: 16px; cursor: pointer;
+            padding: 10px 15px; background: var(--card-bg);
+            border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            color: var(--text-color); font-weight: 500;
+            transition: background-color 0.3s;
         }
 
-        /* Экраны приложения */
-        .screen {
-            display: none; 
-            flex-direction: column;
-            flex-grow: 1;
-            width: 100%;
-        }
-
-        .screen.active {
-            display: flex; 
-            animation: fadeIn 0.4s ease;
-        }
+        .screen { display: none; flex-direction: column; flex-grow: 1; width: 100%; }
+        .screen.active { display: flex; animation: fadeIn 0.4s ease; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Главное меню */
-        .hero-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            color: #8C847E;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 20px;
-            flex-grow: 1;
-            align-content: start;
-        }
-
-        .category-card {
-            border-radius: 20px;
-            padding: 30px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
-        .category-card:active { transform: scale(0.97); opacity: 0.8; }
+        .hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 20px; color: #8C847E; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; align-content: start; }
         
-        .category-title { 
-            font-size: 18px; 
-            font-weight: 600; 
-            text-align: center; 
-            color: var(--text-color);
+        .category-card {
+            border-radius: 20px; padding: 30px 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s, opacity 0.2s;
         }
+        .category-card:active { transform: scale(0.97); opacity: 0.8; }
+        .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
 
-        /* Мягкие фоны для категорий */
         .cat-wants { background-color: var(--wants-color); }
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
 
-        /* Внутренности комнат (Карточки) */
-        .cards-area {
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .action-card {
-            background-color: var(--card-bg);
-            border-radius: 18px;
-            padding: 25px 15px;
-            width: 40%;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+        .cards-area { padding: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
         
-        .action-card:active { 
-            transform: scale(0.96); 
-            background-color: #FDFBF7; 
+        .action-card {
+            background-color: var(--card-bg); border-radius: 18px;
+            padding: 25px 15px; width: 40%; text-align: center;
+            font-size: 16px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            cursor: pointer; transition: transform 0.2s;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .action-card:active { transform: scale(0.96); background-color: #FDFBF7; }
+        
+        /* Место под будущую картинку в карточке */
+        .card-img-placeholder {
+            width: 80px; height: 80px; background-color: #F7F5F0;
+            border-radius: 10px; margin-bottom: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 24px; color: #CCC;
         }
     </style>
 </head>
 <body>
 
     <div id="screen-menu" class="screen active">
-        <div class="header">Нейро-Малыш</div>
-        
+        <div class="header" style="justify-content: center;">Нейро-Малыш</div>
         <div class="hero-title">Во что поиграем?</div>
-
         <div class="menu-grid">
             <div class="category-card cat-wants" onclick="openRoom('wants', 'Хотелки')">
                 <div class="category-title">Хотелки</div>
@@ -174,16 +108,21 @@
 
     <div id="screen-room" class="screen">
         <div class="header">
-            <div class="back-btn" onclick="goHome()">Назад</div>
+            <div class="back-btn" onclick="goHome()">⬅ Назад</div>
             <span id="room-title">Комната</span>
+            <div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()">🎓 Игра</div>
         </div>
-        
         <div id="room-content" class="cards-area"></div>
     </div>
 
     <script>
         vkBridge.send('VKWebAppInit');
 
+        let currentRoom = '';
+        let isQuizMode = false;
+        let expectedCardId = null;
+
+        // Данные комнат. Добавил по 4 карточки для цифр, чтобы викторина была полноценной
         const roomsData = {
             'wants': [
                 { id: 'пить', text: 'Хочу пить', sound: 'drink.wav' },
@@ -199,53 +138,114 @@
             ],
             'numbers': [
                 { id: '1', text: 'Один', sound: '' },
-                { id: '2', text: 'Два', sound: '' }
+                { id: '2', text: 'Два', sound: '' },
+                { id: '3', text: 'Три', sound: '' },
+                { id: '4', text: 'Четыре', sound: '' }
             ]
         };
 
         function openRoom(roomId, title) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            currentRoom = roomId;
+            isQuizMode = false; // Сбрасываем викторину при входе
+            updateQuizToggleUI();
             
             document.getElementById('room-title').innerText = title;
-            const contentArea = document.getElementById('room-content');
-            contentArea.innerHTML = ''; 
-
-            roomsData[roomId].forEach(card => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'action-card';
-                cardDiv.innerText = card.text;
-                cardDiv.onclick = () => playAction(card.id, card.sound);
-                contentArea.appendChild(cardDiv);
-            });
+            renderCards(roomId);
 
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-room').classList.add('active');
         }
 
+        function renderCards(roomId) {
+            const contentArea = document.getElementById('room-content');
+            contentArea.innerHTML = ''; 
+            
+            roomsData[roomId].forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'action-card';
+                // Заглушка под будущую квадратную картинку
+                cardDiv.innerHTML = `
+                    <div class="card-img-placeholder">🖼️</div>
+                    <div>${card.text}</div>
+                `;
+                cardDiv.onclick = () => handleCardClick(card.id, card.sound);
+                contentArea.appendChild(cardDiv);
+            });
+        }
+
         function goHome() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            isQuizMode = false; // Сбрасываем при выходе
             document.getElementById('screen-room').classList.remove('active');
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        async function playAction(actionType, soundFile) {
-            console.log(`Малыш выбрал: ${actionType}`);
+        function toggleQuiz() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            isQuizMode = !isQuizMode;
+            updateQuizToggleUI();
             
-            if (soundFile) {
-                const audio = new Audio(soundFile);
-                audio.play().catch(err => console.log("Браузер заблокировал автозвук:", err));
+            if (isQuizMode) {
+                startNewQuizRound();
+            }
+        }
+
+        function updateQuizToggleUI() {
+            const btn = document.getElementById('quizToggle');
+            if (isQuizMode) {
+                btn.innerText = "🛑 Выключить";
+                btn.style.backgroundColor = "#95D5B2"; // Зеленый фон для активной игры
+                btn.style.color = "#FFFFFF";
+            } else {
+                btn.innerText = "🎓 Игра";
+                btn.style.backgroundColor = "#FFFFFF";
+                btn.style.color = "var(--text-color)";
+            }
+        }
+
+        function startNewQuizRound() {
+            const cards = roomsData[currentRoom];
+            // Выбираем случайную карточку
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            expectedCardId = randomCard.id;
+            
+            console.log(`Утя загадала: ${randomCard.text}`);
+            
+            // Здесь мы позже добавим голос Ути "Где цифра два?"
+            // const questionAudio = new Audio(`where_is_${randomCard.id}.wav`);
+            // questionAudio.play();
+        }
+
+        async function handleCardClick(actionId, soundFile) {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            
+            if (isQuizMode) {
+                // ЛОГИКА ВИКТОРИНЫ
+                if (actionId === expectedCardId) {
+                    console.log("Правильно!");
+                    // Тут будет радостный звук "Молодец!"
+                    setTimeout(startNewQuizRound, 1500); // Через 1.5 секунды новый вопрос
+                } else {
+                    console.log("Ой, не то!");
+                    // Тут будет звук "Попробуй еще раз"
+                }
+            } else {
+                // ОБЫЧНЫЙ РЕЖИМ (Обучение)
+                if (soundFile) {
+                    const audio = new Audio(soundFile);
+                    audio.play().catch(err => console.log("Блок звука:", err));
+                }
             }
             
+            // Фоновая статистика на сервер
             try {
                 fetch("https://neuro-master.online/malysh-api/api/action", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action_type: actionType, user_id: 0 })
+                    body: JSON.stringify({ action_type: actionId, user_id: 0 })
                 });
-            } catch (error) {
-                console.error("Ошибка отправки статистики:", error);
-            }
+            } catch (e) {}
         }
     </script>
 </body>
