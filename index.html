@@ -128,10 +128,7 @@
 
         // Обработка нажатия на Утю
         utyaBtn.addEventListener('click', () => {
-            // В будущем здесь будет запрос к нашему бэкенду на порту 8015
             console.log("Отправляем запрос на сервер: малыш нажал на Утю!");
-            
-            // Легкая вибрация телефона при нажатии (Haptic Feedback), если телефон поддерживает
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"});
         });
 
@@ -141,7 +138,7 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"});
             
             try {
-                // Отправляем сигнал на наш новенький бэкенд
+                // Отправляем сигнал на наш бэкенд
                 const response = await fetch("https://neuro-master.online/malysh-api/api/action", {
                     method: "POST",
                     headers: {
@@ -149,12 +146,19 @@
                     },
                     body: JSON.stringify({
                         action_type: actionType,
-                        user_id: 0 // Пока ставим заглушку, позже достанем реальный ID из ВК
+                        user_id: 0
                     })
                 });
                 
                 const result = await response.json();
                 console.log("Ура! Сервер ответил:", result);
+                
+                // МАГИЯ ЗВУКА: если сервер прислал ссылку на аудио, включаем её!
+                if (result.audio_url) {
+                    const audio = new Audio(result.audio_url);
+                    audio.play();
+                }
+                
             } catch (error) {
                 console.error("Ой, сервер не отвечает:", error);
             }
