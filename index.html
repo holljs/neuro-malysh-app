@@ -6,161 +6,249 @@
     <title>Нейро-Малыш</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
-        /* Сенсорно-безопасные цвета: пастельные, без резких контрастов */
         :root {
             --bg-color: #F8F9FA;
             --card-bg: #FFFFFF;
             --text-color: #4A4A4A;
-            --accent-color: #FFD166; /* Теплый желтый цвет Ути */
-            --accent-hover: #FFC233;
+            --accent-color: #FFD166; 
+            --wants-color: #8ECAE6;
+            --animals-color: #95D5B2;
+            --letters-color: #FFA69E;
+            --numbers-color: #BDE0FE;
         }
 
         body {
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
-            align-items: center;
             height: 100vh;
-            overflow: hidden; /* Запрещаем случайный скролл */
-            user-select: none; /* Запрещаем выделение текста малышом */
+            overflow: hidden; 
+            user-select: none; 
         }
 
+        /* Общие стили шапки */
         .header {
             width: 100%;
-            padding: 20px;
+            padding: 20px 0;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-            color: #8ECAE6; /* Мягкий голубой */
-        }
-
-        /* Центральный персонаж - Утя */
-        .character-container {
-            flex-grow: 1;
+            color: #8ECAE6; 
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Экраны приложения */
+        .screen {
+            display: none; /* По умолчанию всё скрыто */
+            flex-direction: column;
+            flex-grow: 1;
             width: 100%;
         }
 
-        .utya-btn {
-            background-color: var(--card-bg);
-            border: 4px solid var(--accent-color);
-            border-radius: 40px;
-            width: 200px;
-            height: 200px;
+        .screen.active {
+            display: flex; /* Показываем только активный экран */
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Главное меню: Утя и 4 комнаты */
+        .hero-utya {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.05); /* Очень мягкая тень */
-            transition: transform 0.2s, background-color 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .hero-utya span { font-size: 80px; }
+        .hero-utya-text { font-size: 18px; font-weight: bold; margin-top: 10px; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            align-content: start;
+        }
+
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 25px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            border: 4px solid;
             cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .utya-btn:active {
-            transform: scale(0.95); /* Эффект нажатия (тактильный отклик) */
-            background-color: #FFF9E6;
-        }
+        .category-card:active { transform: scale(0.95); }
+        .category-icon { font-size: 50px; margin-bottom: 10px; }
+        .category-title { font-size: 16px; font-weight: bold; text-align: center; }
 
-        .utya-image {
-            font-size: 80px; /* Пока используем эмодзи утки, потом заменим на картинку */
-            margin-bottom: 10px;
-        }
+        .cat-wants { border-color: var(--wants-color); }
+        .cat-animals { border-color: var(--animals-color); }
+        .cat-letters { border-color: var(--letters-color); }
+        .cat-numbers { border-color: var(--numbers-color); }
 
-        .utya-text {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        /* Зона карточек действий */
+        /* Внутренности комнат (Карточки) */
         .cards-area {
-            width: 100%;
             padding: 20px;
             display: flex;
-            justify-content: space-around;
-            background-color: #E9ECEF;
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
         }
 
         .action-card {
             background-color: var(--card-bg);
             border-radius: 20px;
-            padding: 15px;
+            padding: 20px;
             width: 40%;
             text-align: center;
             font-size: 18px;
             font-weight: bold;
-            border: 2px solid transparent;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
         }
+        .action-card:active { transform: scale(0.95); background-color: #FFF9E6; }
         
-        .action-card.water { border-color: #8ECAE6; }
-        .action-card.play { border-color: #95D5B2; }
     </style>
 </head>
 <body>
 
-    <div class="header">Нейро-Малыш</div>
+    <div id="screen-menu" class="screen active">
+        <div class="header">Нейро-Малыш</div>
+        
+        <div class="hero-utya">
+            <span>🦆</span>
+            <div class="hero-utya-text">Во что поиграем?</div>
+        </div>
 
-    <div class="character-container">
-        <div class="utya-btn" id="utyaBtn">
-            <div class="utya-image">🦆</div>
-            <div class="utya-text">Утя здесь!</div>
+        <div class="menu-grid">
+            <div class="category-card cat-wants" onclick="openRoom('wants', 'Хочу / Не хочу')">
+                <div class="category-icon">🍼</div>
+                <div class="category-title">Хотелки</div>
+            </div>
+            <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
+                <div class="category-icon">🐶</div>
+                <div class="category-title">Животные</div>
+            </div>
+            <div class="category-card cat-letters" onclick="openRoom('letters', 'Буквы')">
+                <div class="category-icon">🅰️</div>
+                <div class="category-title">Буквы</div>
+            </div>
+            <div class="category-card cat-numbers" onclick="openRoom('numbers', 'Цифры')">
+                <div class="category-icon">1️⃣</div>
+                <div class="category-title">Цифры</div>
+            </div>
         </div>
     </div>
 
-    <div class="cards-area">
-        <div class="action-card water" onclick="playAction('пить')">Хочу пить</div>
-        <div class="action-card play" onclick="playAction('играть')">Играть</div>
+    <div id="screen-room" class="screen">
+        <div class="header">
+            <div class="back-btn" onclick="goHome()">⬅️</div>
+            <span id="room-title">Комната</span>
+        </div>
+        
+        <div id="room-content" class="cards-area"></div>
     </div>
 
     <script>
-        // Инициализация VK Mini Apps
         vkBridge.send('VKWebAppInit');
 
-        const utyaBtn = document.getElementById('utyaBtn');
+        // Данные для наших комнат
+        const roomsData = {
+            'wants': [
+                { id: 'пить', text: 'Хочу пить', color: '#8ECAE6', sound: 'drink.wav' },
+                { id: 'играть', text: 'Играть', color: '#95D5B2', sound: 'play.wav' }
+            ],
+            'animals': [
+                { id: 'собака', text: 'Собачка', color: '#FFD166', sound: '' },
+                { id: 'кошка', text: 'Кошечка', color: '#FFA69E', sound: '' }
+            ],
+            'letters': [
+                { id: 'а', text: 'А', color: '#FFA69E', sound: '' },
+                { id: 'б', text: 'Б', color: '#8ECAE6', sound: '' }
+            ],
+            'numbers': [
+                { id: '1', text: 'Один 1️⃣', color: '#BDE0FE', sound: '' },
+                { id: '2', text: 'Два 2️⃣', color: '#FFD166', sound: '' }
+            ]
+        };
 
-        // Обработка нажатия на Утю
-        utyaBtn.addEventListener('click', () => {
-            console.log("Малыш нажал на Утю!");
+        // Функция открытия комнаты
+        function openRoom(roomId, title) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-        });
-
-        // Функция для карточек действий
-        async function playAction(actionType) {
-            console.log(`Малыш выбрал карточку: ${actionType}`);
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
-            // 1. МГНОВЕННЫЙ ЗВУК: Включаем локальный файл сразу, без задержек
-            let soundFile = "";
-            if (actionType === 'пить') soundFile = "drink.wav";
-            if (actionType === 'играть') soundFile = "play.wav";
+            document.getElementById('room-title').innerText = title;
+            const contentArea = document.getElementById('room-content');
+            contentArea.innerHTML = ''; // Очищаем старые карточки
+
+            // Создаем новые карточки для выбранной комнаты
+            roomsData[roomId].forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'action-card';
+                cardDiv.style.border = `2px solid ${card.color}`;
+                cardDiv.innerText = card.text;
+                cardDiv.onclick = () => playAction(card.id, card.sound);
+                contentArea.appendChild(cardDiv);
+            });
+
+            // Переключаем экраны
+            document.getElementById('screen-menu').classList.remove('active');
+            document.getElementById('screen-room').classList.add('active');
+        }
+
+        // Возврат в меню
+        function goHome() {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            document.getElementById('screen-room').classList.remove('active');
+            document.getElementById('screen-menu').classList.add('active');
+        }
+
+        // Наша рабочая функция воспроизведения
+        async function playAction(actionType, soundFile) {
+            console.log(`Малыш выбрал: ${actionType}`);
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
             if (soundFile) {
                 const audio = new Audio(soundFile);
                 audio.play().catch(err => console.log("Браузер заблокировал автозвук:", err));
             }
             
-            // 2. ФОНОВЫЙ СИГНАЛ: Тихо отправляем данные на сервер для статистики
             try {
                 fetch("https://neuro-master.online/malysh-api/api/action", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        action_type: actionType,
-                        user_id: 0
-                    })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action_type: actionType, user_id: 0 })
                 });
             } catch (error) {
-                // Сервер может спать, но ребенок этого даже не заметит, ведь Утя уже заговорила!
                 console.error("Ошибка отправки статистики:", error);
             }
         }
