@@ -137,10 +137,10 @@
                 { id: 'б', text: 'Б', sound: '' }
             ],
             'numbers': [
-                { id: '1', text: 'Один', sound: '' },
-                { id: '2', text: 'Два', sound: '' },
-                { id: '3', text: 'Три', sound: '' },
-                { id: '4', text: 'Четыре', sound: '' }
+                { id: '1', text: 'Один', sound: '', image: '1.jpg' },
+                { id: '2', text: 'Два', sound: '', image: '2.jpg' },
+                { id: '3', text: 'Три', sound: '', image: '3.jpg' },
+                { id: '4', text: 'Четыре', sound: '', image: '4.jpg' } // <-- Обновили здесь!
             ]
         };
 
@@ -164,9 +164,14 @@
             roomsData[roomId].forEach(card => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'action-card';
-                // Заглушка под будущую квадратную картинку
+                
+                // Проверяем: если есть картинка - вставляем её. Если нет - ставим серый квадрат-заглушку.
+                const imageHtml = card.image 
+                    ? `<img src="${card.image}" class="card-img-placeholder" style="background-color: transparent;">` 
+                    : `<div class="card-img-placeholder">🖼️</div>`;
+
                 cardDiv.innerHTML = `
-                    <div class="card-img-placeholder">🖼️</div>
+                    ${imageHtml}
                     <div>${card.text}</div>
                 `;
                 cardDiv.onclick = () => handleCardClick(card.id, card.sound);
