@@ -51,7 +51,6 @@
 
         .hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 20px; color: #8C847E; }
         
-        /* Главное меню */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; align-content: start; }
         .category-card {
             border-radius: 20px; padding: 30px 10px;
@@ -66,55 +65,61 @@
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
 
-        /* Контейнер для карточек внутри комнаты */
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; padding: 20px;
         }
 
-        /* РЕЖИМ 1: Одна большая карточка (Обучение) */
+        /* РЕЖИМ 1: Одна большая карточка со слайдером */
         .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        
         .large-card {
             background-color: var(--card-bg); border-radius: 30px;
-            padding: 40px 20px; width: 80%; max-width: 350px; text-align: center;
+            padding: 40px 20px; width: 80%; max-width: 300px; text-align: center;
             font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.1s;
         }
-        .large-card:active { transform: scale(0.95); }
+        .large-card:active { transform: scale(0.97); }
+        
         .large-card img {
             width: 180px; height: 180px; object-fit: cover;
             border-radius: 20px; margin-bottom: 20px;
         }
-        .tap-hint { margin-top: 20px; font-size: 14px; color: #A09B98; animation: pulse 2s infinite; }
+        .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        /* Кнопки перелистывания */
+        .slider-controls {
+            display: flex; gap: 40px; margin-top: 25px;
         }
+        .nav-btn {
+            font-size: 24px; background: var(--card-bg); color: var(--text-color);
+            border-radius: 50%; width: 60px; height: 60px; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; user-select: none;
+        }
+        .nav-btn:active { transform: scale(0.9); background-color: #FDFBF7; }
 
         /* РЕЖИМ 2: Сетка 2x2 (Викторина) */
         .quiz-mode {
-            display: none; /* Скрыта по умолчанию */
-            width: 100%; max-width: 500px;
-            grid-template-columns: 1fr 1fr; /* Жестко 2 колонки */
-            gap: 15px; padding: 10px; box-sizing: border-box;
+            display: none; width: 100%; max-width: 500px;
+            grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; box-sizing: border-box;
         }
         .quiz-mode.active { display: grid; }
         
         .quiz-card {
             background-color: var(--card-bg); border-radius: 18px;
-            padding: 15px 10px; text-align: center;
-            font-size: 18px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            padding: 15px 10px; text-align: center; font-size: 18px; font-weight: 500; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center;
         }
         .quiz-card:active { transform: scale(0.96); background-color: #FDFBF7; }
+        
         .quiz-card img {
             width: 90px; height: 90px; object-fit: cover;
             border-radius: 12px; margin-bottom: 10px;
         }
 
-        /* Заглушка, если нет картинки */
         .placeholder { background-color: #F7F5F0; display: flex; align-items: center; justify-content: center; color: #CCC; }
         .large-card .placeholder { width: 180px; height: 180px; border-radius: 20px; margin-bottom: 20px; font-size: 40px; }
         .quiz-card .placeholder { width: 90px; height: 90px; border-radius: 12px; margin-bottom: 10px; font-size: 24px; }
@@ -152,7 +157,6 @@
         <div class="room-content-area">
             <div id="learning-area" class="learning-mode">
                 </div>
-
             <div id="quiz-area" class="quiz-mode">
                 </div>
         </div>
@@ -164,7 +168,7 @@
         let currentRoom = '';
         let isQuizMode = false;
         let expectedCardId = null;
-        let currentLearningIndex = 0; // Какую карточку показываем сейчас
+        let currentLearningIndex = 0; 
 
         const roomsData = {
             'wants': [
@@ -196,7 +200,7 @@
             document.getElementById('room-title').innerText = title;
             updateQuizToggleUI();
             
-            renderLearningCard(); // Показываем первую большую карточку
+            renderLearningCard(); 
 
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-room').classList.add('active');
@@ -209,7 +213,7 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        // --- РЕЖИМ ОБУЧЕНИЯ ---
+        // --- РЕЖИМ ОБУЧЕНИЯ СО СЛАЙДЕРОМ ---
         function renderLearningCard() {
             const cards = roomsData[currentRoom];
             const card = cards[currentLearningIndex];
@@ -219,24 +223,40 @@
                 ? `<img src="${card.image}" alt="${card.text}">` 
                 : `<div class="placeholder">🖼️</div>`;
 
+            // Вставляем карточку и кнопки управления под ней
             area.innerHTML = `
-                <div class="large-card" onclick="nextLearningCard()">
+                <div class="large-card" onclick="playSound('${card.sound}')">
                     ${imageHtml}
                     <div>${card.text}</div>
                 </div>
-                <div class="tap-hint">Нажми, чтобы перевернуть 👆</div>
+                <div class="tap-hint">Нажми на картинку, чтобы услышать 🔊</div>
+                <div class="slider-controls">
+                    <div class="nav-btn" onclick="prevLearningCard()">⬅️</div>
+                    <div class="nav-btn" onclick="nextLearningCard()">➡️</div>
+                </div>
             `;
             
-            // Автоматически озвучиваем при появлении
             playSound(card.sound);
+        }
+
+        function prevLearningCard() {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            const cards = roomsData[currentRoom];
+            currentLearningIndex--;
+            // Если ушли левее первой карточки — перекидываем на самую последнюю
+            if (currentLearningIndex < 0) {
+                currentLearningIndex = cards.length - 1;
+            }
+            renderLearningCard();
         }
 
         function nextLearningCard() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             const cards = roomsData[currentRoom];
             currentLearningIndex++;
+            // Если дошли до конца — возвращаем в начало
             if (currentLearningIndex >= cards.length) {
-                currentLearningIndex = 0; // Начинаем сначала, если дошли до конца
+                currentLearningIndex = 0;
             }
             renderLearningCard();
         }
@@ -291,7 +311,6 @@
             expectedCardId = randomCard.id;
             
             console.log(`Утя загадала: Найди ${randomCard.text}`);
-            // TODO: Здесь будет звук Ути: "Где цифра X?"
         }
 
         function handleQuizClick(actionId) {
@@ -299,11 +318,9 @@
             
             if (actionId === expectedCardId) {
                 console.log("Правильно!");
-                // TODO: Звук "Правильно, молодец!"
                 setTimeout(startNewQuizRound, 1000);
             } else {
                 console.log("Ой, не то!");
-                // TODO: Звук "Попробуй еще раз"
             }
         }
 
@@ -321,7 +338,8 @@
         }
 
         function playSound(soundFile) {
-            if (soundFile) {
+            // Если звук есть и он не пустой (не "undefined" или "")
+            if (soundFile && soundFile !== 'undefined') {
                 const audio = new Audio(soundFile);
                 audio.play().catch(err => console.log("Браузер ждет взаимодействия пользователя:", err));
             }
