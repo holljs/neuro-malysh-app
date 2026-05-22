@@ -128,7 +128,7 @@
 
         // Обработка нажатия на Утю
         utyaBtn.addEventListener('click', () => {
-            console.log("Отправляем запрос на сервер: малыш нажал на Утю!");
+            console.log("Малыш нажал на Утю!");
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
         });
 
@@ -137,9 +137,19 @@
             console.log(`Малыш выбрал карточку: ${actionType}`);
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
+            // 1. МГНОВЕННЫЙ ЗВУК: Включаем локальный файл сразу, без задержек
+            let soundFile = "";
+            if (actionType === 'пить') soundFile = "drink.wav";
+            if (actionType === 'играть') soundFile = "play.wav";
+            
+            if (soundFile) {
+                const audio = new Audio(soundFile);
+                audio.play().catch(err => console.log("Браузер заблокировал автозвук:", err));
+            }
+            
+            // 2. ФОНОВЫЙ СИГНАЛ: Тихо отправляем данные на сервер для статистики
             try {
-                // Отправляем сигнал на наш бэкенд
-                const response = await fetch("https://neuro-master.online/malysh-api/api/action", {
+                fetch("https://neuro-master.online/malysh-api/api/action", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -149,18 +159,9 @@
                         user_id: 0
                     })
                 });
-                
-                const result = await response.json();
-                console.log("Ура! Сервер ответил:", result);
-                
-                // МАГИЯ ЗВУКА: если сервер прислал ссылку на аудио, включаем её!
-                if (result.audio_url) {
-                    const audio = new Audio(result.audio_url);
-                    audio.play();
-                }
-                
             } catch (error) {
-                console.error("Ой, сервер не отвечает:", error);
+                // Сервер может спать, но ребенок этого даже не заметит, ведь Утя уже заговорила!
+                console.error("Ошибка отправки статистики:", error);
             }
         }
     </script>
