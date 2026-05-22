@@ -70,7 +70,7 @@
             justify-content: center; align-items: center; padding: 20px;
         }
 
-        /* РЕЖИМ 1: Одна большая карточка со слайдером */
+        /* РЕЖИМ 1: Обучение */
         .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
         
         .large-card {
@@ -88,10 +88,7 @@
         }
         .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
-        /* Кнопки перелистывания */
-        .slider-controls {
-            display: flex; gap: 40px; margin-top: 25px;
-        }
+        .slider-controls { display: flex; gap: 40px; margin-top: 25px; }
         .nav-btn {
             font-size: 24px; background: var(--card-bg); color: var(--text-color);
             border-radius: 50%; width: 60px; height: 60px; display: flex;
@@ -100,7 +97,7 @@
         }
         .nav-btn:active { transform: scale(0.9); background-color: #FDFBF7; }
 
-        /* РЕЖИМ 2: Сетка 2x2 (Викторина) */
+        /* РЕЖИМ 2: Викторина (Сетка 2x2) */
         .quiz-mode {
             display: none; width: 100%; max-width: 500px;
             grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; box-sizing: border-box;
@@ -155,10 +152,8 @@
         </div>
         
         <div class="room-content-area">
-            <div id="learning-area" class="learning-mode">
-                </div>
-            <div id="quiz-area" class="quiz-mode">
-                </div>
+            <div id="learning-area" class="learning-mode"></div>
+            <div id="quiz-area" class="quiz-mode"></div>
         </div>
     </div>
 
@@ -169,6 +164,7 @@
         let isQuizMode = false;
         let expectedCardId = null;
         let currentLearningIndex = 0; 
+        let quizCards = [];
 
         const roomsData = {
             'wants': [
@@ -184,10 +180,16 @@
                 { id: 'б', text: 'Б', sound: '' }
             ],
             'numbers': [
-                { id: '1', text: 'Один', sound: '', image: '1.jpg' },
-                { id: '2', text: 'Два', sound: '', image: '2.jpg' },
-                { id: '3', text: 'Три', sound: '', image: '3.jpg' },
-                { id: '4', text: 'Четыре', sound: '', image: '4.jpg' }
+                { id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' },
+                { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' },
+                { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' },
+                { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' },
+                { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' },
+                { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' },
+                { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' },
+                { id: '8', text: 'Восемь', sound: '8.wav', image: '8.jpg' },
+                { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' },
+                { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }
             ]
         };
 
@@ -213,7 +215,7 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        // --- РЕЖИМ ОБУЧЕНИЯ СО СЛАЙДЕРОМ ---
+        // --- РЕЖИМ ОБУЧЕНИЯ ---
         function renderLearningCard() {
             const cards = roomsData[currentRoom];
             const card = cards[currentLearningIndex];
@@ -223,7 +225,6 @@
                 ? `<img src="${card.image}" alt="${card.text}">` 
                 : `<div class="placeholder">🖼️</div>`;
 
-            // Вставляем карточку и кнопки управления под ней
             area.innerHTML = `
                 <div class="large-card" onclick="playSound('${card.sound}')">
                     ${imageHtml}
@@ -243,7 +244,6 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             const cards = roomsData[currentRoom];
             currentLearningIndex--;
-            // Если ушли левее первой карточки — перекидываем на самую последнюю
             if (currentLearningIndex < 0) {
                 currentLearningIndex = cards.length - 1;
             }
@@ -254,7 +254,6 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             const cards = roomsData[currentRoom];
             currentLearningIndex++;
-            // Если дошли до конца — возвращаем в начало
             if (currentLearningIndex >= cards.length) {
                 currentLearningIndex = 0;
             }
@@ -262,6 +261,15 @@
         }
 
         // --- РЕЖИМ ВИКТОРИНЫ ---
+        // Перемешивает массив случайным образом
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function toggleQuiz() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             isQuizMode = !isQuizMode;
@@ -273,7 +281,6 @@
             if (isQuizMode) {
                 learningArea.style.display = 'none';
                 quizArea.classList.add('active');
-                renderQuizGrid();
                 startNewQuizRound();
             } else {
                 quizArea.classList.remove('active');
@@ -283,12 +290,28 @@
             }
         }
 
+        function startNewQuizRound() {
+            const allCards = [...roomsData[currentRoom]];
+            
+            // Выбираем 4 случайные карточки для сетки
+            shuffleArray(allCards);
+            quizCards = allCards.slice(0, 4);
+            
+            // Выбираем одну из этих 4-х в качестве правильного ответа
+            const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)];
+            expectedCardId = randomTarget.id;
+            
+            renderQuizGrid();
+            
+            // Озвучиваем вопрос "Где цифра X?"
+            playSound(`q${expectedCardId}.wav`);
+        }
+
         function renderQuizGrid() {
-            const cards = roomsData[currentRoom];
             const quizArea = document.getElementById('quiz-area');
             quizArea.innerHTML = '';
             
-            cards.forEach(card => {
+            quizCards.forEach(card => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'quiz-card';
                 
@@ -305,22 +328,15 @@
             });
         }
 
-        function startNewQuizRound() {
-            const cards = roomsData[currentRoom];
-            const randomCard = cards[Math.floor(Math.random() * cards.length)];
-            expectedCardId = randomCard.id;
-            
-            console.log(`Утя загадала: Найди ${randomCard.text}`);
-        }
-
         function handleQuizClick(actionId) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             
             if (actionId === expectedCardId) {
-                console.log("Правильно!");
-                setTimeout(startNewQuizRound, 1000);
+                playSound('correct.wav');
+                // Ждем полторы секунды, пока звучит похвала, и запускаем новый раунд
+                setTimeout(startNewQuizRound, 1500);
             } else {
-                console.log("Ой, не то!");
+                playSound('wrong.wav');
             }
         }
 
@@ -338,10 +354,9 @@
         }
 
         function playSound(soundFile) {
-            // Если звук есть и он не пустой (не "undefined" или "")
             if (soundFile && soundFile !== 'undefined') {
                 const audio = new Audio(soundFile);
-                audio.play().catch(err => console.log("Браузер ждет взаимодействия пользователя:", err));
+                audio.play().catch(err => console.log("Браузер ждет клика:", err));
             }
         }
     </script>
