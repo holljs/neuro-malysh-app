@@ -129,13 +129,13 @@
         // Обработка нажатия на Утю
         utyaBtn.addEventListener('click', () => {
             console.log("Отправляем запрос на сервер: малыш нажал на Утю!");
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"});
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
         });
 
         // Функция для карточек действий
         async function playAction(actionType) {
             console.log(`Малыш выбрал карточку: ${actionType}`);
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"});
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
             try {
                 // Отправляем сигнал на наш бэкенд
