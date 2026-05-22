@@ -136,10 +136,28 @@
         });
 
         // Функция для карточек действий
-        function playAction(actionType) {
+        async function playAction(actionType) {
             console.log(`Малыш выбрал карточку: ${actionType}`);
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"});
-            // Сюда добавим проигрывание сгенерированного .wav файла
+            
+            try {
+                // Отправляем сигнал на наш новенький бэкенд
+                const response = await fetch("https://neuro-master.online/malysh-api/api/action", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        action_type: actionType,
+                        user_id: 0 // Пока ставим заглушку, позже достанем реальный ID из ВК
+                    })
+                });
+                
+                const result = await response.json();
+                console.log("Ура! Сервер ответил:", result);
+            } catch (error) {
+                console.error("Ой, сервер не отвечает:", error);
+            }
         }
     </script>
 </body>
