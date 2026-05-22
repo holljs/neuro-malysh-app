@@ -10,7 +10,6 @@
             --bg-color: #F7F5F0; 
             --card-bg: #FFFFFF;
             --text-color: #5C5552; 
-            
             --wants-color: #E3E9E5; 
             --animals-color: #F2EBE5; 
             --letters-color: #E8EBF0; 
@@ -51,12 +50,13 @@
         }
 
         .hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 20px; color: #8C847E; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; align-content: start; }
         
+        /* Главное меню */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; align-content: start; }
         .category-card {
             border-radius: 20px; padding: 30px 10px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+            cursor: pointer; transition: transform 0.2s;
         }
         .category-card:active { transform: scale(0.97); opacity: 0.8; }
         .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
@@ -66,23 +66,59 @@
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
 
-        .cards-area { padding: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+        /* Контейнер для карточек внутри комнаты */
+        .room-content-area {
+            flex-grow: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        /* РЕЖИМ 1: Одна большая карточка (Обучение) */
+        .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        .large-card {
+            background-color: var(--card-bg); border-radius: 30px;
+            padding: 40px 20px; width: 80%; max-width: 350px; text-align: center;
+            font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            cursor: pointer; display: flex; flex-direction: column; align-items: center;
+        }
+        .large-card:active { transform: scale(0.95); }
+        .large-card img {
+            width: 180px; height: 180px; object-fit: cover;
+            border-radius: 20px; margin-bottom: 20px;
+        }
+        .tap-hint { margin-top: 20px; font-size: 14px; color: #A09B98; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* РЕЖИМ 2: Сетка 2x2 (Викторина) */
+        .quiz-mode {
+            display: none; /* Скрыта по умолчанию */
+            width: 100%; max-width: 500px;
+            grid-template-columns: 1fr 1fr; /* Жестко 2 колонки */
+            gap: 15px; padding: 10px; box-sizing: border-box;
+        }
+        .quiz-mode.active { display: grid; }
         
-        .action-card {
+        .quiz-card {
             background-color: var(--card-bg); border-radius: 18px;
-            padding: 25px 15px; width: 40%; text-align: center;
-            font-size: 16px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            cursor: pointer; transition: transform 0.2s;
-            display: flex; flex-direction: column; align-items: center;
+            padding: 15px 10px; text-align: center;
+            font-size: 18px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            cursor: pointer; display: flex; flex-direction: column; align-items: center;
         }
-        .action-card:active { transform: scale(0.96); background-color: #FDFBF7; }
+        .quiz-card:active { transform: scale(0.96); background-color: #FDFBF7; }
+        .quiz-card img {
+            width: 90px; height: 90px; object-fit: cover;
+            border-radius: 12px; margin-bottom: 10px;
+        }
+
+        /* Заглушка, если нет картинки */
+        .placeholder { background-color: #F7F5F0; display: flex; align-items: center; justify-content: center; color: #CCC; }
+        .large-card .placeholder { width: 180px; height: 180px; border-radius: 20px; margin-bottom: 20px; font-size: 40px; }
+        .quiz-card .placeholder { width: 90px; height: 90px; border-radius: 12px; margin-bottom: 10px; font-size: 24px; }
         
-        /* Место под будущую картинку в карточке */
-        .card-img-placeholder {
-            width: 80px; height: 80px; background-color: #F7F5F0;
-            border-radius: 10px; margin-bottom: 10px; display: flex;
-            align-items: center; justify-content: center; font-size: 24px; color: #CCC;
-        }
     </style>
 </head>
 <body>
@@ -112,7 +148,14 @@
             <span id="room-title">Комната</span>
             <div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()">🎓 Игра</div>
         </div>
-        <div id="room-content" class="cards-area"></div>
+        
+        <div class="room-content-area">
+            <div id="learning-area" class="learning-mode">
+                </div>
+
+            <div id="quiz-area" class="quiz-mode">
+                </div>
+        </div>
     </div>
 
     <script>
@@ -121,8 +164,8 @@
         let currentRoom = '';
         let isQuizMode = false;
         let expectedCardId = null;
+        let currentLearningIndex = 0; // Какую карточку показываем сейчас
 
-        // Данные комнат. Добавил по 4 карточки для цифр, чтобы викторина была полноценной
         const roomsData = {
             'wants': [
                 { id: 'пить', text: 'Хочу пить', sound: 'drink.wav' },
@@ -140,59 +183,127 @@
                 { id: '1', text: 'Один', sound: '', image: '1.jpg' },
                 { id: '2', text: 'Два', sound: '', image: '2.jpg' },
                 { id: '3', text: 'Три', sound: '', image: '3.jpg' },
-                { id: '4', text: 'Четыре', sound: '', image: '4.jpg' } // <-- Обновили здесь!
+                { id: '4', text: 'Четыре', sound: '', image: '4.jpg' }
             ]
         };
 
         function openRoom(roomId, title) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             currentRoom = roomId;
-            isQuizMode = false; // Сбрасываем викторину при входе
-            updateQuizToggleUI();
+            isQuizMode = false; 
+            currentLearningIndex = 0; 
             
             document.getElementById('room-title').innerText = title;
-            renderCards(roomId);
+            updateQuizToggleUI();
+            
+            renderLearningCard(); // Показываем первую большую карточку
 
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-room').classList.add('active');
         }
 
-        function renderCards(roomId) {
-            const contentArea = document.getElementById('room-content');
-            contentArea.innerHTML = ''; 
-            
-            roomsData[roomId].forEach(card => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'action-card';
-                
-                // Проверяем: если есть картинка - вставляем её. Если нет - ставим серый квадрат-заглушку.
-                const imageHtml = card.image 
-                    ? `<img src="${card.image}" class="card-img-placeholder" style="background-color: transparent;">` 
-                    : `<div class="card-img-placeholder">🖼️</div>`;
-
-                cardDiv.innerHTML = `
-                    ${imageHtml}
-                    <div>${card.text}</div>
-                `;
-                cardDiv.onclick = () => handleCardClick(card.id, card.sound);
-                contentArea.appendChild(cardDiv);
-            });
-        }
-
         function goHome() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-            isQuizMode = false; // Сбрасываем при выходе
+            isQuizMode = false; 
             document.getElementById('screen-room').classList.remove('active');
             document.getElementById('screen-menu').classList.add('active');
         }
 
+        // --- РЕЖИМ ОБУЧЕНИЯ ---
+        function renderLearningCard() {
+            const cards = roomsData[currentRoom];
+            const card = cards[currentLearningIndex];
+            const area = document.getElementById('learning-area');
+            
+            const imageHtml = card.image 
+                ? `<img src="${card.image}" alt="${card.text}">` 
+                : `<div class="placeholder">🖼️</div>`;
+
+            area.innerHTML = `
+                <div class="large-card" onclick="nextLearningCard()">
+                    ${imageHtml}
+                    <div>${card.text}</div>
+                </div>
+                <div class="tap-hint">Нажми, чтобы перевернуть 👆</div>
+            `;
+            
+            // Автоматически озвучиваем при появлении
+            playSound(card.sound);
+        }
+
+        function nextLearningCard() {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            const cards = roomsData[currentRoom];
+            currentLearningIndex++;
+            if (currentLearningIndex >= cards.length) {
+                currentLearningIndex = 0; // Начинаем сначала, если дошли до конца
+            }
+            renderLearningCard();
+        }
+
+        // --- РЕЖИМ ВИКТОРИНЫ ---
         function toggleQuiz() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             isQuizMode = !isQuizMode;
             updateQuizToggleUI();
             
+            const learningArea = document.getElementById('learning-area');
+            const quizArea = document.getElementById('quiz-area');
+
             if (isQuizMode) {
+                learningArea.style.display = 'none';
+                quizArea.classList.add('active');
+                renderQuizGrid();
                 startNewQuizRound();
+            } else {
+                quizArea.classList.remove('active');
+                learningArea.style.display = 'flex';
+                currentLearningIndex = 0;
+                renderLearningCard();
+            }
+        }
+
+        function renderQuizGrid() {
+            const cards = roomsData[currentRoom];
+            const quizArea = document.getElementById('quiz-area');
+            quizArea.innerHTML = '';
+            
+            cards.forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'quiz-card';
+                
+                const imageHtml = card.image 
+                    ? `<img src="${card.image}">` 
+                    : `<div class="placeholder">🖼️</div>`;
+
+                cardDiv.innerHTML = `
+                    ${imageHtml}
+                    <div>${card.text}</div>
+                `;
+                cardDiv.onclick = () => handleQuizClick(card.id);
+                quizArea.appendChild(cardDiv);
+            });
+        }
+
+        function startNewQuizRound() {
+            const cards = roomsData[currentRoom];
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            expectedCardId = randomCard.id;
+            
+            console.log(`Утя загадала: Найди ${randomCard.text}`);
+            // TODO: Здесь будет звук Ути: "Где цифра X?"
+        }
+
+        function handleQuizClick(actionId) {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            
+            if (actionId === expectedCardId) {
+                console.log("Правильно!");
+                // TODO: Звук "Правильно, молодец!"
+                setTimeout(startNewQuizRound, 1000);
+            } else {
+                console.log("Ой, не то!");
+                // TODO: Звук "Попробуй еще раз"
             }
         }
 
@@ -200,7 +311,7 @@
             const btn = document.getElementById('quizToggle');
             if (isQuizMode) {
                 btn.innerText = "🛑 Выключить";
-                btn.style.backgroundColor = "#95D5B2"; // Зеленый фон для активной игры
+                btn.style.backgroundColor = "#95D5B2";
                 btn.style.color = "#FFFFFF";
             } else {
                 btn.innerText = "🎓 Игра";
@@ -209,48 +320,11 @@
             }
         }
 
-        function startNewQuizRound() {
-            const cards = roomsData[currentRoom];
-            // Выбираем случайную карточку
-            const randomCard = cards[Math.floor(Math.random() * cards.length)];
-            expectedCardId = randomCard.id;
-            
-            console.log(`Утя загадала: ${randomCard.text}`);
-            
-            // Здесь мы позже добавим голос Ути "Где цифра два?"
-            // const questionAudio = new Audio(`where_is_${randomCard.id}.wav`);
-            // questionAudio.play();
-        }
-
-        async function handleCardClick(actionId, soundFile) {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-            
-            if (isQuizMode) {
-                // ЛОГИКА ВИКТОРИНЫ
-                if (actionId === expectedCardId) {
-                    console.log("Правильно!");
-                    // Тут будет радостный звук "Молодец!"
-                    setTimeout(startNewQuizRound, 1500); // Через 1.5 секунды новый вопрос
-                } else {
-                    console.log("Ой, не то!");
-                    // Тут будет звук "Попробуй еще раз"
-                }
-            } else {
-                // ОБЫЧНЫЙ РЕЖИМ (Обучение)
-                if (soundFile) {
-                    const audio = new Audio(soundFile);
-                    audio.play().catch(err => console.log("Блок звука:", err));
-                }
+        function playSound(soundFile) {
+            if (soundFile) {
+                const audio = new Audio(soundFile);
+                audio.play().catch(err => console.log("Браузер ждет взаимодействия пользователя:", err));
             }
-            
-            // Фоновая статистика на сервер
-            try {
-                fetch("https://neuro-master.online/malysh-api/api/action", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action_type: actionId, user_id: 0 })
-                });
-            } catch (e) {}
         }
     </script>
 </body>
