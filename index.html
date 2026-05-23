@@ -309,8 +309,8 @@
             document.getElementById('color-game-area').classList.remove('active');
             document.getElementById('learning-area').style.display = 'flex';
             
-            // Скрываем/показываем кнопку Академической игры
-            document.getElementById('quizToggle').style.display = (roomId === 'colors') ? 'none' : 'block';
+            // ИСПРАВЛЕНО: Кнопка "Игра" теперь ВСЕГДА видна во всех комнатах!
+            document.getElementById('quizToggle').style.display = 'block';
 
             document.getElementById('room-title').innerText = title;
             updateQuizToggleUI();
