@@ -25,7 +25,7 @@
             height: 100vh; overflow: hidden; user-select: none; 
         }
 
-        /* --- НОВАЯ ДВУХСТРОЧНАЯ ШАПКА --- */
+        /* --- ДВУХСТРОЧНАЯ ШАПКА --- */
         .header {
             width: 100%; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
@@ -82,21 +82,15 @@
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; padding: 20px;
+            position: relative; width: 100%; box-sizing: border-box;
         }
 
-        /* --- КНОПКА ПЕРЕКЛЮЧЕНИЯ ЗВУКОВ --- */
+        /* --- ПЕРЕКЛЮЧАТЕЛЬ ЗВУКОВ / НАЗВАНИЙ --- */
         .sound-mode-switch {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 8px 18px;
-            margin-bottom: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #7A90A4;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            cursor: pointer;
-            user-select: none;
-            display: inline-block;
+            background-color: var(--card-bg); border-radius: 20px;
+            padding: 8px 18px; margin-bottom: 20px;
+            font-size: 15px; font-weight: 600; color: #7A90A4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04); cursor: pointer;
             transition: transform 0.1s;
         }
         .sound-mode-switch:active { transform: scale(0.95); }
@@ -113,19 +107,15 @@
         }
         .large-card:active { transform: scale(0.97); }
         
-        .large-card img {
-            width: 180px; height: 180px; object-fit: cover;
-            border-radius: 20px; margin-bottom: 20px;
-        }
+        .large-card img { width: 180px; height: 180px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; }
         .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
-        /* Кнопки перелистывания */
         .slider-controls { display: flex; gap: 40px; margin-top: 25px; }
         .nav-btn {
             font-size: 24px; background: var(--card-bg); color: var(--text-color);
             border-radius: 50%; width: 60px; height: 60px; display: flex;
             align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; user-select: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer;
         }
         .nav-btn:active { transform: scale(0.9); background-color: #FDFBF7; }
 
@@ -137,25 +127,61 @@
         .quiz-mode.active { display: grid; }
         
         .quiz-card {
-            background-color: var(--card-bg); border-radius: 18px;
-            padding: 10px; text-align: center; font-size: 18px; font-weight: 500; 
+            background-color: var(--card-bg); border-radius: 18px; padding: 10px;
+            text-align: center; font-size: 18px; font-weight: 500; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; 
             display: flex; flex-direction: column; align-items: center;
             width: 100%; box-sizing: border-box; 
         }
         .quiz-card:active { transform: scale(0.96); background-color: #FDFBF7; }
-        
-        .quiz-card img {
-            width: 100%; 
-            aspect-ratio: 1 / 1; 
-            object-fit: cover;
-            border-radius: 12px; margin-bottom: 12px;
-        }
+        .quiz-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
 
         .placeholder { background-color: #F7F5F0; display: flex; align-items: center; justify-content: center; color: #CCC; }
         .large-card .placeholder { width: 180px; height: 180px; border-radius: 20px; margin-bottom: 20px; font-size: 40px; }
         .quiz-card .placeholder { width: 100%; aspect-ratio: 1/1; border-radius: 12px; margin-bottom: 12px; font-size: 24px; }
         
+        /* --- ИГРОВОЙ ИНТЕРФЕЙС "ЦВЕТА" --- */
+        .color-game-container {
+            display: none; width: 100%; height: 100%; max-width: 600px;
+            grid-template-columns: 1fr 1fr; gap: 40px; padding: 10px;
+            box-sizing: border-box; position: relative;
+        }
+        .color-game-container.active { display: grid; }
+
+        .duck-column, .boat-column {
+            display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%;
+        }
+
+        .draggable-duck {
+            width: 70px; height: 70px; object-fit: contain; z-index: 10;
+            cursor: grab; touch-action: none; position: relative;
+            transition: transform 0.1s ease;
+        }
+        .draggable-duck.dragging { z-index: 100; cursor: grabbing; transform: scale(1.1); }
+        .draggable-duck.matched { opacity: 0.2; pointer-events: none; transform: scale(0.8); transition: all 0.4s; }
+
+        .target-boat {
+            width: 85px; height: 85px; object-fit: contain;
+            border: 2px dashed transparent; border-radius: 20px;
+            padding: 5px; box-sizing: border-box; transition: all 0.3s;
+            position: relative;
+        }
+        /* Сюда садится уточка, когда цвет угадан */
+        .target-boat.matched::after {
+            content: ''; position: absolute; top: 5px; left: 12px;
+            width: 55px; height: 55px;
+            background-size: contain; background-repeat: no-repeat;
+        }
+        /* Ставим фоновые картинки для угаданных уточек внутри лодок */
+        .target-boat[data-color="yellow"].matched::after { background-image: url('duck_yellow.png'); }
+        .target-boat[data-color="orange"].matched::after { background-image: url('duck_orange.png'); }
+        .target-boat[data-color="red"].matched::after { background-image: url('duck_red.png'); }
+        .target-boat[data-color="pink"].matched::after { background-image: url('duck_pink.png'); }
+        .target-boat[data-color="purple"].matched::after { background-image: url('duck_purple.png'); }
+        .target-boat[data-color="blue"].matched::after { background-image: url('duck_blue.png'); }
+        .target-boat[data-color="green"].matched::after { background-image: url('duck_green.png'); }
+        .target-boat[data-color="grey"].matched::after { background-image: url('duck_grey.png'); }
+
     </style>
 </head>
 <body>
@@ -164,8 +190,8 @@
         <div class="header" style="justify-content: center;">Нейро-Малыш</div>
         <div class="hero-title">Во что поиграем?</div>
         <div class="menu-grid">
-            <div class="category-card cat-wants" onclick="openRoom('wants', 'Хотелки')">
-                <div class="category-title">Хотелки</div>
+            <div class="category-card cat-wants" onclick="openRoom('colors', 'Цвета')">
+                <div class="category-title">🎨 Цвета</div>
             </div>
             <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
                 <div class="category-title">Животные</div>
@@ -193,6 +219,11 @@
         <div class="room-content-area">
             <div id="learning-area" class="learning-mode"></div>
             <div id="quiz-area" class="quiz-mode"></div>
+            
+            <div id="color-game-area" class="color-game-container">
+                <div class="duck-column" id="duck-zone"></div>
+                <div class="boat-column" id="boat-zone"></div>
+            </div>
         </div>
     </div>
 
@@ -204,12 +235,23 @@
         let expectedCardId = null;
         let currentLearningIndex = 0; 
         let quizCards = [];
-        let playNamesMode = false; // Переключатель: false = звуки, true = названия
+        let playNamesMode = false; 
+
+        // Переменные для мобильного перетаскивания
+        let activeDuck = null;
+        let startX = 0, startY = 0;
+        let matchedColorsCount = 0;
 
         const roomsData = {
-            'wants': [
-                { id: 'пить', text: 'Хочу пить', sound: 'drink.wav' },
-                { id: 'играть', text: 'Играть', sound: 'play.wav' }
+            'colors': [
+                { id: 'yellow', text: 'Жёлтый', sound: 'color_yellow.wav', image: 'duck_yellow.png', boat: 'boat_yellow.png' },
+                { id: 'orange', text: 'Оранжевый', sound: 'color_orange.wav', image: 'duck_orange.png', boat: 'boat_orange.png' },
+                { id: 'red', text: 'Красный', sound: 'color_red.wav', image: 'duck_red.png', boat: 'boat_red.png' },
+                { id: 'pink', text: 'Розовый', sound: 'color_pink.wav', image: 'duck_pink.png', boat: 'boat_pink.png' },
+                { id: 'purple', text: 'Фиолетовый', sound: 'color_purple.wav', image: 'duck_purple.png', boat: 'boat_purple.png' },
+                { id: 'blue', text: 'Синий', sound: 'color_blue.wav', image: 'duck_blue.png', boat: 'boat_blue.png' },
+                { id: 'green', text: 'Зелёный', sound: 'color_green.wav', image: 'duck_green.png', boat: 'boat_green.png' },
+                { id: 'grey', text: 'Серый', sound: 'color_grey.wav', image: 'duck_grey.png', boat: 'boat_grey.png' }
             ],
             'animals': [
                 { id: 'кошка', text: 'Кошка', sound: 'a1.wav', image: 'a1.jpg' },
@@ -250,7 +292,7 @@
                 { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' },
                 { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' },
                 { id: '8', text: 'Восемь', sound: '8.wav', image: '8.jpg' },
-                { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' },
+                { id: '9', text: 'Демять', sound: '9.wav', image: '9.jpg' },
                 { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }
             ]
         };
@@ -260,14 +302,16 @@
             currentRoom = roomId;
             isQuizMode = false; 
             currentLearningIndex = 0; 
-            playNamesMode = false; // При входе всегда включаем звуки
+            playNamesMode = false; 
             
-            // --- НОВОЕ: Сбрасываем экран ---
-            // Принудительно прячем викторину и возвращаем режим обучения
+            // Принудительно очищаем экраны
             document.getElementById('quiz-area').classList.remove('active');
+            document.getElementById('color-game-area').classList.remove('active');
             document.getElementById('learning-area').style.display = 'flex';
-            // -------------------------------
             
+            // Скрываем/показываем кнопку Академической игры
+            document.getElementById('quizToggle').style.display = (roomId === 'colors') ? 'none' : 'block';
+
             document.getElementById('room-title').innerText = title;
             updateQuizToggleUI();
             
@@ -284,12 +328,11 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
-        // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЗВУКОВ ---
         function toggleSoundMode(event) {
-            if (event) event.stopPropagation(); // Не даем клику перейти на картинку
+            if (event) event.stopPropagation();
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             playNamesMode = !playNamesMode;
-            renderLearningCard(); // Перерисовываем карточку с новой кнопкой и звуком
+            renderLearningCard(); 
         }
 
         // --- РЕЖИМ ОБУЧЕНИЯ ---
@@ -302,14 +345,12 @@
                 ? `<img src="${card.image}" alt="${card.text}">` 
                 : `<div class="placeholder">🖼️</div>`;
 
-            // Рисуем кнопку переключателя только в комнате животных
             let soundModeHTML = '';
             if (currentRoom === 'animals') {
                 const modeText = playNamesMode ? "🗣️ Говорим названия" : "🔊 Слушаем звуки";
                 soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${modeText}</div>`;
             }
 
-            // Магия: если включены названия, берем a1.wav и делаем из него na1.wav
             let currentSoundToPlay = card.sound;
             if (currentRoom === 'animals' && playNamesMode && card.sound) {
                 currentSoundToPlay = 'n' + card.sound; 
@@ -335,9 +376,7 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             const cards = roomsData[currentRoom];
             currentLearningIndex--;
-            if (currentLearningIndex < 0) {
-                currentLearningIndex = cards.length - 1;
-            }
+            if (currentLearningIndex < 0) { currentLearningIndex = cards.length - 1; }
             renderLearningCard();
         }
 
@@ -345,21 +384,11 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             const cards = roomsData[currentRoom];
             currentLearningIndex++;
-            if (currentLearningIndex >= cards.length) {
-                currentLearningIndex = 0;
-            }
+            if (currentLearningIndex >= cards.length) { currentLearningIndex = 0; }
             renderLearningCard();
         }
 
-        // --- РЕЖИМ ВИКТОРИНЫ ---
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
+        // --- РЕЖИМ ИГРЫ (ОБЩИЙ ДЛЯ КОМНАТ) ---
         function toggleQuiz() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             isQuizMode = !isQuizMode;
@@ -367,33 +396,138 @@
             
             const learningArea = document.getElementById('learning-area');
             const quizArea = document.getElementById('quiz-area');
+            const colorArea = document.getElementById('color-game-area');
 
             if (isQuizMode) {
                 learningArea.style.display = 'none';
-                quizArea.classList.add('active');
-                startNewQuizRound();
+                if (currentRoom === 'colors') {
+                    colorArea.classList.add('active');
+                    setupColorGame();
+                } else {
+                    quizArea.classList.add('active');
+                    startNewQuizRound();
+                }
             } else {
                 quizArea.classList.remove('active');
+                colorArea.classList.remove('active');
                 learningArea.style.display = 'flex';
                 currentLearningIndex = 0;
                 renderLearningCard();
             }
         }
 
+        // --- ЛОГИКА ИГРЫ "ЦВЕТА" (DRAG AND DROP) ---
+        function setupColorGame() {
+            const duckZone = document.getElementById('duck-zone');
+            const boatZone = document.getElementById('boat-zone');
+            duckZone.innerHTML = '';
+            boatZone.innerHTML = '';
+            matchedColorsCount = 0;
+
+            playSound('color_intro.wav');
+
+            // Берём палитру, перемешиваем отдельно уток и отдельно лодки
+            let ducks = shuffleArray([...roomsData['colors']]);
+            let boats = shuffleArray([...roomsData['colors']]);
+
+            ducks.forEach(item => {
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.className = 'draggable-duck';
+                img.setAttribute('data-color', item.id);
+                // Подключаем мобильные тач-события
+                img.addEventListener('touchstart', handleTouchStart, {passive: false});
+                img.addEventListener('touchmove', handleTouchMove, {passive: false});
+                img.addEventListener('touchend', handleTouchEnd);
+                duckZone.appendChild(img);
+            });
+
+            boats.forEach(item => {
+                const img = document.createElement('img');
+                img.src = item.boat;
+                img.className = 'target-boat';
+                img.setAttribute('data-color', item.id);
+                boatZone.appendChild(img);
+            });
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            if (e.target.classList.contains('matched')) return;
+            activeDuck = e.target;
+            activeDuck.classList.add('dragging');
+            
+            const touch = e.touches[0];
+            // Запоминаем изначальные координаты утки на экране
+            const rect = activeDuck.getBoundingClientRect();
+            startX = touch.clientX - rect.left;
+            startY = touch.clientY - rect.top;
+        }
+
+        function handleTouchMove(e) {
+            if (!activeDuck) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            
+            // Двигаем утку вслед за пальцем
+            activeDuck.style.position = 'fixed';
+            activeDuck.style.left = (touch.clientX - startX) + 'px';
+            activeDuck.style.top = (touch.clientY - startY) + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!activeDuck) return;
+            activeDuck.classList.remove('dragging');
+
+            const duckColor = activeDuck.getAttribute('data-color');
+            const touch = e.changedTouches[0];
+            
+            // Ищем, над каким элементом отпустили палец
+            activeDuck.style.display = 'none'; // Временно прячем, чтобы заглянуть "под неё"
+            const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+            activeDuck.style.display = 'block'; // Возвращаем обратно
+
+            let targetBoat = null;
+            if (elementUnderTouch && elementUnderTouch.classList.contains('target-boat')) {
+                targetBoat = elementUnderTouch;
+            }
+
+            // Проверяем попадание
+            if (targetBoat && targetBoat.getAttribute('data-color') === duckColor && !targetBoat.classList.contains('matched')) {
+                // ЦВЕТ СОВПАЛ!
+                vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+                activeDuck.classList.add('matched');
+                targetBoat.classList.add('matched');
+                
+                playSound('color_correct.wav');
+                matchedColorsCount++;
+
+                // Проверяем полную победу (все 8 собраны)
+                if (matchedColorsCount === roomsData['colors'].length) {
+                    setTimeout(() => { playSound('color_win.wav'); }, 1000);
+                }
+            } else {
+                // ПРОМАХ — возвращаем уточку на место
+                vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+                activeDuck.style.position = 'relative';
+                activeDuck.style.left = '0px';
+                activeDuck.style.top = '0px';
+            }
+
+            activeDuck = null;
+        }
+
+        // --- ВИКТОРИНА (БАЗОВАЯ ЛОГИКА ДЛЯ ЦИФР И ЖИВОТНЫХ) ---
         function startNewQuizRound() {
             const allCards = [...roomsData[currentRoom]];
-            
-            // Выбираем 4 случайные карточки для сетки
             shuffleArray(allCards);
             quizCards = allCards.slice(0, 4);
             
-            // Выбираем одну из этих 4-х в качестве правильного ответа
             const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)];
             expectedCardId = randomTarget.id;
             
             renderQuizGrid();
             
-            // Озвучиваем вопрос
             if (randomTarget.sound) {
                 const soundFilename = randomTarget.sound.split('/').pop(); 
                 const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); 
@@ -408,15 +542,9 @@
             quizCards.forEach(card => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'quiz-card';
-                
-                const imageHtml = card.image 
-                    ? `<img src="${card.image}">` 
-                    : `<div class="placeholder">🖼️</div>`;
+                const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder">🖼️</div>`;
 
-                cardDiv.innerHTML = `
-                    ${imageHtml}
-                    <div>${card.text}</div>
-                `;
+                cardDiv.innerHTML = `${imageHtml}<div>${card.text}</div>`;
                 cardDiv.onclick = () => handleQuizClick(card.id);
                 quizArea.appendChild(cardDiv);
             });
@@ -424,26 +552,30 @@
 
         function handleQuizClick(actionId) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-            
             if (actionId === expectedCardId) {
                 playSound('correct.wav');
-                // Ждем полторы секунды, пока звучит похвала, и запускаем новый раунд
                 setTimeout(startNewQuizRound, 1500);
             } else {
                 playSound('wrong.wav');
             }
         }
 
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function updateQuizToggleUI() {
             const btn = document.getElementById('quizToggle');
             if (isQuizMode) {
                 btn.innerText = "🛑 Выключить";
-                btn.style.backgroundColor = "#95D5B2";
-                btn.style.color = "#FFFFFF";
+                btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF";
             } else {
                 btn.innerText = "🎓 Игра";
-                btn.style.backgroundColor = "#FFFFFF";
-                btn.style.color = "var(--text-color)";
+                btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)";
             }
         }
 
