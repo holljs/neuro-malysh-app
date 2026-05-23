@@ -30,12 +30,12 @@
             width: 100%; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             box-sizing: border-box;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color); 
         }
 
         .header-top {
             display: flex; justify-content: space-between; width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 10px; 
         }
 
         .back-btn, .quiz-toggle {
@@ -44,7 +44,7 @@
             border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             color: var(--text-color); font-weight: 500;
             transition: background-color 0.3s;
-            white-space: nowrap;
+            white-space: nowrap; 
         }
         .back-btn:active, .quiz-toggle:active { transform: scale(0.95); opacity: 0.8; }
 
@@ -84,6 +84,23 @@
             justify-content: center; align-items: center; padding: 20px;
         }
 
+        /* --- КНОПКА ПЕРЕКЛЮЧЕНИЯ ЗВУКОВ --- */
+        .sound-mode-switch {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 8px 18px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #7A90A4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+        .sound-mode-switch:active { transform: scale(0.95); }
+
         /* РЕЖИМ 1: Одна большая карточка со слайдером */
         .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
         
@@ -112,7 +129,7 @@
         }
         .nav-btn:active { transform: scale(0.9); background-color: #FDFBF7; }
 
-        /* --- ОБНОВЛЕННАЯ СЕТКА ВИКТОРИНЫ --- */
+        /* РЕЖИМ 2: Сетка 2x2 (Викторина) */
         .quiz-mode {
             display: none; width: 100%; max-width: 500px;
             grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; box-sizing: border-box;
@@ -124,7 +141,7 @@
             padding: 10px; text-align: center; font-size: 18px; font-weight: 500; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; 
             display: flex; flex-direction: column; align-items: center;
-            width: 100%; box-sizing: border-box;
+            width: 100%; box-sizing: border-box; 
         }
         .quiz-card:active { transform: scale(0.96); background-color: #FDFBF7; }
         
@@ -187,6 +204,7 @@
         let expectedCardId = null;
         let currentLearningIndex = 0; 
         let quizCards = [];
+        let playNamesMode = false; // Переключатель: false = звуки, true = названия
 
         const roomsData = {
             'wants': [
@@ -242,6 +260,13 @@
             currentRoom = roomId;
             isQuizMode = false; 
             currentLearningIndex = 0; 
+            playNamesMode = false; // При входе всегда включаем звуки
+            
+            // --- НОВОЕ: Сбрасываем экран ---
+            // Принудительно прячем викторину и возвращаем режим обучения
+            document.getElementById('quiz-area').classList.remove('active');
+            document.getElementById('learning-area').style.display = 'flex';
+            // -------------------------------
             
             document.getElementById('room-title').innerText = title;
             updateQuizToggleUI();
@@ -259,6 +284,14 @@
             document.getElementById('screen-menu').classList.add('active');
         }
 
+        // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЗВУКОВ ---
+        function toggleSoundMode(event) {
+            if (event) event.stopPropagation(); // Не даем клику перейти на картинку
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            playNamesMode = !playNamesMode;
+            renderLearningCard(); // Перерисовываем карточку с новой кнопкой и звуком
+        }
+
         // --- РЕЖИМ ОБУЧЕНИЯ ---
         function renderLearningCard() {
             const cards = roomsData[currentRoom];
@@ -269,8 +302,22 @@
                 ? `<img src="${card.image}" alt="${card.text}">` 
                 : `<div class="placeholder">🖼️</div>`;
 
+            // Рисуем кнопку переключателя только в комнате животных
+            let soundModeHTML = '';
+            if (currentRoom === 'animals') {
+                const modeText = playNamesMode ? "🗣️ Говорим названия" : "🔊 Слушаем звуки";
+                soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${modeText}</div>`;
+            }
+
+            // Магия: если включены названия, берем a1.wav и делаем из него na1.wav
+            let currentSoundToPlay = card.sound;
+            if (currentRoom === 'animals' && playNamesMode && card.sound) {
+                currentSoundToPlay = 'n' + card.sound; 
+            }
+
             area.innerHTML = `
-                <div class="large-card" onclick="playSound('${card.sound}')">
+                ${soundModeHTML}
+                <div class="large-card" onclick="playSound('${currentSoundToPlay}')">
                     ${imageHtml}
                     <div>${card.text}</div>
                 </div>
@@ -281,7 +328,7 @@
                 </div>
             `;
             
-            playSound(card.sound);
+            playSound(currentSoundToPlay);
         }
 
         function prevLearningCard() {
