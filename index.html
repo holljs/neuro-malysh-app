@@ -30,30 +30,26 @@
             width: 100%; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             box-sizing: border-box;
-            background-color: var(--bg-color); /* Чтобы не было видно фона за ней */
+            background-color: var(--bg-color);
         }
 
-        /* Первая строка: Кнопки */
         .header-top {
             display: flex; justify-content: space-between; width: 100%;
-            margin-bottom: 10px; /* Отступ от заголовка */
+            margin-bottom: 10px;
         }
 
-        /* Восстановили крупные, удобные размеры */
         .back-btn, .quiz-toggle {
             font-size: 16px; cursor: pointer;
             padding: 10px 15px; background: var(--card-bg);
             border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             color: var(--text-color); font-weight: 500;
             transition: background-color 0.3s;
-            white-space: nowrap; /* Текст не переносится */
+            white-space: nowrap;
         }
         .back-btn:active, .quiz-toggle:active { transform: scale(0.95); opacity: 0.8; }
 
-        /* Вторая строка: Заголовок */
         .header-title-row { width: 100%; text-align: center; }
         
-        /* Убрали абсолютное позиционирование */
         #room-title {
             font-size: 22px; font-weight: 600;
             color: #7A90A4; display: inline-block;
@@ -116,29 +112,32 @@
         }
         .nav-btn:active { transform: scale(0.9); background-color: #FDFBF7; }
 
-        /* РЕЖИМ 2: Сетка 2x2 (Викторина) */
+        /* --- ОБНОВЛЕННАЯ СЕТКА ВИКТОРИНЫ --- */
         .quiz-mode {
             display: none; width: 100%; max-width: 500px;
-            grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; box-sizing: border-box;
+            grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; box-sizing: border-box;
         }
         .quiz-mode.active { display: grid; }
         
         .quiz-card {
             background-color: var(--card-bg); border-radius: 18px;
-            padding: 15px 10px; text-align: center; font-size: 18px; font-weight: 500; 
+            padding: 10px; text-align: center; font-size: 18px; font-weight: 500; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; 
             display: flex; flex-direction: column; align-items: center;
+            width: 100%; box-sizing: border-box;
         }
         .quiz-card:active { transform: scale(0.96); background-color: #FDFBF7; }
         
         .quiz-card img {
-            width: 90px; height: 90px; object-fit: cover;
-            border-radius: 12px; margin-bottom: 10px;
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            object-fit: cover;
+            border-radius: 12px; margin-bottom: 12px;
         }
 
         .placeholder { background-color: #F7F5F0; display: flex; align-items: center; justify-content: center; color: #CCC; }
         .large-card .placeholder { width: 180px; height: 180px; border-radius: 20px; margin-bottom: 20px; font-size: 40px; }
-        .quiz-card .placeholder { width: 90px; height: 90px; border-radius: 12px; margin-bottom: 10px; font-size: 24px; }
+        .quiz-card .placeholder { width: 100%; aspect-ratio: 1/1; border-radius: 12px; margin-bottom: 12px; font-size: 24px; }
         
     </style>
 </head>
@@ -175,10 +174,8 @@
         </div>
         
         <div class="room-content-area">
-            <div id="learning-area" class="learning-mode">
-                </div>
-            <div id="quiz-area" class="quiz-mode">
-                </div>
+            <div id="learning-area" class="learning-mode"></div>
+            <div id="quiz-area" class="quiz-mode"></div>
         </div>
     </div>
 
@@ -308,7 +305,6 @@
         }
 
         // --- РЕЖИМ ВИКТОРИНЫ ---
-        // Перемешивает массив случайным образом
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -350,8 +346,12 @@
             
             renderQuizGrid();
             
-            // Озвучиваем вопрос "Где цифра X?"
-            playSound(`q${expectedCardId}.wav`);
+            // Озвучиваем вопрос
+            if (randomTarget.sound) {
+                const soundFilename = randomTarget.sound.split('/').pop(); 
+                const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); 
+                playSound(`q${fileBase}.wav`); 
+            }
         }
 
         function renderQuizGrid() {
