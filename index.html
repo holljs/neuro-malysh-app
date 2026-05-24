@@ -27,7 +27,7 @@
 
         /* --- ШАПКА --- */
         .header {
-            width: 100%; padding: 10px 15px; /* Уменьшили вертикальный padding */
+            width: 100%; padding: 10px 15px;
             display: flex; flex-direction: column; align-items: center;
             box-sizing: border-box;
             background-color: var(--bg-color); 
@@ -75,9 +75,9 @@
 
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 10px; /* Уменьшили padding */
+            justify-content: center; align-items: center; padding: 10px;
             position: relative; width: 100%; box-sizing: border-box;
-            overflow: hidden; /* Важно для Drag-and-Drop */
+            overflow: hidden;
         }
 
         /* --- ПЕРЕКЛЮЧАТЕЛЬ --- */
@@ -99,7 +99,7 @@
             font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             cursor: pointer; display: flex; flex-direction: column; align-items: center;
         }
-        .large-card img { width: 180px; height: 180px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; }
+        .large-card img { width: 180px; height: 180px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
         .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
         .slider-controls { display: flex; gap: 40px; margin-top: 25px; }
@@ -110,9 +110,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer;
         }
 
-        /* ВИКТОРЫНА 2x2 */
+        /* ВИКТОРИНА 2x2 */
         .quiz-mode {
-            display: none; width: 100%; height: 100%;
+            display: none; width: 100%; height: 100%; max-width: 500px;
             grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; padding: 10px; box-sizing: border-box;
         }
         .quiz-mode.active { display: grid; }
@@ -124,13 +124,12 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             width: 100%; height: 100%; box-sizing: border-box; 
         }
-        .quiz-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
+        .quiz-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
 
-        
-        /* --- ИГРА "ЦВЕТА" - СУПЕР-КРУПНО --- */
+        /* --- ИГРА "ЦВЕТА" --- */
         .color-game-container {
             display: none; width: 100%; height: 100%;
-            grid-template-columns: 1fr 1fr; gap: 20px; /* Уменьшили gap */
+            grid-template-columns: 1fr 1fr; gap: 20px;
             padding: 10px 5px; box-sizing: border-box; position: relative;
         }
         .color-game-container.active { display: grid; }
@@ -139,7 +138,6 @@
             display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; width: 100%;
         }
 
-        /* Утки - МАКСИМАЛЬНО крупные (40% ширины экрана) */
         .draggable-duck {
             width: 40vw; height: 40vw; max-width: 160px; max-height: 160px;
             object-fit: contain; z-index: 10;
@@ -148,12 +146,10 @@
         .draggable-duck.dragging { z-index: 100; transform: scale(1.1); }
         .draggable-duck.matched { opacity: 0.1; pointer-events: none; transform: scale(0.7); transition: all 0.4s; }
 
-        /* Лодочки - МАКСИМАЛЬНО крупные (45% ширины экрана) */
         .target-boat {
             width: 45vw; height: 45vw; max-width: 180px; max-height: 180px;
             object-fit: contain; box-sizing: border-box; position: relative;
         }
-        /* Сюда садится уточка при совпадении */
         .target-boat.matched::after {
             content: ''; position: absolute; top: 10%; left: 15%;
             width: 70%; height: 70%;
@@ -226,7 +222,7 @@
         // Переменные Drag-and-Drop
         let activeDuck = null;
         let startX = 0, startY = 0;
-        let initialX = 0, initialY = 0; // Для плавного возврата
+        let initialX = 0, initialY = 0;
         let matchedColorsCount = 0;
 
         const roomsData = {
@@ -267,8 +263,39 @@
                 { id: 'мышка', text: 'Мышка', sound: 'a24.wav', image: 'a24.jpg' }
             ],
             'letters': [
-                { id: 'а', text: 'А', sound: '' },
-                { id: 'б', text: 'Б', sound: '' }
+                { id: 'a', text: 'А', image: 'b_a.png' },
+                { id: 'b', text: 'Б', image: 'b_b.png' },
+                { id: 'v', text: 'В', image: 'b_v.png' },
+                { id: 'g', text: 'Г', image: 'b_g.png' },
+                { id: 'd', text: 'Д', image: 'b_d.png' },
+                { id: 'e', text: 'Е', image: 'b_e.png' },
+                { id: 'yo', text: 'Ё', image: 'b_yo.png' },
+                { id: 'zh', text: 'Ж', image: 'b_zh.png' },
+                { id: 'z', text: 'З', image: 'b_z.png' },
+                { id: 'i', text: 'И', image: 'b_i.png' },
+                { id: 'y', text: 'Й', image: 'b_y.png' },
+                { id: 'k', text: 'К', image: 'b_k.png' },
+                { id: 'l', text: 'Л', image: 'b_l.png' },
+                { id: 'm', text: 'М', image: 'b_m.png' },
+                { id: 'n', text: 'Н', image: 'b_n.png' },
+                { id: 'o', text: 'О', image: 'b_o.png' },
+                { id: 'p', text: 'П', image: 'b_p.png' },
+                { id: 'r', text: 'Р', image: 'b_r.png' },
+                { id: 's', text: 'С', image: 'b_s.png' },
+                { id: 't', text: 'Т', image: 'b_t.png' },
+                { id: 'u', text: 'У', image: 'b_u.png' },
+                { id: 'f', text: 'Ф', image: 'b_f.png' },
+                { id: 'h', text: 'Х', image: 'b_h.png' },
+                { id: 'ts', text: 'Ц', image: 'b_ts.png' },
+                { id: 'ch', text: 'Ч', image: 'b_ch.png' },
+                { id: 'sh', text: 'Ш', image: 'b_sh.png' },
+                { id: 'sch', text: 'Щ', image: 'b_sch.png' },
+                { id: 'tv', text: 'Ъ', image: 'b_tv.png' },
+                { id: 'ы', text: 'Ы', image: 'b_ы.png' },
+                { id: 'myag', text: 'Ь', image: 'b_myag.png' },
+                { id: 'e_ob', text: 'Э', image: 'b_e_ob.png' },
+                { id: 'yu', text: 'Ю', image: 'b_yu.png' },
+                { id: 'ya', text: 'Я', image: 'b_ya.png' }
             ],
             'numbers': [
                 { id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' },
@@ -329,12 +356,19 @@
             const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder">🖼️</div>`;
 
             let soundModeHTML = '';
+            let currentSoundToPlay = '';
+
             if (currentRoom === 'animals') {
                 soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Названия" : "🔊 Звуки"}</div>`;
+                currentSoundToPlay = playNamesMode ? 'n' + card.sound : card.sound;
+            } else if (currentRoom === 'letters') {
+                soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Буквы" : "🔊 Звуки"}</div>`;
+                // Для букв: n_b_a.wav или s_b_a.wav
+                const prefix = playNamesMode ? 'n_b_' : 's_b_';
+                currentSoundToPlay = prefix + card.id + '.wav';
+            } else {
+                currentSoundToPlay = card.sound;
             }
-
-            let currentSoundToPlay = card.sound;
-            if (currentRoom === 'animals' && playNamesMode && card.sound) { currentSoundToPlay = 'n' + card.sound; }
 
             area.innerHTML = `
                 ${soundModeHTML}
@@ -421,7 +455,6 @@
             const touch = e.touches[0];
             const rect = activeDuck.getBoundingClientRect();
             
-            // Запоминаем начальную позицию для возврата
             if (!activeDuck.style.left) {
                 initialX = activeDuck.offsetLeft;
                 initialY = activeDuck.offsetTop;
@@ -462,7 +495,6 @@
                 activeDuck.classList.add('matched');
                 targetBoat.classList.add('matched');
                 
-                // Фиксируем утку внутри лодки (визуально)
                 activeDuck.style.display = 'none'; 
 
                 playSound('color_correct.wav');
@@ -472,28 +504,31 @@
                     setTimeout(() => { playSound('color_win.wav'); setTimeout(setupColorGame, 2000); }, 1000);
                 }
             } else {
-                // ПРОМАХ — возвращаем уточку на место с анимацией
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
                 activeDuck.style.transition = 'all 0.3s ease';
                 activeDuck.style.position = 'relative';
                 activeDuck.style.left = '0px';
                 activeDuck.style.top = '0px';
-                // Убираем transition после анимации
                 setTimeout(() => { activeDuck.style.transition = 'none'; }, 300);
             }
 
             activeDuck = null;
         }
 
-        // ВИКТОРИНА (БАЗОВАЯ)
+        // ВИКТОРИНА (БАЗОВАЯ + ПОДДЕРЖКА БУКВ)
         function startNewQuizRound() {
             const allCards = [...roomsData[currentRoom]];
             shuffleArray(allCards);
             quizCards = allCards.slice(0, 4);
             const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)];
             expectedCardId = randomTarget.id;
+            
             renderQuizGrid();
-            if (randomTarget.sound) {
+            
+            if (currentRoom === 'letters') {
+                // Вопрос для викторины букв: q_b_a.wav
+                playSound(`q_b_${randomTarget.id}.wav`);
+            } else if (randomTarget.sound) {
                 const soundFilename = randomTarget.sound.split('/').pop(); 
                 const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); 
                 playSound(`q${fileBase}.wav`); 
