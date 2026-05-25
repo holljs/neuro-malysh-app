@@ -154,7 +154,7 @@
         .wants-card:active { transform: scale(0.95); background-color: #FDFBF7; }
         .wants-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
 
-        /* ИГРЫ (Цвета и Кормление) */
+        /* ИГРЫ */
         .game-container {
             display: none; width: 100%; height: 100%;
             grid-template-columns: 1fr 1fr; gap: 20px;
@@ -166,14 +166,14 @@
         }
         .draggable-item {
             width: 40vw; height: 40vw; max-width: 140px; max-height: 140px;
-            object-fit: contain; z-index: 10; cursor: grab; touch-action: none; position: relative;
+            object-fit: contain; z-index: 10; cursor: pointer; touch-action: none; position: relative;
         }
         .target-item {
             width: 45vw; height: 45vw; max-width: 160px; max-height: 160px;
             object-fit: cover; border-radius: 20px; position: relative;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .draggable-item.dragging { z-index: 100; transform: scale(1.1); }
+        .draggable-item.dragging { z-index: 100; transform: scale(1.1); cursor: grabbing; }
         .draggable-item.matched { opacity: 0.1; pointer-events: none; transform: scale(0.7); transition: all 0.4s; }
         
         .target-item.matched::after {
@@ -247,6 +247,7 @@
         let quizCards = [];
         let playNamesMode = false; 
 
+        // Переменные для перетаскивания (Мышь + Сенсор)
         let activeItem = null;
         let startX = 0, startY = 0;
         let matchedCount = 0;
@@ -267,27 +268,26 @@
                 { id: 'no', text: 'Нет', sound: 'w_no.wav', image: 'w_no.png' },
                 { id: 'sleep', text: 'Спать', sound: 'w_sleep.wav', image: 'w_sleep.png' }
             ],
-            // ОПТИМИЗИРОВАННАЯ МЕГА-БАЗА КОРМЛЕНИЯ (19 пар)
             'feeding': [
-                { id: 'cat', text: 'Кошка', target: 'a1.jpg', drag: 'food_fish.png', sound: 'f_cat.wav' },
-                { id: 'dog', text: 'Собака', target: 'a2.jpg', drag: 'food_bone.png', sound: 'f_dog.wav' },
-                { id: 'cow', text: 'Корова', target: 'a3.jpg', drag: 'food_hay.png', sound: 'f_cow.wav' },
-                { id: 'horse', text: 'Лошадь', target: 'a4.jpg', drag: 'food_apple.png', sound: 'f_horse.wav' },
-                { id: 'sheep', text: 'Овца', target: 'a5.jpg', drag: 'food_grass.png', sound: 'f_sheep.wav' },
-                { id: 'pig', text: 'Свинья', target: 'a6.jpg', drag: 'food_acorn.png', sound: 'f_pig.wav' },
-                { id: 'goat', text: 'Коза', target: 'a7.jpg', drag: 'food_cabbage.png', sound: 'f_goat.wav' },
-                { id: 'wolf', text: 'Волк', target: 'a8.jpg', drag: 'food_steak.png', sound: 'f_wolf.wav' },
-                { id: 'goose', text: 'Гусь', target: 'a9.jpg', drag: 'food_grain.png', sound: 'f_goose.wav' },
-                { id: 'frog', text: 'Лягушка', target: 'a10.jpg', drag: 'food_fly.png', sound: 'f_frog.wav' },
-                { id: 'lion', text: 'Лев', target: 'a11.jpg', drag: 'food_steak.png', sound: 'f_lion.wav' },
-                { id: 'tiger', text: 'Тигр', target: 'a12.jpg', drag: 'food_steak.png', sound: 'f_tiger.wav' },
-                { id: 'bee', text: 'Пчела', target: 'a15.jpg', drag: 'food_flower.png', sound: 'f_bee.wav' },
-                { id: 'fox', text: 'Лиса', target: 'a16.jpg', drag: 'food_chicken.png', sound: 'f_fox.wav' },
-                { id: 'hedgehog', text: 'Ёжик', target: 'a17.jpg', drag: 'food_mushroom.png', sound: 'f_hedgehog.wav' },
-                { id: 'hen', text: 'Курица', target: 'a18.jpg', drag: 'food_grain.png', sound: 'f_hen.wav' },
-                { id: 'rooster', text: 'Петушок', target: 'a19.jpg', drag: 'food_grain.png', sound: 'f_rooster.wav' },
-                { id: 'donkey', text: 'Ослик', target: 'a21.jpg', drag: 'food_carrot.png', sound: 'f_donkey.wav' },
-                { id: 'mouse', text: 'Мышка', target: 'a24.jpg', drag: 'food_cheese.png', sound: 'f_mouse.wav' }
+                { id: 'cat', text: 'Кошка ест', target: 'a1.jpg', drag: 'food_fish.png', sound: 'f_cat.wav' },
+                { id: 'dog', text: 'Собака ест', target: 'a2.jpg', drag: 'food_bone.png', sound: 'f_dog.wav' },
+                { id: 'cow', text: 'Корова ест', target: 'a3.jpg', drag: 'food_hay.png', sound: 'f_cow.wav' },
+                { id: 'horse', text: 'Лошадь ест', target: 'a4.jpg', drag: 'food_apple.png', sound: 'f_horse.wav' },
+                { id: 'sheep', text: 'Овца ест', target: 'a5.jpg', drag: 'food_grass.png', sound: 'f_sheep.wav' },
+                { id: 'pig', text: 'Свинья ест', target: 'a6.jpg', drag: 'food_acorn.png', sound: 'f_pig.wav' },
+                { id: 'goat', text: 'Коза ест', target: 'a7.jpg', drag: 'food_cabbage.png', sound: 'f_goat.wav' },
+                { id: 'wolf', text: 'Волк ест', target: 'a8.jpg', drag: 'food_steak.png', sound: 'f_wolf.wav' },
+                { id: 'goose', text: 'Гусь ест', target: 'a9.jpg', drag: 'food_grain.png', sound: 'f_goose.wav' },
+                { id: 'frog', text: 'Лягушка ест', target: 'a10.jpg', drag: 'food_fly.png', sound: 'f_frog.wav' },
+                { id: 'lion', text: 'Лев ест', target: 'a11.jpg', drag: 'food_steak.png', sound: 'f_lion.wav' },
+                { id: 'tiger', text: 'Тигр ест', target: 'a12.jpg', drag: 'food_steak.png', sound: 'f_tiger.wav' },
+                { id: 'bee', text: 'Пчела ест', target: 'a15.jpg', drag: 'food_flower.png', sound: 'f_bee.wav' },
+                { id: 'fox', text: 'Лиса ест', target: 'a16.jpg', drag: 'food_chicken.png', sound: 'f_fox.wav' },
+                { id: 'hedgehog', text: 'Ёжик ест', target: 'a17.jpg', drag: 'food_mushroom.png', sound: 'f_hedgehog.wav' },
+                { id: 'hen', text: 'Курица ест', target: 'a18.jpg', drag: 'food_grain.png', sound: 'f_hen.wav' },
+                { id: 'rooster', text: 'Петушок ест', target: 'a19.jpg', drag: 'food_grain.png', sound: 'f_rooster.wav' },
+                { id: 'donkey', text: 'Ослик ест', target: 'a21.jpg', drag: 'food_carrot.png', sound: 'f_donkey.wav' },
+                { id: 'mouse', text: 'Мышка ест', target: 'a24.jpg', drag: 'food_cheese.png', sound: 'f_mouse.wav' }
             ],
             'colors': [
                 { id: 'yellow', text: 'Жёлтый', target: 'boat_yellow.png', drag: 'duck_yellow.png', sound: 'color_yellow.wav' },
@@ -434,7 +434,6 @@
             let allData = [...roomsData[currentRoom]];
             shuffleArray(allData);
             
-            // Фильтр для выбора 3 карточек с УНИКАЛЬНОЙ едой/драг-объектом
             let roundData = [];
             let usedDrags = new Set();
             for (let i = 0; i < allData.length; i++) {
@@ -451,9 +450,16 @@
             draggables.forEach(item => {
                 const img = document.createElement('img');
                 img.src = item.drag; img.className = 'draggable-item'; img.setAttribute('data-id', item.id);
-                img.addEventListener('touchstart', handleTouchStart, {passive: false});
-                img.addEventListener('touchmove', handleTouchMove, {passive: false});
-                img.addEventListener('touchend', handleTouchEnd);
+                
+                // ВОТ ГЛАВНЫЙ СЕКРЕТ ПРОТИВ "ТЕНИ" МЫШКИ:
+                img.ondragstart = () => false; 
+
+                // Подключаем сенсор
+                img.addEventListener('touchstart', handlePointerStart, {passive: false});
+                
+                // Подключаем обычную мышку
+                img.addEventListener('mousedown', handlePointerStart);
+                
                 dragZone.appendChild(img);
             });
 
@@ -464,22 +470,42 @@
             });
         }
 
-        function handleTouchStart(e) {
-            e.preventDefault(); if (e.target.classList.contains('matched')) return;
+        // Универсальные функции (Мышь + Сенсор)
+        function handlePointerStart(e) {
+            if (e.type === 'touchstart') e.preventDefault(); // Запрещаем скролл только для пальца
+            if (e.target.classList.contains('matched')) return;
             activeItem = e.target; activeItem.classList.add('dragging');
-            const touch = e.touches[0]; const rect = activeItem.getBoundingClientRect();
-            startX = touch.clientX - rect.left; startY = touch.clientY - rect.top;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const rect = activeItem.getBoundingClientRect();
+            startX = clientX - rect.left; startY = clientY - rect.top;
         }
 
-        function handleTouchMove(e) {
-            if (!activeItem) return; e.preventDefault(); const touch = e.touches[0];
-            activeItem.style.position = 'fixed'; activeItem.style.left = (touch.clientX - startX) + 'px'; activeItem.style.top = (touch.clientY - startY) + 'px';
+        function handlePointerMove(e) {
+            if (!activeItem) return; 
+            e.preventDefault(); 
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            activeItem.style.position = 'fixed'; 
+            activeItem.style.left = (clientX - startX) + 'px'; 
+            activeItem.style.top = (clientY - startY) + 'px';
         }
 
-        function handleTouchEnd(e) {
-            if (!activeItem) return; activeItem.classList.remove('dragging');
-            const itemId = activeItem.getAttribute('data-id'); const touch = e.changedTouches[0];
-            activeItem.style.display = 'none'; const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY); activeItem.style.display = 'block'; 
+        function handlePointerEnd(e) {
+            if (!activeItem) return; 
+            activeItem.classList.remove('dragging');
+            
+            const itemId = activeItem.getAttribute('data-id'); 
+            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+            
+            activeItem.style.display = 'none'; 
+            const elementUnderTouch = document.elementFromPoint(clientX, clientY); 
+            activeItem.style.display = 'block'; 
 
             let target = (elementUnderTouch && elementUnderTouch.classList.contains('target-item')) ? elementUnderTouch : null;
 
@@ -500,7 +526,6 @@
                     setTimeout(() => { playSound(winSound); setTimeout(setupDragGame, 4500); }, 1500);
                 }
             } else {
-                // ИГРАЕМ ЗВУК ОШИБКИ wrong.wav
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
                 playSound('wrong.wav'); 
                 activeItem.style.transition = 'all 0.3s ease'; activeItem.style.position = 'relative'; activeItem.style.left = '0px'; activeItem.style.top = '0px';
@@ -508,6 +533,12 @@
             }
             activeItem = null;
         }
+
+        // Глобальные слушатели мышки и сенсора (чтобы объект не терялся при быстром движении)
+        document.addEventListener('touchmove', handlePointerMove, {passive: false});
+        document.addEventListener('touchend', handlePointerEnd);
+        document.addEventListener('mousemove', handlePointerMove, {passive: false});
+        document.addEventListener('mouseup', handlePointerEnd);
 
         function startNewQuizRound() {
             const allCards = [...roomsData[currentRoom]]; shuffleArray(allCards); quizCards = allCards.slice(0, 4);
