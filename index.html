@@ -16,6 +16,7 @@
             --letters-color: #E8EBF0; 
             --numbers-color: #F0EAE1;
             --feed-color: #E9F0E3; 
+            --wind-color: #E6F0F9;
         }
 
         body {
@@ -85,6 +86,7 @@
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
+        .cat-wind { background-color: var(--wind-color); grid-column: span 2; padding: 30px; }
 
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; 
@@ -154,7 +156,7 @@
         .wants-card:active { transform: scale(0.95); background-color: #FDFBF7; }
         .wants-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
 
-        /* ИГРЫ */
+        /* ИГРЫ (DRAG AND DROP) */
         .game-container {
             display: none; width: 100%; height: 100%;
             grid-template-columns: 1fr 1fr; gap: 20px;
@@ -175,12 +177,38 @@
         }
         .draggable-item.dragging { z-index: 100; transform: scale(1.1); cursor: grabbing; }
         .draggable-item.matched { opacity: 0.1; pointer-events: none; transform: scale(0.7); transition: all 0.4s; }
-        
         .target-item.matched::after {
             content: ''; position: absolute; top: 15%; left: 15%;
             width: 70%; height: 70%;
             background-size: contain; background-repeat: no-repeat; background-position: center;
         }
+
+        /* --- ВЕТЕРОК (МИКРОФОН) --- */
+        .wind-container {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100%; text-align: center;
+        }
+        .wind-container.active { display: flex; }
+        
+        .wind-instruction {
+            font-size: 20px; font-weight: bold; color: #7A90A4; margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .wind-spinner {
+            width: 70vw; max-width: 250px; aspect-ratio: 1/1;
+            object-fit: contain;
+            margin-bottom: 40px;
+            will-change: transform; /* Оптимизация для плавного вращения */
+        }
+
+        .wind-start-btn {
+            background-color: #8CC084; color: white;
+            font-size: 18px; font-weight: bold; padding: 15px 30px;
+            border-radius: 25px; box-shadow: 0 4px 15px rgba(140, 192, 132, 0.4);
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .wind-start-btn:active { transform: scale(0.95); }
 
     </style>
 </head>
@@ -193,6 +221,10 @@
             <div class="category-card cat-wants" onclick="openRoom('wants', 'Желания')">
                 <div class="category-icon-placeholder"><img src="icon_wants.png" alt=""></div>
                 <div class="category-title">Желания</div>
+            </div>
+            <div class="category-card cat-wind" onclick="openRoom('wind', 'Ветерок')">
+                <div class="category-icon-placeholder"><img src="icon_wind.png" alt=""></div>
+                <div class="category-title">Ветерок</div>
             </div>
             <div class="category-card cat-feed" onclick="openRoom('feeding', 'Кто что ест?')">
                 <div class="category-icon-placeholder"><img src="icon_feeding.png" alt=""></div>
@@ -234,6 +266,11 @@
                 <div class="drag-column" id="drag-zone"></div>
                 <div class="target-column" id="target-zone"></div>
             </div>
+            <div id="wind-area" class="wind-container">
+                <div class="wind-instruction" id="wind-instruction">Нажми кнопку и подуй!</div>
+                <img src="wind_spinner.png" id="wind-spinner" class="wind-spinner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><circle cx=\\'50\\' cy=\\'50\\' r=\\'40\\' fill=\\'%23eee\\'/></svg>'">
+                <div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()">🌬️ Включить микрофон</div>
+            </div>
         </div>
     </div>
 
@@ -251,6 +288,17 @@
         let activeItem = null;
         let startX = 0, startY = 0;
         let matchedCount = 0;
+
+        // Переменные для микрофона (Ветерок)
+        let audioCtx;
+        let analyser;
+        let microphone;
+        let javascriptNode;
+        let windSpeed = 0;
+        let windRotation = 0;
+        let windAnimFrame;
+        let windPraiseTimer = null;
+        let micStarted = false;
 
         const roomsData = {
             'wants': [
@@ -341,17 +389,24 @@
             document.getElementById('game-area').classList.remove('active');
             document.getElementById('learning-area').style.display = 'none';
             document.getElementById('wants-area').classList.remove('active');
+            document.getElementById('wind-area').classList.remove('active');
+            document.getElementById('quizToggle').style.display = 'block';
+
+            stopWindGame(); // Всегда останавливаем микрофон при смене комнаты
             
             if (roomId === 'wants') {
                 document.getElementById('quizToggle').style.display = 'none'; 
                 document.getElementById('wants-area').classList.add('active');
                 renderWantsBoard();
+            } else if (roomId === 'wind') {
+                document.getElementById('quizToggle').style.display = 'none';
+                document.getElementById('wind-area').classList.add('active');
+                document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!";
+                document.getElementById('wind-start-btn').style.display = 'block';
             } else if (roomId === 'colors' || roomId === 'feeding') {
-                document.getElementById('quizToggle').style.display = 'block';
                 document.getElementById('learning-area').style.display = 'none'; 
                 toggleQuiz();
             } else {
-                document.getElementById('quizToggle').style.display = 'block';
                 document.getElementById('learning-area').style.display = 'flex';
                 renderLearningCard(); 
                 updateQuizToggleUI();
@@ -365,9 +420,87 @@
         function goHome() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             isQuizMode = false; 
+            stopWindGame();
             document.getElementById('screen-room').classList.remove('active');
             document.getElementById('screen-menu').classList.add('active');
         }
+
+        // --- ЛОГИКА ВЕТЕРКА (МИКРОФОН) ---
+        function startWindGame() {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            document.getElementById('wind-start-btn').style.display = 'none';
+            document.getElementById('wind-instruction').innerText = "Дуй сильнее!";
+            playSound('wind_intro.wav');
+
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then(function(stream) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                microphone = audioCtx.createMediaStreamSource(stream);
+                javascriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
+
+                analyser.smoothingTimeConstant = 0.8;
+                analyser.fftSize = 1024;
+
+                microphone.connect(analyser);
+                analyser.connect(javascriptNode);
+                javascriptNode.connect(audioCtx.destination);
+                
+                micStarted = true;
+
+                javascriptNode.onaudioprocess = function() {
+                    let array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                    let values = 0;
+                    let length = array.length;
+                    for (let i = 0; i < length; i++) {
+                        values += (array[i]);
+                    }
+                    let average = values / length;
+                    
+                    // Если шум (дыхание) превышает порог
+                    if (average > 15) { 
+                        windSpeed += (average - 15) * 0.15; 
+                        if (windSpeed > 40) windSpeed = 40; // Максимальная скорость
+                    }
+                }
+                updateWindSpinner();
+            })
+            .catch(function(err) {
+                document.getElementById('wind-instruction').innerText = "Разреши доступ к микрофону :(";
+                document.getElementById('wind-start-btn').style.display = 'block';
+                console.log("Ошибка микрофона: " + err);
+            });
+        }
+
+        function updateWindSpinner() {
+            if (!micStarted) return;
+            windRotation += windSpeed;
+            windSpeed *= 0.97; // Инерция/Трение (замедление)
+            if (windSpeed < 0) windSpeed = 0;
+
+            document.getElementById('wind-spinner').style.transform = `rotate(${windRotation}deg)`;
+
+            // Хвалим малыша, если сильно раскрутил (с защитой от спама)
+            if (windSpeed > 25 && !windPraiseTimer) {
+                playSound('wind_good.wav');
+                windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 5000); 
+            } else if (windSpeed > 10 && windSpeed <= 25 && Math.random() < 0.02 && !windPraiseTimer) {
+                playSound('wind_more.wav');
+                windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 4000);
+            }
+
+            windAnimFrame = requestAnimationFrame(updateWindSpinner);
+        }
+
+        function stopWindGame() {
+            micStarted = false;
+            cancelAnimationFrame(windAnimFrame);
+            if (audioCtx && audioCtx.state !== 'closed') {
+                audioCtx.close();
+            }
+        }
+        // ---------------------------------
 
         function toggleSoundMode(event) {
             if (event) event.stopPropagation();
@@ -451,13 +584,9 @@
                 const img = document.createElement('img');
                 img.src = item.drag; img.className = 'draggable-item'; img.setAttribute('data-id', item.id);
                 
-                // ВОТ ГЛАВНЫЙ СЕКРЕТ ПРОТИВ "ТЕНИ" МЫШКИ:
                 img.ondragstart = () => false; 
 
-                // Подключаем сенсор
                 img.addEventListener('touchstart', handlePointerStart, {passive: false});
-                
-                // Подключаем обычную мышку
                 img.addEventListener('mousedown', handlePointerStart);
                 
                 dragZone.appendChild(img);
@@ -470,9 +599,8 @@
             });
         }
 
-        // Универсальные функции (Мышь + Сенсор)
         function handlePointerStart(e) {
-            if (e.type === 'touchstart') e.preventDefault(); // Запрещаем скролл только для пальца
+            if (e.type === 'touchstart') e.preventDefault(); 
             if (e.target.classList.contains('matched')) return;
             activeItem = e.target; activeItem.classList.add('dragging');
             
@@ -534,7 +662,6 @@
             activeItem = null;
         }
 
-        // Глобальные слушатели мышки и сенсора (чтобы объект не терялся при быстром движении)
         document.addEventListener('touchmove', handlePointerMove, {passive: false});
         document.addEventListener('touchend', handlePointerEnd);
         document.addEventListener('mousemove', handlePointerMove, {passive: false});
