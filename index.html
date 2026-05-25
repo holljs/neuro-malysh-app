@@ -72,13 +72,13 @@
         }
         .category-card:active { transform: scale(0.97); opacity: 0.8; }
         
-        /* Место под будущие картинки в меню */
+        /* Иконки в меню */
         .category-icon-placeholder { width: 60px; height: 60px; margin-bottom: 10px; }
         .category-icon-placeholder img { width: 100%; height: 100%; object-fit: contain; }
 
         .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
 
-        .cat-wants { background-color: var(--wants-color); grid-column: span 2; padding: 30px; } /* Хотелки - большая кнопка */
+        .cat-wants { background-color: var(--wants-color); grid-column: span 2; padding: 30px; } 
         .cat-colors { background-color: var(--colors-color); }
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
@@ -110,7 +110,6 @@
             font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             cursor: pointer; display: flex; flex-direction: column; align-items: center;
         }
-        /* Увеличили картинку */
         .large-card img { width: 200px; height: 200px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
         .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
@@ -138,7 +137,7 @@
         }
         .quiz-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
 
-        /* --- ХОТЕЛКИ (Доска коммуникации) --- */
+        /* --- ХОТЕЛКИ --- */
         .wants-mode {
             display: none; width: 100%; height: 100%; max-width: 500px;
             grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; padding-bottom: 40px;
@@ -203,23 +202,23 @@
         <div class="hero-title">Во что поиграем?</div>
         <div class="menu-grid">
             <div class="category-card cat-wants" onclick="openRoom('wants', 'Желания')">
-                <div class="category-icon-placeholder"></div>
+                <div class="category-icon-placeholder"><img src="icon_wants.png" alt=""></div>
                 <div class="category-title">Желания</div>
             </div>
             <div class="category-card cat-colors" onclick="openRoom('colors', 'Цвета')">
-                <div class="category-icon-placeholder"></div>
+                <div class="category-icon-placeholder"><img src="icon_colors.png" alt=""></div>
                 <div class="category-title">Цвета</div>
             </div>
             <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
-                <div class="category-icon-placeholder"></div>
+                <div class="category-icon-placeholder"><img src="icon_animals.png" alt=""></div>
                 <div class="category-title">Животные</div>
             </div>
             <div class="category-card cat-letters" onclick="openRoom('letters', 'Буквы')">
-                <div class="category-icon-placeholder"></div>
+                <div class="category-icon-placeholder"><img src="icon_letters.png" alt=""></div>
                 <div class="category-title">Буквы</div>
             </div>
             <div class="category-card cat-numbers" onclick="openRoom('numbers', 'Цифры')">
-                <div class="category-icon-placeholder"></div>
+                <div class="category-icon-placeholder"><img src="icon_numbers.png" alt=""></div>
                 <div class="category-title">Цифры</div>
             </div>
         </div>
@@ -373,15 +372,13 @@
             currentLearningIndex = 0; 
             playNamesMode = false; 
             
-            // Скрываем все экраны
             document.getElementById('quiz-area').classList.remove('active');
             document.getElementById('color-game-area').classList.remove('active');
             document.getElementById('learning-area').style.display = 'none';
             document.getElementById('wants-area').classList.remove('active');
             
-            // Настраиваем видимость в зависимости от комнаты
             if (roomId === 'wants') {
-                document.getElementById('quizToggle').style.display = 'none'; // В Хотелках нет игры
+                document.getElementById('quizToggle').style.display = 'none'; 
                 document.getElementById('wants-area').classList.add('active');
                 renderWantsBoard();
             } else {
@@ -578,7 +575,6 @@
                 playSound('color_correct.wav');
                 matchedColorsCount++;
 
-                // Победа! Даем Уте 4.5 секунды, чтобы спокойно договорить фразу
                 if (matchedColorsCount === 3) {
                     setTimeout(() => { 
                         playSound('color_win.wav'); 
