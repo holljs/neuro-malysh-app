@@ -11,6 +11,7 @@
             --card-bg: #FFFFFF;
             --text-color: #5C5552; 
             --wants-color: #E3E9E5; 
+            --colors-color: #F8E8E8; 
             --animals-color: #F2EBE5; 
             --letters-color: #E8EBF0; 
             --numbers-color: #F0EAE1; 
@@ -31,6 +32,7 @@
             display: flex; flex-direction: column; align-items: center;
             box-sizing: border-box;
             background-color: var(--bg-color); 
+            flex-shrink: 0;
         }
 
         .header-top {
@@ -49,26 +51,35 @@
         .back-btn:active, .quiz-toggle:active { transform: scale(0.95); opacity: 0.8; }
 
         .header-title-row { width: 100%; text-align: center; }
-        
         #room-title { font-size: 20px; font-weight: 600; color: #7A90A4; display: inline-block; }
 
-        .screen { display: none; flex-direction: column; flex-grow: 1; width: 100%; }
+        .screen { display: none; flex-direction: column; flex-grow: 1; width: 100%; height: 100%; overflow: hidden; }
         .screen.active { display: flex; animation: fadeIn 0.4s ease; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 20px; color: #8C847E; }
+        .hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 10px; color: #8C847E; }
         
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; align-content: start; }
+        /* МЕНЮ */
+        .menu-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; 
+            align-content: start; overflow-y: auto; flex-grow: 1;
+        }
         .category-card {
-            border-radius: 20px; padding: 30px 10px;
+            border-radius: 20px; padding: 25px 10px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; transition: transform 0.2s;
         }
         .category-card:active { transform: scale(0.97); opacity: 0.8; }
+        
+        /* Место под будущие картинки в меню */
+        .category-icon-placeholder { width: 60px; height: 60px; margin-bottom: 10px; }
+        .category-icon-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+
         .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
 
-        .cat-wants { background-color: var(--wants-color); }
+        .cat-wants { background-color: var(--wants-color); grid-column: span 2; padding: 30px; } /* Хотелки - большая кнопка */
+        .cat-colors { background-color: var(--colors-color); }
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
@@ -90,16 +101,17 @@
         }
         .sound-mode-switch:active { transform: scale(0.95); }
 
-        /* ОБУЧЕНИЕ */
+        /* ОБУЧЕНИЕ (Слайдер) */
         .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
         
         .large-card {
             background-color: var(--card-bg); border-radius: 30px;
-            padding: 40px 20px; width: 80%; max-width: 300px; text-align: center;
+            padding: 30px 20px; width: 85%; max-width: 320px; text-align: center;
             font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             cursor: pointer; display: flex; flex-direction: column; align-items: center;
         }
-        .large-card img { width: 180px; height: 180px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
+        /* Увеличили картинку */
+        .large-card img { width: 200px; height: 200px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
         .tap-hint { margin-top: 15px; font-size: 14px; color: #A09B98; }
 
         .slider-controls { display: flex; gap: 40px; margin-top: 25px; }
@@ -125,6 +137,24 @@
             width: 100%; height: 100%; box-sizing: border-box; 
         }
         .quiz-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
+
+        /* --- ХОТЕЛКИ (Доска коммуникации) --- */
+        .wants-mode {
+            display: none; width: 100%; height: 100%; max-width: 500px;
+            grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; padding-bottom: 40px;
+            box-sizing: border-box; align-content: start; overflow-y: auto;
+        }
+        .wants-mode.active { display: grid; }
+        
+        .wants-card {
+            background-color: var(--card-bg); border-radius: 20px; padding: 15px;
+            text-align: center; font-size: 18px; font-weight: 600; color: var(--text-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.1s;
+        }
+        .wants-card:active { transform: scale(0.95); background-color: #FDFBF7; }
+        .wants-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
 
         /* --- ИГРА "ЦВЕТА" --- */
         .color-game-container {
@@ -172,16 +202,24 @@
         <div class="header" style="justify-content: center;">Нейро-Малыш</div>
         <div class="hero-title">Во что поиграем?</div>
         <div class="menu-grid">
-            <div class="category-card cat-wants" onclick="openRoom('colors', 'Цвета')">
-                <div class="category-title">🎨 Цвета</div>
+            <div class="category-card cat-wants" onclick="openRoom('wants', 'Желания')">
+                <div class="category-icon-placeholder"></div>
+                <div class="category-title">Желания</div>
+            </div>
+            <div class="category-card cat-colors" onclick="openRoom('colors', 'Цвета')">
+                <div class="category-icon-placeholder"></div>
+                <div class="category-title">Цвета</div>
             </div>
             <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
+                <div class="category-icon-placeholder"></div>
                 <div class="category-title">Животные</div>
             </div>
             <div class="category-card cat-letters" onclick="openRoom('letters', 'Буквы')">
+                <div class="category-icon-placeholder"></div>
                 <div class="category-title">Буквы</div>
             </div>
             <div class="category-card cat-numbers" onclick="openRoom('numbers', 'Цифры')">
+                <div class="category-icon-placeholder"></div>
                 <div class="category-title">Цифры</div>
             </div>
         </div>
@@ -201,6 +239,8 @@
         <div class="room-content-area">
             <div id="learning-area" class="learning-mode"></div>
             <div id="quiz-area" class="quiz-mode"></div>
+            
+            <div id="wants-area" class="wants-mode"></div>
             
             <div id="color-game-area" class="color-game-container">
                 <div class="duck-column" id="duck-zone"></div>
@@ -226,6 +266,21 @@
         let matchedColorsCount = 0;
 
         const roomsData = {
+            'wants': [
+                { id: 'drink', text: 'Пить', sound: 'w_drink.wav', image: 'w_drink.png' },
+                { id: 'eat', text: 'Кушать', sound: 'w_eat.wav', image: 'w_eat.png' },
+                { id: 'give', text: 'Дай', sound: 'w_give.wav', image: 'w_give.png' },
+                { id: 'help', text: 'Помоги', sound: 'w_help.wav', image: 'w_help.png' },
+                { id: 'cartoon', text: 'Мультик', sound: 'w_cartoon.wav', image: 'w_cartoon.png' },
+                { id: 'walk', text: 'Гулять', sound: 'w_walk.wav', image: 'w_walk.png' },
+                { id: 'more', text: 'Ещё', sound: 'w_more.wav', image: 'w_more.png' },
+                { id: 'play', text: 'Играть', sound: 'w_play.wav', image: 'w_play.png' },
+                { id: 'read', text: 'Читать', sound: 'w_read.wav', image: 'w_read.png' },
+                { id: 'potty', text: 'На горшок', sound: 'w_potty.wav', image: 'w_potty.png' },
+                { id: 'yes', text: 'Да', sound: 'w_yes.wav', image: 'w_yes.png' },
+                { id: 'no', text: 'Нет', sound: 'w_no.wav', image: 'w_no.png' },
+                { id: 'sleep', text: 'Спать', sound: 'w_sleep.wav', image: 'w_sleep.png' }
+            ],
             'colors': [
                 { id: 'yellow', text: 'Жёлтый', sound: 'color_yellow.wav', image: 'duck_yellow.png', boat: 'boat_yellow.png' },
                 { id: 'orange', text: 'Оранжевый', sound: 'color_orange.wav', image: 'duck_orange.png', boat: 'boat_orange.png' },
@@ -318,17 +373,25 @@
             currentLearningIndex = 0; 
             playNamesMode = false; 
             
+            // Скрываем все экраны
             document.getElementById('quiz-area').classList.remove('active');
             document.getElementById('color-game-area').classList.remove('active');
-            document.getElementById('learning-area').style.display = 'flex';
+            document.getElementById('learning-area').style.display = 'none';
+            document.getElementById('wants-area').classList.remove('active');
             
-            document.getElementById('quizToggle').style.display = 'block';
+            // Настраиваем видимость в зависимости от комнаты
+            if (roomId === 'wants') {
+                document.getElementById('quizToggle').style.display = 'none'; // В Хотелках нет игры
+                document.getElementById('wants-area').classList.add('active');
+                renderWantsBoard();
+            } else {
+                document.getElementById('quizToggle').style.display = 'block';
+                document.getElementById('learning-area').style.display = 'flex';
+                renderLearningCard(); 
+                updateQuizToggleUI();
+            }
 
             document.getElementById('room-title').innerText = title;
-            updateQuizToggleUI();
-            
-            renderLearningCard(); 
-
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-room').classList.add('active');
         }
@@ -347,6 +410,22 @@
             renderLearningCard(); 
         }
 
+        // РЕНДЕР ХОТЕЛОК (Сетка)
+        function renderWantsBoard() {
+            const area = document.getElementById('wants-area');
+            area.innerHTML = '';
+            roomsData['wants'].forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'wants-card';
+                cardDiv.innerHTML = `<img src="${card.image}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23eee\\'/></svg>'"><div>${card.text}</div>`;
+                cardDiv.onclick = () => {
+                    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+                    playSound(card.sound);
+                };
+                area.appendChild(cardDiv);
+            });
+        }
+
         // ОБУЧЕНИЕ
         function renderLearningCard() {
             const cards = roomsData[currentRoom];
@@ -363,7 +442,6 @@
                 currentSoundToPlay = playNamesMode ? 'n' + card.sound : card.sound;
             } else if (currentRoom === 'letters') {
                 soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Буквы" : "🔊 Звуки"}</div>`;
-                // Для букв: n_b_a.wav или s_b_a.wav
                 const prefix = playNamesMode ? 'n_b_' : 's_b_';
                 currentSoundToPlay = prefix + card.id + '.wav';
             } else {
@@ -515,7 +593,7 @@
             activeDuck = null;
         }
 
-        // ВИКТОРИНА (БАЗОВАЯ + ПОДДЕРЖКА БУКВ)
+        // ВИКТОРИНА (БАЗОВАЯ)
         function startNewQuizRound() {
             const allCards = [...roomsData[currentRoom]];
             shuffleArray(allCards);
@@ -526,7 +604,6 @@
             renderQuizGrid();
             
             if (currentRoom === 'letters') {
-                // Вопрос для викторины букв: q_b_a.wav
                 playSound(`q_b_${randomTarget.id}.wav`);
             } else if (randomTarget.sound) {
                 const soundFilename = randomTarget.sound.split('/').pop(); 
