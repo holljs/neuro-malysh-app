@@ -28,16 +28,20 @@
 
         /* --- ШАПКА --- */
         .header {
-            width: 100%; padding: 10px 15px;
+            width: 100%; 
+            padding: 25px 15px 10px 15px; /* Увеличили отступ сверху, чтобы уйти от кнопок ВК */
             display: flex; flex-direction: column; align-items: center;
             box-sizing: border-box;
             background-color: var(--bg-color); 
             flex-shrink: 0;
         }
 
+        .header-title-row { width: 100%; text-align: center; }
+        #room-title { font-size: 20px; font-weight: 600; color: #7A90A4; display: inline-block; }
+
         .header-top {
             display: flex; justify-content: space-between; width: 100%;
-            margin-bottom: 8px; 
+            margin-top: 15px; /* Отступ вниз от заголовка */
         }
 
         .back-btn, .quiz-toggle {
@@ -49,9 +53,6 @@
             white-space: nowrap; 
         }
         .back-btn:active, .quiz-toggle:active { transform: scale(0.95); opacity: 0.8; }
-
-        .header-title-row { width: 100%; text-align: center; }
-        #room-title { font-size: 20px; font-weight: 600; color: #7A90A4; display: inline-block; }
 
         .screen { display: none; flex-direction: column; flex-grow: 1; width: 100%; height: 100%; overflow: hidden; }
         .screen.active { display: flex; animation: fadeIn 0.4s ease; }
@@ -226,12 +227,12 @@
 
     <div id="screen-room" class="screen">
         <div class="header">
+            <div class="header-title-row">
+                <span id="room-title">Комната</span>
+            </div>
             <div class="header-top">
                 <div class="back-btn" onclick="goHome()">⬅ Назад</div>
                 <div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()">🎓 Игра</div>
-            </div>
-            <div class="header-title-row">
-                <span id="room-title">Комната</span>
             </div>
         </div>
         
