@@ -578,8 +578,12 @@
                 playSound('color_correct.wav');
                 matchedColorsCount++;
 
+                // Победа! Даем Уте 4.5 секунды, чтобы спокойно договорить фразу
                 if (matchedColorsCount === 3) {
-                    setTimeout(() => { playSound('color_win.wav'); setTimeout(setupColorGame, 2000); }, 1000);
+                    setTimeout(() => { 
+                        playSound('color_win.wav'); 
+                        setTimeout(setupColorGame, 4500); 
+                    }, 1000);
                 }
             } else {
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
