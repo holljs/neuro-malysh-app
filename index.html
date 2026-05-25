@@ -80,13 +80,14 @@
 
         .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
 
-        .cat-wants { background-color: var(--wants-color); grid-column: span 2; padding: 30px; } 
+        /* Теперь все кнопки квадратные (убрано grid-column: span 2) */
+        .cat-wants { background-color: var(--wants-color); } 
+        .cat-wind { background-color: var(--wind-color); }
         .cat-feed { background-color: var(--feed-color); }
         .cat-colors { background-color: var(--colors-color); }
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
-        .cat-wind { background-color: var(--wind-color); grid-column: span 2; padding: 30px; }
 
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; 
@@ -199,7 +200,7 @@
             width: 70vw; max-width: 250px; aspect-ratio: 1/1;
             object-fit: contain;
             margin-bottom: 40px;
-            will-change: transform; /* Оптимизация для плавного вращения */
+            will-change: transform; 
         }
 
         .wind-start-btn {
@@ -392,7 +393,7 @@
             document.getElementById('wind-area').classList.remove('active');
             document.getElementById('quizToggle').style.display = 'block';
 
-            stopWindGame(); // Всегда останавливаем микрофон при смене комнаты
+            stopWindGame(); 
             
             if (roomId === 'wants') {
                 document.getElementById('quizToggle').style.display = 'none'; 
@@ -458,10 +459,9 @@
                     }
                     let average = values / length;
                     
-                    // Если шум (дыхание) превышает порог
                     if (average > 15) { 
                         windSpeed += (average - 15) * 0.15; 
-                        if (windSpeed > 40) windSpeed = 40; // Максимальная скорость
+                        if (windSpeed > 40) windSpeed = 40; 
                     }
                 }
                 updateWindSpinner();
@@ -476,12 +476,11 @@
         function updateWindSpinner() {
             if (!micStarted) return;
             windRotation += windSpeed;
-            windSpeed *= 0.97; // Инерция/Трение (замедление)
+            windSpeed *= 0.97; 
             if (windSpeed < 0) windSpeed = 0;
 
             document.getElementById('wind-spinner').style.transform = `rotate(${windRotation}deg)`;
 
-            // Хвалим малыша, если сильно раскрутил (с защитой от спама)
             if (windSpeed > 25 && !windPraiseTimer) {
                 playSound('wind_good.wav');
                 windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 5000); 
@@ -584,6 +583,7 @@
                 const img = document.createElement('img');
                 img.src = item.drag; img.className = 'draggable-item'; img.setAttribute('data-id', item.id);
                 
+                // Запрещаем системный перенос для мыши
                 img.ondragstart = () => false; 
 
                 img.addEventListener('touchstart', handlePointerStart, {passive: false});
@@ -599,16 +599,28 @@
             });
         }
 
+        // --- ОБНОВЛЕННЫЙ ЗАХВАТ ---
         function handlePointerStart(e) {
             if (e.type === 'touchstart') e.preventDefault(); 
             if (e.target.classList.contains('matched')) return;
-            activeItem = e.target; activeItem.classList.add('dragging');
+            activeItem = e.target;
             
+            // Захватываем размеры ДО масштабирования
+            const rect = activeItem.getBoundingClientRect(); 
+            activeItem.style.width = rect.width + 'px';
+            activeItem.style.height = rect.height + 'px';
+
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            const rect = activeItem.getBoundingClientRect();
-            startX = clientX - rect.left; startY = clientY - rect.top;
+            startX = clientX - rect.left; 
+            startY = clientY - rect.top;
+
+            activeItem.classList.add('dragging');
+            activeItem.style.position = 'fixed';
+            activeItem.style.margin = '0'; // Сбрасываем системные отступы
+            activeItem.style.left = (clientX - startX) + 'px'; 
+            activeItem.style.top = (clientY - startY) + 'px';
         }
 
         function handlePointerMove(e) {
@@ -618,7 +630,6 @@
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            activeItem.style.position = 'fixed'; 
             activeItem.style.left = (clientX - startX) + 'px'; 
             activeItem.style.top = (clientY - startY) + 'px';
         }
@@ -641,22 +652,35 @@
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
                 activeItem.classList.add('matched'); target.classList.add('matched'); activeItem.style.display = 'none'; 
                 
-                if (currentRoom === 'colors') playSound('color_correct.wav');
-                if (currentRoom === 'feeding') {
+                // ИСПРАВЛЕННЫЕ ТАЙМИНГИ ЗВУКОВ
+                if (currentRoom === 'colors') {
+                    playSound('color_correct.wav');
+                } else if (currentRoom === 'feeding') {
                     const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound;
                     playSound('f_yum.wav');
-                    setTimeout(() => playSound(animalSound), 1000);
+                    setTimeout(() => playSound(animalSound), 1000); 
                 }
                 
                 matchedCount++;
                 if (matchedCount === 3) {
-                    const winSound = (currentRoom === 'colors') ? 'color_win.wav' : 'f_win.wav';
-                    setTimeout(() => { playSound(winSound); setTimeout(setupDragGame, 4500); }, 1500);
+                    if (currentRoom === 'colors') {
+                        setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500);
+                    } else if (currentRoom === 'feeding') {
+                        // Ждем 3 секунды, чтобы Утя договорила про животное, и только потом звук победы
+                        setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000);
+                    }
                 }
             } else {
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
                 playSound('wrong.wav'); 
-                activeItem.style.transition = 'all 0.3s ease'; activeItem.style.position = 'relative'; activeItem.style.left = '0px'; activeItem.style.top = '0px';
+                
+                // Возвращаем предмет на базу, снимаем принудительные размеры
+                activeItem.style.transition = 'all 0.3s ease'; 
+                activeItem.style.position = 'relative'; 
+                activeItem.style.left = '0px'; 
+                activeItem.style.top = '0px';
+                activeItem.style.width = '';
+                activeItem.style.height = '';
                 setTimeout(() => { activeItem.style.transition = 'none'; }, 300);
             }
             activeItem = null;
