@@ -295,7 +295,7 @@
 
     <script>
         // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
-        const isTestMode = false; // Отключаем тест, переходим в боевой режим!
+        const isTestMode = true; // Отключаем тест, переходим в боевой режим!
         const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
         const isMobileVK = vkPlatform.includes('mobile');
         let userHasPremium = false; 
@@ -373,7 +373,9 @@
                 const data = await response.json();
                 
                 if (data.success && data.payment_url) {
-                    window.location.href = data.payment_url;
+                    // Открываем платежный шлюз ЮKassa в новой вкладке браузера, чтобы банк не блокировал фрейм
+                    window.open(data.payment_url, '_blank');
+                }
                 } else {
                     alert("Произошла ошибка при создании платежа. Попробуйте чуть позже.");
                 }
