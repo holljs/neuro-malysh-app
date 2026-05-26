@@ -37,14 +37,22 @@
             box-sizing: border-box; background-color: var(--bg-color); flex-shrink: 0;
         }
 
-        .header-title-row { width: 100%; text-align: center; position: relative; }
+        .header-title-row { width: 100%; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; min-height: 32px;}
         #room-title { font-size: 20px; font-weight: 600; color: #7A90A4; display: inline-block; }
         
+        /* ОБНОВЛЕННАЯ ИКОНКА СПРАВКИ */
         .help-icon {
-            position: absolute; right: 0; top: -2px;
-            font-size: 20px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;
+            position: absolute; left: 0; 
+            width: 32px; height: 32px;
+            background-color: #A3C9D9; /* Нежный голубой цвет */
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; font-weight: bold; font-family: sans-serif;
+            cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
         }
-        .help-icon:active { opacity: 1; transform: scale(0.9); }
+        .help-icon:active { transform: scale(0.9); }
 
         .header-top { display: flex; justify-content: space-between; width: 100%; margin-top: 15px; }
 
@@ -76,11 +84,7 @@
         .category-icon-placeholder img { width: 100%; height: 100%; object-fit: contain; }
         .category-title { font-size: 18px; font-weight: 600; text-align: center; color: var(--text-color); }
 
-        /* ЗАМОЧЕК ДЛЯ ПРЕМИУМА */
-        .premium-lock {
-            position: absolute; top: 10px; right: 10px;
-            font-size: 20px; display: none; /* Управляется через JS */
-        }
+        .premium-lock { position: absolute; top: 10px; right: 10px; font-size: 20px; display: none; }
 
         .cat-wants { background-color: var(--wants-color); } 
         .cat-wind { background-color: var(--wind-color); }
@@ -92,12 +96,9 @@
         .cat-numbers { background-color: var(--numbers-color); }
 
         .room-content-area {
-            flex-grow: 1; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 10px;
-            position: relative; width: 100%; box-sizing: border-box; overflow: hidden;
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; position: relative; width: 100%; box-sizing: border-box; overflow: hidden;
         }
 
-        /* ОБУЧЕНИЕ И ВИКТОРИНА (скрыл лишний CSS для компактности, он остался как был) */
         .sound-mode-switch { background-color: var(--card-bg); border-radius: 20px; padding: 8px 18px; margin-bottom: 20px; font-size: 15px; font-weight: 600; color: #7A90A4; box-shadow: 0 4px 12px rgba(0,0,0,0.04); cursor: pointer; }
         .sound-mode-switch:active { transform: scale(0.95); }
         .learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
@@ -203,8 +204,8 @@
     <div id="screen-menu" class="screen active">
         <div class="header" style="justify-content: center;">
             <div class="header-title-row">
-                Нейро-Малыш
-                <div class="help-icon" onclick="openModal('help-modal')">❓</div>
+                <div class="help-icon" onclick="openModal('help-modal')">?</div>
+                <span style="font-size: 20px; font-weight: 600; color: #7A90A4;">Нейро-Малыш</span>
             </div>
         </div>
         <div class="hero-title">Во что поиграем?</div>
@@ -304,26 +305,17 @@
         vkBridge.send('VKWebAppInit');
 
         // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
-        // true = все открыто (для модерации ВК или разработчика). 
-        // false = боевой режим (включаются замочки и пейвол).
         const isTestMode = true; 
-        
-        // Читаем платформу (телефон это или компьютер)
         const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
         const isMobileVK = vkPlatform.includes('mobile');
+        let userHasPremium = false; 
 
-        let userHasPremium = false; // Статус подписки пользователя (позже будете тянуть с бэкенда)
-
-        // Инициализация интерфейса при старте
         function initMonetizationUI() {
-            if (isTestMode || userHasPremium) return; // Если тест или куплено — ничего не блокируем
-
-            // Показываем замочки на премиум-комнатах
+            if (isTestMode || userHasPremium) return; 
             document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
         }
         initMonetizationUI();
 
-        // Функции модальных окон
         function openModal(modalId) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             document.getElementById(modalId).classList.add('active');
@@ -333,13 +325,10 @@
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             document.getElementById(modalId).classList.remove('active');
         }
-
         function goToPayment() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-            // Здесь будет логика редиректа на сайт с ЮKassa (с передачей VK ID)
             alert("Здесь будет переход на оплату для VK ID.");
         }
-        // ------------------------------------
 
         let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
         let activeItem = null; let startX = 0, startY = 0; let matchedCount = 0;
@@ -356,7 +345,6 @@
         const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCanvas.getContext('2d');
         let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
-        // Данные (Скрыты для компактности, они остаются ровно теми же)
         const roomsData = {
             'wants': [{ id: 'drink', text: 'Пить', sound: 'w_drink.wav', image: 'w_drink.png' }, { id: 'eat', text: 'Кушать', sound: 'w_eat.wav', image: 'w_eat.png' }, { id: 'give', text: 'Дай', sound: 'w_give.wav', image: 'w_give.png' }, { id: 'help', text: 'Помоги', sound: 'w_help.wav', image: 'w_help.png' }, { id: 'cartoon', text: 'Мультик', sound: 'w_cartoon.wav', image: 'w_cartoon.png' }, { id: 'walk', text: 'Гулять', sound: 'w_walk.wav', image: 'w_walk.png' }, { id: 'more', text: 'Ещё', sound: 'w_more.wav', image: 'w_more.png' }, { id: 'play', text: 'Играть', sound: 'w_play.wav', image: 'w_play.png' }, { id: 'read', text: 'Читать', sound: 'w_read.wav', image: 'w_read.png' }, { id: 'potty', text: 'На горшок', sound: 'w_potty.wav', image: 'w_potty.png' }, { id: 'yes', text: 'Да', sound: 'w_yes.wav', image: 'w_yes.png' }, { id: 'no', text: 'Нет', sound: 'w_no.wav', image: 'w_no.png' }, { id: 'sleep', text: 'Спать', sound: 'w_sleep.wav', image: 'w_sleep.png' }],
             'feeding': [{ id: 'cat', text: 'Кошка ест', target: 'a1.jpg', drag: 'food_fish.png', sound: 'f_cat.wav' }, { id: 'dog', text: 'Собака ест', target: 'a2.jpg', drag: 'food_bone.png', sound: 'f_dog.wav' }, { id: 'cow', text: 'Корова ест', target: 'a3.jpg', drag: 'food_hay.png', sound: 'f_cow.wav' }, { id: 'horse', text: 'Лошадь ест', target: 'a4.jpg', drag: 'food_apple.png', sound: 'f_horse.wav' }, { id: 'sheep', text: 'Овца ест', target: 'a5.jpg', drag: 'food_grass.png', sound: 'f_sheep.wav' }, { id: 'pig', text: 'Свинья ест', target: 'a6.jpg', drag: 'food_acorn.png', sound: 'f_pig.wav' }, { id: 'goat', text: 'Коза ест', target: 'a7.jpg', drag: 'food_cabbage.png', sound: 'f_goat.wav' }, { id: 'wolf', text: 'Волк ест', target: 'a8.jpg', drag: 'food_steak.png', sound: 'f_wolf.wav' }, { id: 'goose', text: 'Гусь ест', target: 'a9.jpg', drag: 'food_grain.png', sound: 'f_goose.wav' }, { id: 'frog', text: 'Лягушка ест', target: 'a10.jpg', drag: 'food_fly.png', sound: 'f_frog.wav' }, { id: 'lion', text: 'Лев ест', target: 'a11.jpg', drag: 'food_steak.png', sound: 'f_lion.wav' }, { id: 'tiger', text: 'Тигр ест', target: 'a12.jpg', drag: 'food_steak.png', sound: 'f_tiger.wav' }, { id: 'bee', text: 'Пчела ест', target: 'a15.jpg', drag: 'food_flower.png', sound: 'f_bee.wav' }, { id: 'fox', text: 'Лиса ест', target: 'a16.jpg', drag: 'food_chicken.png', sound: 'f_fox.wav' }, { id: 'hedgehog', text: 'Ёжик ест', target: 'a17.jpg', drag: 'food_mushroom.png', sound: 'f_hedgehog.wav' }, { id: 'hen', text: 'Курица ест', target: 'a18.jpg', drag: 'food_grain.png', sound: 'f_hen.wav' }, { id: 'rooster', text: 'Петушок ест', target: 'a19.jpg', drag: 'food_grain.png', sound: 'f_rooster.wav' }, { id: 'donkey', text: 'Ослик ест', target: 'a21.jpg', drag: 'food_carrot.png', sound: 'f_donkey.wav' }, { id: 'mouse', text: 'Мышка ест', target: 'a24.jpg', drag: 'food_cheese.png', sound: 'f_mouse.wav' }],
@@ -369,80 +357,33 @@
         function openRoom(roomId, title) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             
-            // --- ПРОВЕРКА ПОДПИСКИ ---
             const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors');
             if (isPremiumRoom && !isTestMode && !userHasPremium) {
-                if (isMobileVK) {
-                    // Мобилка: молча запрещаем переход, пейвол не показываем (правила Apple/Google)
-                    // Или можно показать алерт: "Полная версия доступна на компьютере"
-                    alert("Полная версия с новыми играми доступна при входе ВКонтакте с компьютера!");
-                    return; 
-                } else {
-                    // Десктоп: показываем окно оплаты ЮKassa
-                    openModal('paywall-modal');
-                    return;
-                }
+                if (isMobileVK) { alert("Полная версия с новыми играми доступна при входе ВКонтакте с компьютера!"); return; } 
+                else { openModal('paywall-modal'); return; }
             }
-            // --------------------------
 
             currentRoom = roomId; isQuizMode = false; currentLearningIndex = 0; playNamesMode = false; 
+            document.getElementById('quiz-area').classList.remove('active'); document.getElementById('game-area').classList.remove('active'); document.getElementById('learning-area').style.display = 'none'; document.getElementById('wants-area').classList.remove('active'); document.getElementById('wind-area').classList.remove('active'); document.getElementById('draw-area').classList.remove('active'); document.getElementById('quizToggle').style.display = 'block'; stopWindGame(); 
             
-            document.getElementById('quiz-area').classList.remove('active');
-            document.getElementById('game-area').classList.remove('active');
-            document.getElementById('learning-area').style.display = 'none';
-            document.getElementById('wants-area').classList.remove('active');
-            document.getElementById('wind-area').classList.remove('active');
-            document.getElementById('draw-area').classList.remove('active');
-            document.getElementById('quizToggle').style.display = 'block';
-
-            stopWindGame(); 
-            
-            if (roomId === 'wants') {
-                document.getElementById('quizToggle').style.display = 'none'; 
-                document.getElementById('wants-area').classList.add('active');
-                renderWantsBoard();
-            } else if (roomId === 'wind') {
-                document.getElementById('quizToggle').style.display = 'none';
-                document.getElementById('wind-area').classList.add('active');
-                document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!";
-                document.getElementById('wind-start-btn').style.display = 'block';
-            } else if (roomId === 'draw') {
-                document.getElementById('quizToggle').style.display = 'none';
-                document.getElementById('draw-area').classList.add('active');
-                initDrawCanvas();
-            } else if (roomId === 'colors' || roomId === 'feeding') {
-                document.getElementById('learning-area').style.display = 'none'; 
-                toggleQuiz();
-            } else {
-                document.getElementById('learning-area').style.display = 'flex';
-                renderLearningCard(); 
-                updateQuizToggleUI();
-            }
+            if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
+            else if (roomId === 'wind') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wind-area').classList.add('active'); document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!"; document.getElementById('wind-start-btn').style.display = 'block'; } 
+            else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
+            else if (roomId === 'colors' || roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); } 
+            else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
             document.getElementById('room-title').innerText = title;
-            document.getElementById('screen-menu').classList.remove('active');
-            document.getElementById('screen-room').classList.add('active');
+            document.getElementById('screen-menu').classList.remove('active'); document.getElementById('screen-room').classList.add('active');
         }
 
-        function goHome() {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-            isQuizMode = false; stopWindGame();
-            document.getElementById('screen-room').classList.remove('active');
-            document.getElementById('screen-menu').classList.add('active');
-        }
+        function goHome() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); isQuizMode = false; stopWindGame(); document.getElementById('screen-room').classList.remove('active'); document.getElementById('screen-menu').classList.add('active'); }
 
         let canvasInitialized = false;
         function initDrawCanvas() {
-            setTimeout(() => {
-                resizeCanvas(); clearDrawCanvas(false); updateDrawImage();
+            setTimeout(() => { resizeCanvas(); clearDrawCanvas(false); updateDrawImage();
                 if (!canvasInitialized) {
-                    paintCanvas.addEventListener('touchstart', startDrawing, {passive: false});
-                    paintCanvas.addEventListener('touchmove', drawPath, {passive: false});
-                    paintCanvas.addEventListener('touchend', stopDrawing);
-                    paintCanvas.addEventListener('mousedown', startDrawing);
-                    paintCanvas.addEventListener('mousemove', drawPath);
-                    paintCanvas.addEventListener('mouseup', stopDrawing);
-                    paintCanvas.addEventListener('mouseleave', stopDrawing);
+                    paintCanvas.addEventListener('touchstart', startDrawing, {passive: false}); paintCanvas.addEventListener('touchmove', drawPath, {passive: false}); paintCanvas.addEventListener('touchend', stopDrawing);
+                    paintCanvas.addEventListener('mousedown', startDrawing); paintCanvas.addEventListener('mousemove', drawPath); paintCanvas.addEventListener('mouseup', stopDrawing); paintCanvas.addEventListener('mouseleave', stopDrawing);
                     canvasInitialized = true;
                 }
             }, 50); 
@@ -458,12 +399,10 @@
         function drawPath(e) { if (!isDrawing) return; e.preventDefault(); const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; }
         function stopDrawing(e) { if (isDrawing && Math.random() < 0.1) { playSound(Math.random() > 0.5 ? 'paint_good.wav' : 'paint_beautiful.wav'); } isDrawing = false; }
 
-        function startWindGame() {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); document.getElementById('wind-start-btn').style.display = 'none'; document.getElementById('wind-instruction').innerText = "Дуй сильнее!"; playSound('wind_intro.wav');
+        function startWindGame() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); document.getElementById('wind-start-btn').style.display = 'none'; document.getElementById('wind-instruction').innerText = "Дуй сильнее!"; playSound('wind_intro.wav');
             navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioCtx.createAnalyser(); microphone = audioCtx.createMediaStreamSource(stream); javascriptNode = audioCtx.createScriptProcessor(2048, 1, 1); analyser.smoothingTimeConstant = 0.8; analyser.fftSize = 1024; microphone.connect(analyser); analyser.connect(javascriptNode); javascriptNode.connect(audioCtx.destination); micStarted = true;
                 javascriptNode.onaudioprocess = function() { let array = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(array); let values = 0; let length = array.length; for (let i = 0; i < length; i++) values += array[i]; let average = values / length; if (average > 15) { windSpeed += (average - 15) * 0.15; if (windSpeed > 40) windSpeed = 40; } }
-                updateWindSpinner(); }).catch(function(err) { document.getElementById('wind-instruction').innerText = "Разреши доступ к микрофону :("; document.getElementById('wind-start-btn').style.display = 'block'; });
-        }
+                updateWindSpinner(); }).catch(function(err) { document.getElementById('wind-instruction').innerText = "Разреши доступ к микрофону :("; document.getElementById('wind-start-btn').style.display = 'block'; }); }
         function updateWindSpinner() { if (!micStarted) return; windRotation += windSpeed; windSpeed *= 0.97; if (windSpeed < 0) windSpeed = 0; document.getElementById('wind-spinner').style.transform = `rotate(${windRotation}deg)`; if (windSpeed > 25 && !windPraiseTimer) { playSound('wind_good.wav'); windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 5000); } else if (windSpeed > 10 && windSpeed <= 25 && Math.random() < 0.02 && !windPraiseTimer) { playSound('wind_more.wav'); windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 4000); } windAnimFrame = requestAnimationFrame(updateWindSpinner); }
         function stopWindGame() { micStarted = false; cancelAnimationFrame(windAnimFrame); if (audioCtx && audioCtx.state !== 'closed') audioCtx.close(); }
 
