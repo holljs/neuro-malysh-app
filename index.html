@@ -305,31 +305,109 @@
         vkBridge.send('VKWebAppInit');
 
         // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
-        const isTestMode = true; 
+        const isTestMode = false; // Отключаем тест, переходим в боевой режим!
         const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
         const isMobileVK = vkPlatform.includes('mobile');
         let userHasPremium = false; 
+        
+        // Укажите здесь ваш реальный домен, где крутится image_server.py
+        const SERVER_URL = "https://neuro-master.online"; 
 
-        function initMonetizationUI() {
-            if (isTestMode || userHasPremium) return; 
-            document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
+        async function initAppAndCheckPremium() {
+            try {
+                // 1. Инициализируем ВК
+                await vkBridge.send('VKWebAppInit');
+                
+                // 2. Получаем данные пользователя и параметры подписи (для защиты API)
+                const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+                const vkSignParams = window.location.search.substring(1); // Убираем '?' в начале
+                
+                // 3. Стучимся на сервер, проверяем статус подписки
+                const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
+                    method: 'GET',
+                    headers: { 'x-vk-sign': vkSignParams }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.has_premium) {
+                    userHasPremium = true;
+                    // Прячем все замочки, если подписка активна
+                    document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'none');
+                } else if (!isTestMode && !userHasPremium) {
+                    // Рисуем замочки, если подписки нет
+                    document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
+                }
+            } catch (error) {
+                console.error("Ошибка при проверке премиума:", error);
+                // На случай падения сервера покажем замочки
+                if (!isTestMode) {
+                    document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
+                }
+            }
         }
-        initMonetizationUI();
+        
+        // Запускаем проверку сразу при загрузке приложения
+        initAppAndCheckPremium();
 
         function openModal(modalId) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             document.getElementById(modalId).classList.add('active');
         }
+        
         function closeModal(modalId, event) {
             if (event && event.target !== document.getElementById(modalId)) return;
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             document.getElementById(modalId).classList.remove('active');
         }
-        function goToPayment() {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-            alert("Здесь будет переход на оплату для VK ID.");
-        }
 
+        async function goToPayment() {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
+            
+            // Меняем текст кнопки, чтобы показать процесс загрузки
+            const btn = document.querySelector('#paywall-modal .wind-start-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Создаем платеж...";
+            btn.style.opacity = "0.7";
+            btn.style.pointerEvents = "none";
+            
+            try {
+                const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+                const vkSignParams = window.location.search.substring(1);
+                
+                const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "x-vk-sign": vkSignParams 
+                    },
+                    body: JSON.stringify({
+                        user_id: userInfo.id,
+                        amount: 150,
+                        description: "Подписка на развивающие игры (1 мес.)",
+                        currency_type: "kids_sub" 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.payment_url) {
+                    // Редирект на страницу оплаты ЮKassa
+                    window.location.href = data.payment_url;
+                } else {
+                    alert("Произошла ошибка при создании платежа. Попробуйте чуть позже.");
+                }
+            } catch (error) {
+                console.error("Ошибка сети при оплате:", error);
+                alert("Нет связи с сервером. Проверьте интернет-соединение.");
+            } finally {
+                // Возвращаем кнопку в исходное состояние
+                btn.innerText = originalText;
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "auto";
+            }
+        }
+        
         let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
         let activeItem = null; let startX = 0, startY = 0; let matchedCount = 0;
         let audioCtx, analyser, microphone, javascriptNode, windSpeed = 0, windRotation = 0, windAnimFrame, windPraiseTimer = null, micStarted = false;
