@@ -40,11 +40,10 @@
         .header-title-row { width: 100%; text-align: center; position: relative; display: flex; justify-content: center; align-items: center; min-height: 32px;}
         #room-title { font-size: 20px; font-weight: 600; color: #7A90A4; display: inline-block; }
         
-        /* ОБНОВЛЕННАЯ ИКОНКА СПРАВКИ */
         .help-icon {
             position: absolute; left: 0; 
             width: 32px; height: 32px;
-            background-color: #A3C9D9; /* Нежный голубой цвет */
+            background-color: #A3C9D9; 
             color: #FFFFFF;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
@@ -166,7 +165,6 @@
         .modal-content h2 { margin-top: 0; color: #5C5552; font-size: 22px; }
         .modal-content p { color: #7A90A4; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
         .legal-info { font-size: 12px; color: #A09B98; text-align: left; line-height: 1.4; }
-
     </style>
 </head>
 <body>
@@ -176,11 +174,9 @@
             <button class="modal-close" onclick="closeModal('help-modal')">✖</button>
             <h2>О приложении</h2>
             <p>«Нейро-Малыш» — это логопедический тренажер для мягкого запуска речи. <br><br>Помогайте Уте-Те кормить зверей, раскрашивать картинки и дуть в настоящий Ветерок!</p>
-            
             <p id="payment-instruction-placeholder" style="display: none;">
                 <a href="#" style="color: #4D79FF;">Как оформить подписку?</a>
             </p>
-
             <hr style="border: none; border-top: 1px solid #E8EBF0; margin: 20px 0;">
             <div class="legal-info">
                 Продавец: Самозанятая Селяхова Наталья Викторовна<br>
@@ -195,7 +191,6 @@
             <h2 style="color: #FFB347; font-size: 24px;">👑 Открой все игры!</h2>
             <p>Умные раскраски, тренажер дыхания, любимые хотелки и другие логопедические игры ждут вас.</p>
             <p style="font-size: 20px; color: #5C5552;"><b>Всего 150 руб/мес.</b></p>
-            
             <button class="wind-start-btn" style="background-color: #FFB347; width: 100%; margin-top: 10px;" onclick="goToPayment()">Оформить подписку</button>
             <button class="clear-btn" style="width: 100%; margin-top: 15px; background: transparent; font-weight: normal;" onclick="closeModal('paywall-modal')">Позже</button>
         </div>
@@ -260,7 +255,6 @@
                 <div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()">🎓 Игра</div>
             </div>
         </div>
-        
         <div class="room-content-area">
             <div id="learning-area" class="learning-mode"></div>
             <div id="quiz-area" class="quiz-mode"></div>
@@ -269,13 +263,11 @@
                 <div class="drag-column" id="drag-zone"></div>
                 <div class="target-column" id="target-zone"></div>
             </div>
-            
             <div id="wind-area" class="wind-container">
                 <div class="wind-instruction" id="wind-instruction">Нажми кнопку и подуй!</div>
                 <img src="wind_spinner.png" id="wind-spinner" class="wind-spinner">
                 <div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()">🌬️ Включить микрофон</div>
             </div>
-
             <div id="draw-area" class="draw-container">
                 <div class="draw-nav">
                     <div class="nav-btn" onclick="changeDrawImage(-1)" style="width:40px; height:40px; font-size:18px;">⬅️</div>
@@ -302,52 +294,42 @@
     </div>
 
     <script>
-        vkBridge.send('VKWebAppInit');
-
         // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
         const isTestMode = false; // Отключаем тест, переходим в боевой режим!
         const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
         const isMobileVK = vkPlatform.includes('mobile');
         let userHasPremium = false; 
         
-        // Укажите здесь ваш реальный домен, где крутится image_server.py
         const SERVER_URL = "https://neuro-master.online"; 
 
         async function initAppAndCheckPremium() {
             try {
-                // 1. Инициализируем ВК
                 await vkBridge.send('VKWebAppInit');
-                
-                // 2. Получаем данные пользователя и параметры подписи (для защиты API)
                 const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-                const vkSignParams = window.location.search.substring(1); // Убираем '?' в начале
+                const vkSignParams = window.location.search.substring(1); 
                 
-                // 3. Стучимся на сервер, проверяем статус подписки
                 const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
                     method: 'GET',
                     headers: { 'x-vk-sign': vkSignParams }
                 });
                 
                 const data = await response.json();
+                console.log("ОТВЕТ СЕРВЕРА:", data); 
                 
                 if (data.success && data.has_premium) {
                     userHasPremium = true;
-                    // Прячем все замочки, если подписка активна
                     document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'none');
                 } else if (!isTestMode && !userHasPremium) {
-                    // Рисуем замочки, если подписки нет
                     document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
                 }
             } catch (error) {
                 console.error("Ошибка при проверке премиума:", error);
-                // На случай падения сервера покажем замочки
                 if (!isTestMode) {
                     document.querySelectorAll('.premium-lock').forEach(lock => lock.style.display = 'block');
                 }
             }
         }
         
-        // Запускаем проверку сразу при загрузке приложения
         initAppAndCheckPremium();
 
         function openModal(modalId) {
@@ -364,7 +346,6 @@
         async function goToPayment() {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
             
-            // Меняем текст кнопки, чтобы показать процесс загрузки
             const btn = document.querySelector('#paywall-modal .wind-start-btn');
             const originalText = btn.innerText;
             btn.innerText = "Создаем платеж...";
@@ -392,7 +373,6 @@
                 const data = await response.json();
                 
                 if (data.success && data.payment_url) {
-                    // Редирект на страницу оплаты ЮKassa
                     window.location.href = data.payment_url;
                 } else {
                     alert("Произошла ошибка при создании платежа. Попробуйте чуть позже.");
@@ -401,7 +381,6 @@
                 console.error("Ошибка сети при оплате:", error);
                 alert("Нет связи с сервером. Проверьте интернет-соединение.");
             } finally {
-                // Возвращаем кнопку в исходное состояние
                 btn.innerText = originalText;
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
@@ -429,7 +408,7 @@
             'colors': [{ id: 'yellow', text: 'Жёлтый', target: 'boat_yellow.png', drag: 'duck_yellow.png', sound: 'color_yellow.wav' }, { id: 'orange', text: 'Оранжевый', target: 'boat_orange.png', drag: 'duck_orange.png', sound: 'color_orange.wav' }, { id: 'red', text: 'Красный', target: 'boat_red.png', drag: 'duck_red.png', sound: 'color_red.wav' }, { id: 'pink', text: 'Розовый', target: 'boat_pink.png', drag: 'duck_pink.png', sound: 'color_pink.wav' }, { id: 'purple', text: 'Фиолетовый', target: 'boat_purple.png', drag: 'duck_purple.png', sound: 'color_purple.wav' }, { id: 'blue', text: 'Синий', target: 'boat_blue.png', drag: 'duck_blue.png', sound: 'color_blue.wav' }, { id: 'green', text: 'Зелёный', target: 'boat_green.png', drag: 'duck_green.png', sound: 'color_green.wav' }, { id: 'grey', text: 'Серый', target: 'boat_grey.png', drag: 'duck_grey.png', sound: 'color_grey.wav' }],
             'animals': [{ id: 'кошка', text: 'Кошка', sound: 'a1.wav', image: 'a1.jpg' }, { id: 'собака', text: 'Собака', sound: 'a2.wav', image: 'a2.jpg' }, { id: 'корова', text: 'Корова', sound: 'a3.wav', image: 'a3.jpg' }, { id: 'лошадь', text: 'Лошадь', sound: 'a4.wav', image: 'a4.jpg' }, { id: 'овца', text: 'Овца', sound: 'a5.wav', image: 'a5.jpg' }, { id: 'свинья', text: 'Свинья', sound: 'a6.wav', image: 'a6.jpg' }, { id: 'коза', text: 'Коза', sound: 'a7.wav', image: 'a7.jpg' }, { id: 'волк', text: 'Волк', sound: 'a8.wav', image: 'a8.jpg' }, { id: 'гусь', text: 'Гусь', sound: 'a9.wav', image: 'a9.jpg' }, { id: 'лягушка', text: 'Лягушка', sound: 'a10.wav', image: 'a10.jpg' }, { id: 'лев', text: 'Лев', sound: 'a11.wav', image: 'a11.jpg' }, { id: 'тигр', text: 'Тигр', sound: 'a12.wav', image: 'a12.jpg' }, { id: 'лиса', text: 'Лиса', sound: 'a16.wav', image: 'a16.jpg' }, { id: 'ежик', text: 'Ёжик', sound: 'a17.wav', image: 'a17.jpg' }, { id: 'курица', text: 'Курица', sound: 'a18.wav', image: 'a18.jpg' }, { id: 'петушок', text: 'Петушок', sound: 'a19.wav', image: 'a19.jpg' }, { id: 'ворона', text: 'Ворона', sound: 'a20.wav', image: 'a20.jpg' }, { id: 'ослик', text: 'Ослик', sound: 'a21.wav', image: 'a21.jpg' }, { id: 'сова', text: 'Сова', sound: 'a22.wav', image: 'a22.jpg' }, { id: 'мышка', text: 'Мышка', sound: 'a24.wav', image: 'a24.jpg' }],
             'letters': [{ id: 'a', text: 'А', image: 'b_a.png' }, { id: 'b', text: 'Б', image: 'b_b.png' }, { id: 'v', text: 'В', image: 'b_v.png' }, { id: 'g', text: 'Г', image: 'b_g.png' }, { id: 'd', text: 'Д', image: 'b_d.png' }, { id: 'e', text: 'Е', image: 'b_e.png' }, { id: 'yo', text: 'Ё', image: 'b_yo.png' }, { id: 'zh', text: 'Ж', image: 'b_zh.png' }, { id: 'z', text: 'З', image: 'b_z.png' }, { id: 'i', text: 'И', image: 'b_i.png' }, { id: 'y', text: 'Й', image: 'b_y.png' }, { id: 'k', text: 'К', image: 'b_k.png' }, { id: 'l', text: 'Л', image: 'b_l.png' }, { id: 'm', text: 'М', image: 'b_m.png' }, { id: 'n', text: 'Н', image: 'b_n.png' }, { id: 'o', text: 'О', image: 'b_o.png' }, { id: 'p', text: 'П', image: 'b_p.png' }, { id: 'r', text: 'Р', image: 'b_r.png' }, { id: 's', text: 'С', image: 'b_s.png' }, { id: 't', text: 'Т', image: 'b_t.png' }, { id: 'u', text: 'У', image: 'b_u.png' }, { id: 'f', text: 'Ф', image: 'b_f.png' }, { id: 'h', text: 'Х', image: 'b_h.png' }, { id: 'ts', text: 'Ц', image: 'b_ts.png' }, { id: 'ch', text: 'Ч', image: 'b_ch.png' }, { id: 'sh', text: 'Ш', image: 'b_sh.png' }, { id: 'sch', text: 'Щ', image: 'b_sch.png' }, { id: 'tv', text: 'Ъ', image: 'b_tv.png' }, { id: 'ы', text: 'Ы', image: 'b_ы.png' }, { id: 'myag', text: 'Ь', image: 'b_myag.png' }, { id: 'e_ob', text: 'Э', image: 'b_e_ob.png' }, { id: 'yu', text: 'Ю', image: 'b_yu.png' }, { id: 'ya', text: 'Я', image: 'b_ya.png' }],
-            'numbers': [{ id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' }, { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' }, { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' }, { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' }, { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' }, { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' }, { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' }, { id: '8', text: 'Восемь', sound: '8.wav', image: '8.jpg' }, { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' }, { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }]
+            'numbers': [{ id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' }, { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' }, { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' }, { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' }, { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' }, { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' }, { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' }, { id: '8', text: 'Восемь', sound: '8.wav', merge: '8.jpg' }, { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' }, { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }]
         };
 
         function openRoom(roomId, title) {
