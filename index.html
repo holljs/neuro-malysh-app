@@ -196,6 +196,16 @@
         </div>
     </div>
 
+    <div id="mobile-paywall-modal" class="modal-overlay" onclick="closeModal('mobile-paywall-modal', event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('mobile-paywall-modal')">✖</button>
+            <h2 style="color: #FFB347; font-size: 24px;">🔒 Комната закрыта</h2>
+            <p style="font-size: 18px; color: #5C5552; margin-top: 15px;">Как зайти в комнаты с замочком, читайте в Справке <b>(?)</b></p>
+            
+            <button class="wind-start-btn" style="background-color: #A3C9D9; width: 100%; margin-top: 20px;" onclick="closeModal('mobile-paywall-modal'); openModal('help-modal');">Открыть справку</button>
+        </div>
+    </div>
+
     <div id="screen-menu" class="screen active">
         <div class="header" style="justify-content: center;">
             <div class="header-title-row">
@@ -416,8 +426,15 @@
             
             const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors');
             if (isPremiumRoom && !isTestMode && !userHasPremium) {
-                if (isMobileVK) { alert("Полная версия с новыми играми доступна при входе ВКонтакте с компьютера!"); return; } 
-                else { openModal('paywall-modal'); return; }
+                if (isMobileVK) { 
+                    // ОТКРЫВАЕМ НАШУ НОВУЮ КРАСИВУЮ МОДАЛКУ ВМЕСТО АЛЕРТА
+                    openModal('mobile-paywall-modal'); 
+                    return; 
+                } 
+                else { 
+                    openModal('paywall-modal'); 
+                    return; 
+                }
             }
 
             currentRoom = roomId; isQuizMode = false; currentLearningIndex = 0; playNamesMode = false; 
