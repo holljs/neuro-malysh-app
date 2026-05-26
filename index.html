@@ -203,7 +203,7 @@
                 <span style="font-size: 20px; font-weight: 600; color: #7A90A4;">Нейро-Малыш</span>
             </div>
         </div>
-        <div class="hero-title">Во что поиграем?</div>
+        <div class="hero-title">Во во что поиграем?</div>
         <div class="menu-grid">
             <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
                 <div class="category-icon-placeholder"><img src="icon_animals.png" alt=""></div>
@@ -295,7 +295,7 @@
 
     <script>
         // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
-        const isTestMode = true; // Отключаем тест, переходим в боевой режим!
+        const isTestMode = true; // СТАВИМ TRUE, ЧТОБЫ МАЛЫШ ИГРАЛ БЕЗ ОГРАНИЧЕНИЙ!
         const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
         const isMobileVK = vkPlatform.includes('mobile');
         let userHasPremium = false; 
@@ -373,9 +373,7 @@
                 const data = await response.json();
                 
                 if (data.success && data.payment_url) {
-                    // Открываем платежный шлюз ЮKassa в новой вкладке браузера, чтобы банк не блокировал фрейм
                     window.open(data.payment_url, '_blank');
-                }
                 } else {
                     alert("Произошла ошибка при создании платежа. Попробуйте чуть позже.");
                 }
