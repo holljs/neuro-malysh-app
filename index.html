@@ -480,19 +480,27 @@
         }
 
         // --- ЛОГИКА РАСКРАСКИ ---
+        let canvasInitialized = false; // Защита от двойных нажатий
+
         function initDrawCanvas() {
-            resizeCanvas();
-            clearDrawCanvas(false);
-            updateDrawImage();
-            
-            paintCanvas.addEventListener('touchstart', startDrawing, {passive: false});
-            paintCanvas.addEventListener('touchmove', drawPath, {passive: false});
-            paintCanvas.addEventListener('touchend', stopDrawing);
-            
-            paintCanvas.addEventListener('mousedown', startDrawing);
-            paintCanvas.addEventListener('mousemove', drawPath);
-            paintCanvas.addEventListener('mouseup', stopDrawing);
-            paintCanvas.addEventListener('mouseleave', stopDrawing);
+            // Даем браузеру микро-паузу (50мс), чтобы блок успел появиться на экране
+            setTimeout(() => {
+                resizeCanvas();
+                clearDrawCanvas(false);
+                updateDrawImage();
+                
+                if (!canvasInitialized) {
+                    paintCanvas.addEventListener('touchstart', startDrawing, {passive: false});
+                    paintCanvas.addEventListener('touchmove', drawPath, {passive: false});
+                    paintCanvas.addEventListener('touchend', stopDrawing);
+                    
+                    paintCanvas.addEventListener('mousedown', startDrawing);
+                    paintCanvas.addEventListener('mousemove', drawPath);
+                    paintCanvas.addEventListener('mouseup', stopDrawing);
+                    paintCanvas.addEventListener('mouseleave', stopDrawing);
+                    canvasInitialized = true;
+                }
+            }, 50); // Та самая магическая пауза!
         }
 
         function resizeCanvas() {
@@ -545,12 +553,14 @@
             isDrawing = true;
             const pos = getMousePos(e);
             ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.strokeStyle = brushColor;
             ctx.lineWidth = brushSize;
-            drawPath(e); // Ставим точку
+            ctx.moveTo(pos.x, pos.y);
+            // Ставим маленькую точку, даже если малыш просто тапнул (без движения пальца)
+            ctx.lineTo(pos.x, pos.y + 0.1); 
+            ctx.stroke();
         }
 
         function drawPath(e) {
@@ -559,11 +569,19 @@
             const pos = getMousePos(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
+            
+            // Начинаем новый путь, чтобы телефон не "зависал" от просчета одной бесконечной линии
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = brushSize;
         }
 
         function stopDrawing(e) {
             if (isDrawing && Math.random() < 0.1) {
-                // Изредка хвалим малыша после длинного мазка
+                // Изредка хвалим малыша после мазка
                 playSound(Math.random() > 0.5 ? 'paint_good.wav' : 'paint_beautiful.wav');
             }
             isDrawing = false;
