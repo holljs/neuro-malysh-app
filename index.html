@@ -18,6 +18,7 @@
             --feed-color: #E9F0E3; 
             --wind-color: #E6F0F9;
             --draw-color: #FFF0E6;
+            --shapes-color: #E8F0F0;
         }
 
         body {
@@ -93,6 +94,7 @@
         .cat-animals { background-color: var(--animals-color); }
         .cat-letters { background-color: var(--letters-color); }
         .cat-numbers { background-color: var(--numbers-color); }
+        .cat-shapes { background-color: var(--shapes-color); }
 
         .room-content-area {
             flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; position: relative; width: 100%; box-sizing: border-box; overflow: hidden;
@@ -223,7 +225,11 @@
                 <div class="category-icon-placeholder"><img src="icon_colors.png" alt=""></div>
                 <div class="category-title">Цвета</div>
             </div>
-
+            <div class="category-card cat-shapes" onclick="openRoom('shapes', 'Фигуры')">
+                <div class="premium-lock">🔒</div>
+                <div class="category-icon-placeholder"><img src="icon_shapes.png" alt=""></div>
+                <div class="category-title">Фигуры</div>
+            </div>
             <div class="category-card cat-draw premium-room" onclick="openRoom('draw', 'Раскраски')">
                 <div class="premium-lock">🔒</div>
                 <div class="category-icon-placeholder"><img src="icon_draw.png" alt=""></div>
@@ -418,7 +424,15 @@
             'colors': [{ id: 'yellow', text: 'Жёлтый', target: 'boat_yellow.png', drag: 'duck_yellow.png', sound: 'color_yellow.wav' }, { id: 'orange', text: 'Оранжевый', target: 'boat_orange.png', drag: 'duck_orange.png', sound: 'color_orange.wav' }, { id: 'red', text: 'Красный', target: 'boat_red.png', drag: 'duck_red.png', sound: 'color_red.wav' }, { id: 'pink', text: 'Розовый', target: 'boat_pink.png', drag: 'duck_pink.png', sound: 'color_pink.wav' }, { id: 'purple', text: 'Фиолетовый', target: 'boat_purple.png', drag: 'duck_purple.png', sound: 'color_purple.wav' }, { id: 'blue', text: 'Синий', target: 'boat_blue.png', drag: 'duck_blue.png', sound: 'color_blue.wav' }, { id: 'green', text: 'Зелёный', target: 'boat_green.png', drag: 'duck_green.png', sound: 'color_green.wav' }, { id: 'grey', text: 'Серый', target: 'boat_grey.png', drag: 'duck_grey.png', sound: 'color_grey.wav' }],
             'animals': [{ id: 'кошка', text: 'Кошка', sound: 'a1.wav', image: 'a1.jpg' }, { id: 'собака', text: 'Собака', sound: 'a2.wav', image: 'a2.jpg' }, { id: 'корова', text: 'Корова', sound: 'a3.wav', image: 'a3.jpg' }, { id: 'лошадь', text: 'Лошадь', sound: 'a4.wav', image: 'a4.jpg' }, { id: 'овца', text: 'Овца', sound: 'a5.wav', image: 'a5.jpg' }, { id: 'свинья', text: 'Свинья', sound: 'a6.wav', image: 'a6.jpg' }, { id: 'коза', text: 'Коза', sound: 'a7.wav', image: 'a7.jpg' }, { id: 'волк', text: 'Волк', sound: 'a8.wav', image: 'a8.jpg' }, { id: 'гусь', text: 'Гусь', sound: 'a9.wav', image: 'a9.jpg' }, { id: 'лягушка', text: 'Лягушка', sound: 'a10.wav', image: 'a10.jpg' }, { id: 'лев', text: 'Лев', sound: 'a11.wav', image: 'a11.jpg' }, { id: 'тигр', text: 'Тигр', sound: 'a12.wav', image: 'a12.jpg' }, { id: 'лиса', text: 'Лиса', sound: 'a16.wav', image: 'a16.jpg' }, { id: 'ежик', text: 'Ёжик', sound: 'a17.wav', image: 'a17.jpg' }, { id: 'курица', text: 'Курица', sound: 'a18.wav', image: 'a18.jpg' }, { id: 'петушок', text: 'Петушок', sound: 'a19.wav', image: 'a19.jpg' }, { id: 'ворона', text: 'Ворона', sound: 'a20.wav', image: 'a20.jpg' }, { id: 'ослик', text: 'Ослик', sound: 'a21.wav', image: 'a21.jpg' }, { id: 'сова', text: 'Сова', sound: 'a22.wav', image: 'a22.jpg' }, { id: 'мышка', text: 'Мышка', sound: 'a24.wav', image: 'a24.jpg' }],
             'letters': [{ id: 'a', text: 'А', image: 'b_a.png' }, { id: 'b', text: 'Б', image: 'b_b.png' }, { id: 'v', text: 'В', image: 'b_v.png' }, { id: 'g', text: 'Г', image: 'b_g.png' }, { id: 'd', text: 'Д', image: 'b_d.png' }, { id: 'e', text: 'Е', image: 'b_e.png' }, { id: 'yo', text: 'Ё', image: 'b_yo.png' }, { id: 'zh', text: 'Ж', image: 'b_zh.png' }, { id: 'z', text: 'З', image: 'b_z.png' }, { id: 'i', text: 'И', image: 'b_i.png' }, { id: 'y', text: 'Й', image: 'b_y.png' }, { id: 'k', text: 'К', image: 'b_k.png' }, { id: 'l', text: 'Л', image: 'b_l.png' }, { id: 'm', text: 'М', image: 'b_m.png' }, { id: 'n', text: 'Н', image: 'b_n.png' }, { id: 'o', text: 'О', image: 'b_o.png' }, { id: 'p', text: 'П', image: 'b_p.png' }, { id: 'r', text: 'Р', image: 'b_r.png' }, { id: 's', text: 'С', image: 'b_s.png' }, { id: 't', text: 'Т', image: 'b_t.png' }, { id: 'u', text: 'У', image: 'b_u.png' }, { id: 'f', text: 'Ф', image: 'b_f.png' }, { id: 'h', text: 'Х', image: 'b_h.png' }, { id: 'ts', text: 'Ц', image: 'b_ts.png' }, { id: 'ch', text: 'Ч', image: 'b_ch.png' }, { id: 'sh', text: 'Ш', image: 'b_sh.png' }, { id: 'sch', text: 'Щ', image: 'b_sch.png' }, { id: 'tv', text: 'Ъ', image: 'b_tv.png' }, { id: 'ы', text: 'Ы', image: 'b_ы.png' }, { id: 'myag', text: 'Ь', image: 'b_myag.png' }, { id: 'e_ob', text: 'Э', image: 'b_e_ob.png' }, { id: 'yu', text: 'Ю', image: 'b_yu.png' }, { id: 'ya', text: 'Я', image: 'b_ya.png' }],
-            'numbers': [{ id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' }, { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' }, { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' }, { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' }, { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' }, { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' }, { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' }, { id: '8', text: 'Восемь', sound: '8.wav', merge: '8.jpg' }, { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' }, { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }]
+            'numbers': [{ id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' }, { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' }, { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' }, { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' }, { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' }, { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' }, { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' }, { id: '8', text: 'Восемь', sound: '8.wav', merge: '8.jpg' }, { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' }, { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }],
+            'shapes': [
+                { id: 'circle', text: 'Круг', image: 'card_circle.png', sound: 'shape_circle.wav', targets: ['target_circle_wheel.png', 'target_circle_sun.png'] },
+                { id: 'square', text: 'Квадрат', image: 'card_square.png', sound: 'shape_square.wav', targets: ['target_square_house.png', 'target_square_gift1.png', 'target_square_gift2.png'] },
+                { id: 'triangle', text: 'Треугольник', image: 'card_triangle.png', sound: 'shape_triangle.wav', targets: ['target_triangle_sail.png', 'target_triangle_roof.png'] },
+                { id: 'rect', text: 'Прямоугольник', image: 'card_rect.png', sound: 'shape_rect.wav', targets: ['target_rect_train.png', 'target_rect_truck1.png', 'target_rect_truck2.png'] },
+                { id: 'star', text: 'Звезда', image: 'card_star.png', sound: 'shape_star.wav', targets: ['target_star_wand.png', 'target_star_sky.png'] },
+                { id: 'rhombus', text: 'Ромб', image: 'card_romb.png', sound: 'shape_rombus.wav', targets: ['target_romb_kite.png', 'target_romb_diamond.png'] }
+            ]
         };
 
         function openRoom(roomId, title) {
@@ -481,12 +495,129 @@
 
         function toggleSoundMode(event) { if (event) event.stopPropagation(); vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playNamesMode = !playNamesMode; renderLearningCard(); }
         function renderWantsBoard() { const area = document.getElementById('wants-area'); area.innerHTML = ''; roomsData['wants'].forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'wants-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound(card.sound); }; area.appendChild(cardDiv); }); }
-        function renderLearningCard() { const cards = roomsData[currentRoom]; const card = cards[currentLearningIndex]; const area = document.getElementById('learning-area'); const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder">🖼️</div>`; let soundModeHTML = ''; let currentSoundToPlay = ''; if (currentRoom === 'animals') { soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Названия" : "🔊 Звуки"}</div>`; currentSoundToPlay = playNamesMode ? 'n' + card.sound : card.sound; } else if (currentRoom === 'letters') { soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Буквы" : "🔊 Звуки"}</div>`; const prefix = playNamesMode ? 'n_b_' : 's_b_'; currentSoundToPlay = prefix + card.id + '.wav'; } else { currentSoundToPlay = card.sound; } area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать 🔊</div><div class="slider-controls"><div class="nav-btn" onclick="prevLearningCard()">⬅️</div><div class="nav-btn" onclick="nextLearningCard()">➡️</div></div>`; playSound(currentSoundToPlay); }
+        
+        function renderLearningCard() { 
+            const cards = roomsData[currentRoom]; 
+            const card = cards[currentLearningIndex]; 
+            const area = document.getElementById('learning-area'); 
+            const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder">🖼️</div>`; 
+            let soundModeHTML = ''; 
+            let currentSoundToPlay = ''; 
+            if (currentRoom === 'animals') { 
+                soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Названия" : "🔊 Звуки"}</div>`; 
+                currentSoundToPlay = playNamesMode ? 'n' + card.sound : card.sound; 
+            } else if (currentRoom === 'letters') { 
+                soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Буквы" : "🔊 Звуки"}</div>`; 
+                const prefix = playNamesMode ? 'n_b_' : 's_b_'; 
+                currentSoundToPlay = prefix + card.id + '.wav'; 
+            } else if (currentRoom === 'shapes') { 
+                // Для фигур нет переключения звуков, просто название
+                currentSoundToPlay = card.sound; 
+            } else { 
+                currentSoundToPlay = card.sound; 
+            } 
+            area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать 🔊</div><div class="slider-controls"><div class="nav-btn" onclick="prevLearningCard()">⬅️</div><div class="nav-btn" onclick="nextLearningCard()">➡️</div></div>`; 
+            if (currentSoundToPlay) playSound(currentSoundToPlay); 
+        }
+        
         function prevLearningCard() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; renderLearningCard(); }
         function nextLearningCard() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; renderLearningCard(); }
         
-        function toggleQuiz() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); isQuizMode = !isQuizMode; updateQuizToggleUI(); const learningArea = document.getElementById('learning-area'); const quizArea = document.getElementById('quiz-area'); const gameArea = document.getElementById('game-area'); if (isQuizMode) { learningArea.style.display = 'none'; if (currentRoom === 'colors' || currentRoom === 'feeding') { gameArea.classList.add('active'); setupDragGame(); } else { quizArea.classList.add('active'); startNewQuizRound(); } } else { quizArea.classList.remove('active'); gameArea.classList.remove('active'); if (currentRoom === 'colors' || currentRoom === 'feeding') { goHome(); } else { learningArea.style.display = 'flex'; currentLearningIndex = 0; renderLearningCard(); } } }
-        function setupDragGame() { const dragZone = document.getElementById('drag-zone'); const targetZone = document.getElementById('target-zone'); dragZone.innerHTML = ''; targetZone.innerHTML = ''; matchedCount = 0; if (currentRoom === 'colors') playSound('color_intro.wav'); if (currentRoom === 'feeding') playSound('f_intro.wav'); let allData = [...roomsData[currentRoom]]; shuffleArray(allData); let roundData = []; let usedDrags = new Set(); for (let i = 0; i < allData.length; i++) { if (!usedDrags.has(allData[i].drag)) { roundData.push(allData[i]); usedDrags.add(allData[i].drag); } if (roundData.length === 3) break; } let draggables = shuffleArray([...roundData]); let targets = shuffleArray([...roundData]); draggables.forEach(item => { const img = document.createElement('img'); img.src = item.drag; img.className = 'draggable-item'; img.setAttribute('data-id', item.id); img.ondragstart = () => false; img.addEventListener('touchstart', handlePointerStart, {passive: false}); img.addEventListener('mousedown', handlePointerStart); dragZone.appendChild(img); }); targets.forEach(item => { const img = document.createElement('img'); img.src = item.target; img.className = 'target-item'; img.setAttribute('data-id', item.id); targetZone.appendChild(img); }); }
+        function toggleQuiz() { 
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
+            isQuizMode = !isQuizMode; 
+            updateQuizToggleUI(); 
+            const learningArea = document.getElementById('learning-area'); 
+            const quizArea = document.getElementById('quiz-area'); 
+            const gameArea = document.getElementById('game-area'); 
+            if (isQuizMode) { 
+                learningArea.style.display = 'none'; 
+                if (currentRoom === 'colors' || currentRoom === 'feeding') { 
+                    gameArea.classList.add('active'); 
+                    setupDragGame(); 
+                } else if (currentRoom === 'shapes') { 
+                    gameArea.classList.add('active'); 
+                    setupDragGame(); 
+                } else { 
+                    quizArea.classList.add('active'); 
+                    startNewQuizRound(); 
+                } 
+            } else { 
+                quizArea.classList.remove('active'); 
+                gameArea.classList.remove('active'); 
+                if (currentRoom === 'colors' || currentRoom === 'feeding' || currentRoom === 'shapes') { 
+                    goHome(); 
+                } else { 
+                    learningArea.style.display = 'flex'; 
+                    currentLearningIndex = 0; 
+                    renderLearningCard(); 
+                } 
+            } 
+        }
+        
+        function setupDragGame() { 
+            const dragZone = document.getElementById('drag-zone'); 
+            const targetZone = document.getElementById('target-zone'); 
+            dragZone.innerHTML = ''; 
+            targetZone.innerHTML = ''; 
+            matchedCount = 0; 
+            if (currentRoom === 'colors') playSound('color_intro.wav'); 
+            if (currentRoom === 'feeding') playSound('f_intro.wav'); 
+            if (currentRoom === 'shapes') playSound('shapes_intro.wav'); 
+            
+            let allData = [...roomsData[currentRoom]]; 
+            shuffleArray(allData); 
+            let roundData = []; 
+            let usedDrags = new Set(); 
+            for (let i = 0; i < allData.length; i++) { 
+                if (currentRoom === 'shapes') { 
+                    // для shapes у каждого объекта есть поле 'targets' (массив) и своя картинка drag (card_*.png)
+                    if (!usedDrags.has(allData[i].id)) { 
+                        roundData.push(allData[i]); 
+                        usedDrags.add(allData[i].id); 
+                    } 
+                } else { 
+                    // для colors и feeding используем drag как раньше
+                    if (!usedDrags.has(allData[i].drag)) { 
+                        roundData.push(allData[i]); 
+                        usedDrags.add(allData[i].drag); 
+                    } 
+                } 
+                if (roundData.length === 3) break; 
+            } 
+            let draggables = shuffleArray([...roundData]); 
+            let targets = shuffleArray([...roundData]); 
+            
+            draggables.forEach(item => { 
+                const img = document.createElement('img'); 
+                if (currentRoom === 'shapes') { 
+                    img.src = item.image; // card_xxx.png 
+                } else { 
+                    img.src = item.drag; 
+                } 
+                img.className = 'draggable-item'; 
+                img.setAttribute('data-id', item.id); 
+                img.ondragstart = () => false; 
+                img.addEventListener('touchstart', handlePointerStart, {passive: false}); 
+                img.addEventListener('mousedown', handlePointerStart); 
+                dragZone.appendChild(img); 
+            }); 
+            
+            targets.forEach(item => { 
+                const img = document.createElement('img'); 
+                if (currentRoom === 'shapes') { 
+                    // выбрать случайную цель из массива targets
+                    const targetsArray = item.targets; 
+                    const randomTarget = targetsArray[Math.floor(Math.random() * targetsArray.length)]; 
+                    img.src = randomTarget; 
+                } else { 
+                    img.src = item.target; 
+                } 
+                img.className = 'target-item'; 
+                img.setAttribute('data-id', item.id); 
+                targetZone.appendChild(img); 
+            }); 
+        }
         
         function handlePointerStart(e) { 
             if (e.type === 'touchstart') e.preventDefault(); 
@@ -547,12 +678,15 @@
                     const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound; 
                     playSound('f_yum.wav'); 
                     setTimeout(() => playSound(animalSound), 1000); 
+                } else if (currentRoom === 'shapes') { 
+                    playSound('shape_correct.wav'); 
                 } 
                 
                 matchedCount++; 
                 if (matchedCount === 3) { 
                     if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500); 
                     else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000); 
+                    else if (currentRoom === 'shapes') setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000); 
                 } 
             } else { 
                 vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
