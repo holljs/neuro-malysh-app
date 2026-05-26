@@ -213,7 +213,7 @@
                 <span style="font-size: 20px; font-weight: 600; color: #7A90A4;">Нейро-Малыш</span>
             </div>
         </div>
-        <div class="hero-title">Во во что поиграем?</div>
+        <div class="hero-title">Во что поиграем?</div>
         <div class="menu-grid">
             <div class="category-card cat-animals" onclick="openRoom('animals', 'Животные')">
                 <div class="category-icon-placeholder"><img src="icon_animals.png" alt=""></div>
@@ -427,7 +427,6 @@
             const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors');
             if (isPremiumRoom && !isTestMode && !userHasPremium) {
                 if (isMobileVK) { 
-                    // ОТКРЫВАЕМ НАШУ НОВУЮ КРАСИВУЮ МОДАЛКУ ВМЕСТО АЛЕРТА
                     openModal('mobile-paywall-modal'); 
                     return; 
                 } 
@@ -489,9 +488,85 @@
         function toggleQuiz() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); isQuizMode = !isQuizMode; updateQuizToggleUI(); const learningArea = document.getElementById('learning-area'); const quizArea = document.getElementById('quiz-area'); const gameArea = document.getElementById('game-area'); if (isQuizMode) { learningArea.style.display = 'none'; if (currentRoom === 'colors' || currentRoom === 'feeding') { gameArea.classList.add('active'); setupDragGame(); } else { quizArea.classList.add('active'); startNewQuizRound(); } } else { quizArea.classList.remove('active'); gameArea.classList.remove('active'); if (currentRoom === 'colors' || currentRoom === 'feeding') { goHome(); } else { learningArea.style.display = 'flex'; currentLearningIndex = 0; renderLearningCard(); } } }
         function setupDragGame() { const dragZone = document.getElementById('drag-zone'); const targetZone = document.getElementById('target-zone'); dragZone.innerHTML = ''; targetZone.innerHTML = ''; matchedCount = 0; if (currentRoom === 'colors') playSound('color_intro.wav'); if (currentRoom === 'feeding') playSound('f_intro.wav'); let allData = [...roomsData[currentRoom]]; shuffleArray(allData); let roundData = []; let usedDrags = new Set(); for (let i = 0; i < allData.length; i++) { if (!usedDrags.has(allData[i].drag)) { roundData.push(allData[i]); usedDrags.add(allData[i].drag); } if (roundData.length === 3) break; } let draggables = shuffleArray([...roundData]); let targets = shuffleArray([...roundData]); draggables.forEach(item => { const img = document.createElement('img'); img.src = item.drag; img.className = 'draggable-item'; img.setAttribute('data-id', item.id); img.ondragstart = () => false; img.addEventListener('touchstart', handlePointerStart, {passive: false}); img.addEventListener('mousedown', handlePointerStart); dragZone.appendChild(img); }); targets.forEach(item => { const img = document.createElement('img'); img.src = item.target; img.className = 'target-item'; img.setAttribute('data-id', item.id); targetZone.appendChild(img); }); }
         
-        function handlePointerStart(e) { if (e.type === 'touchstart') e.preventDefault(); if (e.target.classList.contains('matched')) return; activeItem = e.target; const rect = activeItem.getBoundingClientRect(); activeItem.style.width = rect.width + 'px'; activeItem.style.height = rect.height + 'px'; const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; startX = clientX - rect.left; startY = clientY - rect.top; activeItem.classList.add('dragging'); activeItem.style.position = 'fixed'; activeItem.style.margin = '0'; activeItem.style.left = (clientX - startX) + 'px'; activeItem.style.top = (clientY - startY) + 'px'; }
-        function handlePointerMove(e) { if (!activeItem) return; e.preventDefault(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; activeItem.style.left = (clientX - startX) + 'px'; activeItem.style.top = (clientY - startY) + 'px'; }
-        function handlePointerEnd(e) { if (!activeItem) return; activeItem.classList.remove('dragging'); const itemId = activeItem.getAttribute('data-id'); const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY; activeItem.style.display = 'none'; const elementUnderTouch = document.elementFromPoint(clientX, clientY); activeItem.style.display = 'block'; let target = (elementUnderTouch && elementUnderTouch.classList.contains('target-item')) ? elementUnderTouch : null; if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); activeItem.classList.add('matched'); target.classList.add('matched'); activeItem.style.display = 'none'; if (currentRoom === 'colors') playSound('color_correct.wav'); else if (currentRoom === 'feeding') { const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound; playSound('f_yum.wav'); setTimeout(() => playSound(animalSound), 1000); } matchedCount++; if (matchedCount === 3) { if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500); else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000); } } else { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound('wrong.wav'); activeItem.style.transition = 'all 0.3s ease'; activeItem.style.position = 'relative'; activeItem.style.left = '0px'; activeItem.style.top = '0px'; activeItem.style.width = ''; activeItem.style.height = ''; setTimeout(() => { activeItem.style.transition = 'none'; }, 300); } activeItem = null; }
+        function handlePointerStart(e) { 
+            if (e.type === 'touchstart') e.preventDefault(); 
+            if (e.target.classList.contains('matched')) return; 
+            
+            activeItem = e.target; 
+            const rect = activeItem.getBoundingClientRect(); 
+            
+            // Фиксируем размеры до пикселя
+            activeItem.style.width = rect.width + 'px'; 
+            activeItem.style.height = rect.height + 'px'; 
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX; 
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
+            
+            // ЖЕСТКАЯ СЦЕПКА: центрируем предмет ровно под пальцем малыша
+            startX = rect.width / 2; 
+            startY = rect.height / 2; 
+            
+            activeItem.classList.add('dragging'); 
+            activeItem.style.position = 'fixed'; 
+            activeItem.style.margin = '0'; 
+            
+            activeItem.style.left = (clientX - startX) + 'px'; 
+            activeItem.style.top = (clientY - startY) + 'px'; 
+        }
+
+        function handlePointerMove(e) { 
+            if (!activeItem) return; 
+            e.preventDefault(); 
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX; 
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
+            activeItem.style.left = (clientX - startX) + 'px'; 
+            activeItem.style.top = (clientY - startY) + 'px'; 
+        }
+
+        function handlePointerEnd(e) { 
+            if (!activeItem) return; 
+            activeItem.classList.remove('dragging'); 
+            const itemId = activeItem.getAttribute('data-id'); 
+            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; 
+            const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY; 
+            
+            activeItem.style.display = 'none'; 
+            const elementUnderTouch = document.elementFromPoint(clientX, clientY); 
+            activeItem.style.display = 'block'; 
+            
+            let target = (elementUnderTouch && elementUnderTouch.classList.contains('target-item')) ? elementUnderTouch : null; 
+            
+            if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) { 
+                vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
+                activeItem.classList.add('matched'); 
+                target.classList.add('matched'); 
+                activeItem.style.display = 'none'; 
+                
+                if (currentRoom === 'colors') playSound('color_correct.wav'); 
+                else if (currentRoom === 'feeding') { 
+                    const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound; 
+                    playSound('f_yum.wav'); 
+                    setTimeout(() => playSound(animalSound), 1000); 
+                } 
+                
+                matchedCount++; 
+                if (matchedCount === 3) { 
+                    if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500); 
+                    else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000); 
+                } 
+            } else { 
+                vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
+                playSound('wrong.wav'); 
+                activeItem.style.transition = 'all 0.3s ease'; 
+                activeItem.style.position = 'relative'; 
+                activeItem.style.left = '0px'; 
+                activeItem.style.top = '0px'; 
+                activeItem.style.width = ''; 
+                activeItem.style.height = ''; 
+                setTimeout(() => { activeItem.style.transition = 'none'; }, 300); 
+            } 
+            activeItem = null; 
+        }
         
         document.addEventListener('touchmove', handlePointerMove, {passive: false}); document.addEventListener('touchend', handlePointerEnd); document.addEventListener('mousemove', handlePointerMove, {passive: false}); document.addEventListener('mouseup', handlePointerEnd);
         
