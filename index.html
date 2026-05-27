@@ -431,7 +431,7 @@
                 { id: 'triangle', text: 'Треугольник', image: 'card_triangle.png', sound: 'shape_triangle.wav', targets: ['target_triangle_sail.png', 'target_triangle_roof.png'] },
                 { id: 'rect', text: 'Прямоугольник', image: 'card_rect.png', sound: 'shape_rect.wav', targets: ['target_rect_train.png', 'target_rect_truck1.png', 'target_rect_truck2.png'] },
                 { id: 'star', text: 'Звезда', image: 'card_star.png', sound: 'shape_star.wav', targets: ['target_star_wand.png', 'target_star_sky.png'] },
-                { id: 'rhombus', text: 'Ромб', image: 'card_romb.png', sound: 'shape_rombus.wav', targets: ['target_romb_kite.png', 'target_romb_diamond.png'] }
+                { id: 'rhombus', text: 'Ромб', image: 'card_romb.png', sound: 'shape_rhombus.wav', targets: ['target_romb_kite.png', 'target_romb_diamond.png'] }
             ]
         };
 
@@ -456,7 +456,7 @@
             if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
             else if (roomId === 'wind') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wind-area').classList.add('active'); document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!"; document.getElementById('wind-start-btn').style.display = 'block'; } 
             else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
-            else if (roomId === 'colors' || roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); } 
+           else if (roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); }
             else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
             document.getElementById('room-title').innerText = title;
@@ -546,8 +546,8 @@
             } else { 
                 quizArea.classList.remove('active'); 
                 gameArea.classList.remove('active'); 
-                // ВОТ ЗДЕСЬ УБРАЛИ 'shapes', ЧТОБЫ ВОЗВРАЩАЛО К КАРТОЧКАМ:
-                if (currentRoom === 'colors' || currentRoom === 'feeding') { 
+                // УБРАЛИ КОМНАТУ colors ОТСЮДА, чтобы возвращать ребенка к карточкам:
+                if (currentRoom === 'feeding') { 
                     goHome(); 
                 } else { 
                     learningArea.style.display = 'flex'; 
