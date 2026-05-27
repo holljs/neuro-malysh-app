@@ -530,6 +530,7 @@
             const learningArea = document.getElementById('learning-area'); 
             const quizArea = document.getElementById('quiz-area'); 
             const gameArea = document.getElementById('game-area'); 
+            
             if (isQuizMode) { 
                 learningArea.style.display = 'none'; 
                 if (currentRoom === 'colors' || currentRoom === 'feeding') { 
@@ -545,7 +546,8 @@
             } else { 
                 quizArea.classList.remove('active'); 
                 gameArea.classList.remove('active'); 
-                if (currentRoom === 'colors' || currentRoom === 'feeding' || currentRoom === 'shapes') { 
+                // ВОТ ЗДЕСЬ УБРАЛИ 'shapes', ЧТОБЫ ВОЗВРАЩАЛО К КАРТОЧКАМ:
+                if (currentRoom === 'colors' || currentRoom === 'feeding') { 
                     goHome(); 
                 } else { 
                     learningArea.style.display = 'flex'; 
