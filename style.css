@@ -190,7 +190,7 @@ body {
     opacity: 0.9;
 }
 
-/* ---- КОМНАТА "БОЛЬШОЙ-МАЛЕНЬКИЙ" (адаптивная) ---- */
+/* ---- КОМНАТА "БОЛЬШОЙ-МАЛЕНЬКИЙ" (адаптивная с явной разницей) ---- */
 .bs-container {
     display: none;
     flex-direction: row;
@@ -219,35 +219,61 @@ body {
     align-items: center;
     gap: 20px;
 }
+
+/* Размеры предметов для перетаскивания */
 .bs-drag-big {
-    width: 35vw;
-    max-width: 160px;
+    width: 180px;
+    max-width: 45vw;
     height: auto;
 }
 .bs-drag-small {
-    width: 25vw;
-    max-width: 100px;
+    width: 80px;
+    max-width: 20vw;
     height: auto;
 }
+
+/* Размеры коробок (целей) */
 .bs-box {
     object-fit: contain;
-    width: auto;
-    max-width: 100%;
-    max-height: 100%;
 }
 .bs-box-big {
-    max-width: 35vw;
-    max-height: 35vw;
+    width: 180px;
+    max-width: 45vw;
+    height: auto;
 }
 .bs-box-small {
-    max-width: 25vw;
-    max-height: 25vw;
+    width: 90px;
+    max-width: 22vw;
+    height: auto;
 }
 .bs-box-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
+}
+
+/* Для маленьких экранов (телефоны) – сохраняем пропорции */
+@media (max-width: 600px) {
+    .bs-drag-big {
+        width: 45vw;
+        max-width: 160px;
+    }
+    .bs-drag-small {
+        width: 22vw;
+        max-width: 85px;
+    }
+    .bs-box-big {
+        width: 45vw;
+        max-width: 160px;
+    }
+    .bs-box-small {
+        width: 22vw;
+        max-width: 85px;
+    }
+    .bs-left-side, .bs-right-side {
+        gap: 15px;
+    }
 }
 
 /* ---- КАРТОЧКИ ЖЕЛАНИЙ ---- */
