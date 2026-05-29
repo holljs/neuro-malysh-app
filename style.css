@@ -163,3 +163,38 @@ body {
 .legal-info { font-size: 12px; color: #A09B98; text-align: left; line-height: 1.4; }
 .wind-start-btn { background-color: #8CC084; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border-radius: 25px; border: none; cursor: pointer; }
 .clear-btn { background-color: #F8E8E8; color: #5C5552; border: none; padding: 10px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (КОМНАТА БОЛЬШОЙ-МАЛЕНЬКИЙ) --- */
+@media (max-width: 600px) {
+    .bs-container {
+        padding: 5px;
+        gap: 5px;
+    }
+    .bs-left-side {
+        gap: 15px;
+    }
+    .bs-drag-big {
+        width: 35vw !important;
+        height: auto !important;
+        max-width: 140px;
+    }
+    .bs-drag-small {
+        width: 25vw !important;
+        height: auto !important;
+        max-width: 90px;
+    }
+    .bs-box-big {
+        width: 35vw !important;
+        height: auto !important;
+        max-width: 140px;
+    }
+    .bs-box-small {
+        width: 25vw !important;
+        height: auto !important;
+        max-width: 90px;
+    }
+    .bs-box-wrapper {
+        height: auto;
+        margin: 5px 0;
+    }
+}
