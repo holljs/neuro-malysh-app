@@ -337,8 +337,12 @@ function onDragStart(e) {
     dragOffsetY = e.clientY - rect.top;
     
     // Сохраняем исходные размеры и стиль
+    // Сохраняем исходные размеры, но не переопределяем, если они уже адаптивны
     activeItem.style.width = rect.width + 'px';
     activeItem.style.height = rect.height + 'px';
+    // Добавляем фиксацию минимальных размеров, чтобы при перетаскивании не сжималось
+    activeItem.style.minWidth = rect.width + 'px';
+    activeItem.style.minHeight = rect.height + 'px';
     activeItem.classList.add('dragging');
     activeItem.style.position = 'fixed';
     activeItem.style.zIndex = '1000';
