@@ -308,36 +308,45 @@ function setupDragGame() {
 }
 
 function setupBigSmallGame() {
+    // 1. Очищаем зону для предметов
     document.getElementById('bs-drag-zone').innerHTML = ''; 
     
-    if (bsActiveItemsCount === 0 || bsActiveItemsCount === 2) {
-        playSound('bs_intro.wav');
-    }
-    
+    // 2. Берём НАШУ ПОЛНУЮ БАЗУ ИЗ 12 ПАР
     const allPairs = roomsData['big_small'];
-    if (currentPairIndex >= allPairs.length) {
+    
+    // ПРОВЕРКА ИНДЕКСА: если вышли за пределы 12 пар, сбрасываем в 0 и перемешиваем для нового круга
+    if (currentPairIndex >= allPairs.length || currentPairIndex < 0) {
         currentPairIndex = 0; 
         shuffleArray(allPairs);
     }
     
+    // 3. Достаем конкретную пару по текущему индексу
     const pair = allPairs[currentPairIndex];
-    bsActiveItemsCount = 2; 
+    bsActiveItemsCount = 2; // Ждем, пока разложат оба предмета
+    
     const dragZone = document.getElementById('bs-drag-zone');
     
+    // 4. Создаем БОЛЬШОЙ предмет (240px)
     const bigImg = document.createElement('img');
-    bigImg.src = pair.big_img; bigImg.className = 'draggable-item';
-    bigImg.setAttribute('data-size', 'big'); bigImg.setAttribute('data-sound', pair.big_sound);
+    bigImg.src = pair.big_img; 
+    bigImg.className = 'draggable-item';
+    bigImg.setAttribute('data-size', 'big'); 
+    bigImg.setAttribute('data-sound', pair.big_sound);
     bigImg.style.cssText = 'width: 240px; height: 240px; margin: 10px;'; 
     bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     bigImg.addEventListener('mousedown', handlePointerStart);
     
+    // 5. Создаем МАЛЕНЬКИЙ предмет (120px)
     const smallImg = document.createElement('img');
-    smallImg.src = pair.small_img; smallImg.className = 'draggable-item';
-    smallImg.setAttribute('data-size', 'small'); smallImg.setAttribute('data-sound', pair.small_sound);
+    smallImg.src = pair.small_img; 
+    smallImg.className = 'draggable-item';
+    smallImg.setAttribute('data-size', 'small'); 
+    smallImg.setAttribute('data-sound', pair.small_sound);
     smallImg.style.cssText = 'width: 120px; height: 120px; margin: 10px;'; 
     smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     smallImg.addEventListener('mousedown', handlePointerStart);
     
+    // 6. Перемешиваем их случайно (лево/право), чтобы Сева не запоминал шаблон
     const items = [bigImg, smallImg];
     shuffleArray(items);
     items.forEach(img => dragZone.appendChild(img));
