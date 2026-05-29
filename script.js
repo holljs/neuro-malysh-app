@@ -73,8 +73,9 @@ async function goToPayment() {
 }
 
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
-let activeItem = null; let startX = 0, startY = 0; let matchedCount = 0;
+let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
+let canvasInitialized = false; // <-- исправлено: переменная объявлена
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -141,7 +142,6 @@ function openRoom(roomId, title) {
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
     else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
     else if (roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); }
-    // ИСПРАВЛЕНИЕ: Убрали отсюда playSound('bs_intro.wav') — теперь полная тишина при входе!
     else if (roomId === 'big_small') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('bs-area').classList.add('active'); setupBigSmallGame(); }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
@@ -274,8 +274,7 @@ function setupDragGame() {
         img.className = 'draggable-item'; 
         img.setAttribute('data-id', item.id); 
         img.ondragstart = () => false; 
-        img.addEventListener('touchstart', handlePointerStart, {passive: false}); 
-        img.addEventListener('mousedown', handlePointerStart); 
+        img.addEventListener('pointerdown', onDragStart); // <-- pointer events
         dragZone.appendChild(img); 
     }); 
     
@@ -308,133 +307,144 @@ function setupBigSmallGame() {
     const dragZone = document.getElementById('bs-drag-zone');
     
     const bigImg = document.createElement('img');
-    bigImg.src = pair.big_img; bigImg.className = 'draggable-item';
+    bigImg.src = pair.big_img; bigImg.className = 'draggable-item bs-drag-big';
     bigImg.setAttribute('data-size', 'big'); bigImg.setAttribute('data-sound', pair.big_sound);
-    bigImg.style.cssText = 'width: 240px; height: 240px; margin: 10px;'; 
-    bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
-    bigImg.addEventListener('mousedown', handlePointerStart);
+    bigImg.addEventListener('pointerdown', onDragStart); // <-- pointer events
+    bigImg.ondragstart = () => false;
     
     const smallImg = document.createElement('img');
-    smallImg.src = pair.small_img; smallImg.className = 'draggable-item';
+    smallImg.src = pair.small_img; smallImg.className = 'draggable-item bs-drag-small';
     smallImg.setAttribute('data-size', 'small'); smallImg.setAttribute('data-sound', pair.small_sound);
-    smallImg.style.cssText = 'width: 120px; height: 120px; margin: 10px;'; 
-    smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
-    smallImg.addEventListener('mousedown', handlePointerStart);
+    smallImg.addEventListener('pointerdown', onDragStart);
+    smallImg.ondragstart = () => false;
     
     const items = [bigImg, smallImg];
     shuffleArray(items);
     items.forEach(img => dragZone.appendChild(img));
 }
 
-function handlePointerStart(e) { 
-    if (e.type === 'touchstart') e.preventDefault(); 
-    // ИСПРАВЛЕНИЕ: Если ткнули в КОРОБКУ (target-item), игнорируем клик, чтобы она не прыгала!
-    if (e.target.classList.contains('target-item')) return;
-    if (e.target.classList.contains('matched')) return; 
+// ----- НОВЫЕ ОБРАБОТЧИКИ ПЕРЕТАСКИВАНИЯ НА POINTER EVENTS -----
+function onDragStart(e) {
+    // Запрещаем перетаскивание, если это не draggable-элемент или он уже сопоставлен
+    if (!e.target.classList.contains('draggable-item') || e.target.classList.contains('matched')) return;
+    e.preventDefault();
+    e.target.setPointerCapture(e.pointerId);
     
-    activeItem = e.target; 
-    const rect = activeItem.getBoundingClientRect(); 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX; 
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
+    activeItem = e.target;
+    const rect = activeItem.getBoundingClientRect();
+    // Смещение от точки касания до верхнего левого угла элемента
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
     
-    startX = clientX - rect.left; 
-    startY = clientY - rect.top; 
+    // Сохраняем исходные размеры и стиль
+    activeItem.style.width = rect.width + 'px';
+    activeItem.style.height = rect.height + 'px';
+    activeItem.classList.add('dragging');
+    activeItem.style.position = 'fixed';
+    activeItem.style.zIndex = '1000';
+    activeItem.style.left = (e.clientX - dragOffsetX) + 'px';
+    activeItem.style.top = (e.clientY - dragOffsetY) + 'px';
     
-    activeItem.style.width = rect.width + 'px'; 
-    activeItem.style.height = rect.height + 'px'; 
-    activeItem.classList.add('dragging'); 
-    activeItem.style.position = 'fixed'; 
-    activeItem.style.zIndex = '1000'; 
-    
-    activeItem.style.left = (clientX - startX) + 'px'; 
-    activeItem.style.top = (clientY - startY) + 'px'; 
-
-    if (currentRoom === 'big_small' && activeItem) { 
+    // Звук для big_small
+    if (currentRoom === 'big_small' && activeItem) {
         const currentSound = activeItem.getAttribute('data-sound');
-        if (currentSound) playSound(currentSound); 
+        if (currentSound) playSound(currentSound);
     }
 }
 
-function handlePointerMove(e) { 
-    if (!activeItem) return; 
-    e.preventDefault(); 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX; 
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
-    activeItem.style.left = (clientX - startX) + 'px'; 
-    activeItem.style.top = (clientY - startY) + 'px'; 
+function onDragMove(e) {
+    if (!activeItem) return;
+    e.preventDefault();
+    activeItem.style.left = (e.clientX - dragOffsetX) + 'px';
+    activeItem.style.top = (e.clientY - dragOffsetY) + 'px';
 }
 
-function handlePointerEnd(e) { 
-    if (!activeItem) return; 
-    activeItem.classList.remove('dragging'); 
-    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; 
-    const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY; 
+function onDragEnd(e) {
+    if (!activeItem) return;
+    activeItem.releasePointerCapture?.(e.pointerId);
+    activeItem.classList.remove('dragging');
     
-    activeItem.style.display = 'none'; 
-    const elementUnderTouch = document.elementFromPoint(clientX, clientY); 
-    activeItem.style.display = 'block'; 
+    // Спрячем временно элемент, чтобы узнать, над чем палец/курсор
+    activeItem.style.display = 'none';
+    const elemUnderPointer = document.elementsFromPoint(e.clientX, e.clientY);
+    let target = null;
+    for (let el of elemUnderPointer) {
+        if (el.classList && el.classList.contains('target-item')) {
+            target = el;
+            break;
+        }
+    }
+    activeItem.style.display = '';
     
-    let target = (elementUnderTouch && elementUnderTouch.classList.contains('target-item')) ? elementUnderTouch : null; 
-    
+    // Обработка логики в зависимости от комнаты
     if (currentRoom === 'big_small') {
         if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
-            activeItem.style.display = 'none'; 
-            playSound('color_correct.wav'); 
+            activeItem.style.display = 'none';
+            playSound('color_correct.wav');
             bsActiveItemsCount--;
             if (bsActiveItemsCount === 0) {
                 currentPairIndex++;
                 setTimeout(() => {
-                    playSound('bs_win.wav'); 
-                    setTimeout(setupBigSmallGame, 2000); 
-                }, 1000); 
+                    playSound('bs_win.wav');
+                    setTimeout(setupBigSmallGame, 2000);
+                }, 1000);
             }
-            activeItem = null; return; 
+            activeItem = null;
+            return;
         }
     } 
     else {
-        const itemId = activeItem.getAttribute('data-id'); 
-        if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) { 
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
-            activeItem.classList.add('matched'); 
-            target.classList.add('matched'); 
-            activeItem.style.display = 'none'; 
+        const itemId = activeItem.getAttribute('data-id');
+        if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) {
+            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            activeItem.classList.add('matched');
+            target.classList.add('matched');
+            activeItem.style.display = 'none';
             
-            if (currentRoom === 'colors') playSound('color_correct.wav'); 
-            else if (currentRoom === 'feeding') { 
-                const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound; 
-                playSound('f_yum.wav'); 
-                setTimeout(() => playSound(animalSound), 1000); 
-            } else if (currentRoom === 'shapes') { 
-                playSound('shape_correct.wav'); 
-            } 
-            
-            matchedCount++; 
-            if (matchedCount === 3) { 
-                if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500); 
-                else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000); 
-                else if (currentRoom === 'shapes') setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000); 
+            if (currentRoom === 'colors') playSound('color_correct.wav');
+            else if (currentRoom === 'feeding') {
+                const animalSound = roomsData['feeding'].find(a => a.id === itemId).sound;
+                playSound('f_yum.wav');
+                setTimeout(() => playSound(animalSound), 1000);
+            } else if (currentRoom === 'shapes') {
+                playSound('shape_correct.wav');
             }
-            activeItem = null; return; 
-        } 
+            
+            matchedCount++;
+            if (matchedCount === 3) {
+                if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500);
+                else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000);
+                else if (currentRoom === 'shapes') setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000);
+            }
+            activeItem = null;
+            return;
+        }
     }
-
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
-    playSound('wrong.wav'); 
-    activeItem.style.transition = 'all 0.3s ease'; 
-    activeItem.style.position = 'relative'; 
-    activeItem.style.left = '0px'; activeItem.style.top = '0px'; 
-    activeItem.style.width = ''; activeItem.style.height = ''; 
-    setTimeout(() => { if (activeItem) activeItem.style.transition = 'none'; }, 300); 
-    activeItem = null; 
+    
+    // Неправильное попадание
+    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    playSound('wrong.wav');
+    // Возвращаем элемент на место
+    activeItem.style.transition = 'all 0.3s ease';
+    activeItem.style.position = '';
+    activeItem.style.left = '';
+    activeItem.style.top = '';
+    activeItem.style.width = '';
+    activeItem.style.height = '';
+    setTimeout(() => {
+        if (activeItem) activeItem.style.transition = '';
+    }, 300);
+    activeItem = null;
 }
 
-document.addEventListener('touchmove', handlePointerMove, {passive: false}); document.addEventListener('touchend', handlePointerEnd); document.addEventListener('mousemove', handlePointerMove); document.addEventListener('mouseup', handlePointerEnd);
+// Глобальные слушатели pointermove / pointerup
+document.addEventListener('pointermove', onDragMove);
+document.addEventListener('pointerup', onDragEnd);
 
 function startNewQuizRound() { const allCards = [...roomsData[currentRoom]]; shuffleArray(allCards); quizCards = allCards.slice(0, 4); const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)]; expectedCardId = randomTarget.id; renderQuizGrid(); if (currentRoom === 'letters') playSound(`q_b_${randomTarget.id}.wav`); else if (randomTarget.sound) { const soundFilename = randomTarget.sound.split('/').pop(); const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); playSound(`q${fileBase}.wav`); } }
 function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'); quizArea.innerHTML = ''; quizCards.forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'quiz-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => handleQuizClick(card.id); quizArea.appendChild(cardDiv); }); }
 function handleQuizClick(actionId) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
-// Функция перемешивания массивов (исправлена область видимости)
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } }
