@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Нейро-Малыш</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,13 +13,10 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('help-modal')">✖</button>
             <h2>О приложении</h2>
-            <p>«Нейро-Малыш» — это логопедический тренажер для мягкого запуска речи. <br><br>Помогайте Уте-Те кормить зверей, раскрашивать картинки и выполнять весёлые действия!</p>
-            <p id="payment-instruction-placeholder" style="display: none;">
-                <a href="#" style="color: #4D79FF;">Как оформить подписку?</a>
-            </p>
+            <p>«Нейро-Малыш» — логопедический тренажер.<br><br>Помогайте Уте-Те кормить зверей, раскрашивать картинки и делать весёлые дела!</p>
             <hr style="border: none; border-top: 1px solid #E8EBF0; margin: 20px 0;">
             <div class="legal-info">
-                Продавец: Самозанятая Селяхова Наталья Викторовна<br>
+                Продавец: Самозанятая Селяхова Н.В.<br>
                 ИНН: 502209781184<br>
                 Email: holljs@mail.ru
             </div>
@@ -30,8 +26,7 @@
     <div id="paywall-modal" class="modal-overlay" onclick="closeModal('paywall-modal', event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h2 style="color: #FFB347; font-size: 24px;">👑 Открой все игры!</h2>
-            <p>Умные раскраски, комната действий, любимые хотелки и другие логопедические игры ждут вас.</p>
-            <p style="font-size: 20px; color: #5C5552;"><b>Всего 150 руб/мес.</b></p>
+            <p>Всего 150 руб/мес.</p>
             <button class="wind-start-btn" style="background-color: #FFB347; width: 100%; margin-top: 10px;" onclick="goToPayment()">Оформить подписку</button>
             <button class="clear-btn" style="width: 100%; margin-top: 15px; background: transparent; font-weight: normal;" onclick="closeModal('paywall-modal')">Позже</button>
         </div>
@@ -41,7 +36,6 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('mobile-paywall-modal')">✖</button>
             <h2 style="color: #FFB347; font-size: 24px;">🔒 Комната закрыта</h2>
-            <p style="font-size: 18px; color: #5C5552; margin-top: 15px;">Как зайти в комнаты с замочком, читайте в Справке <b>(?)</b></p>
             <button class="wind-start-btn" style="background-color: #A3C9D9; width: 100%; margin-top: 20px;" onclick="closeModal('mobile-paywall-modal'); openModal('help-modal');">Открыть справку</button>
         </div>
     </div>
@@ -129,14 +123,13 @@
             </div>
 
             <div id="bs-area" class="bs-container">
-                <div id="bs-drag-zone" class="bs-top-zone">
-                    </div>
+                <div id="bs-drag-zone" class="bs-top-zone"></div>
                 <div class="bs-bottom-zone">
                     <div class="bs-box-wrapper">
-                        <img src="box.png" class="bs-box bs-box-big target-item" data-size="big" alt="Большая коробка">
+                        <img src="box.png" class="bs-box bs-box-big target-item" data-size="big">
                     </div>
                     <div class="bs-box-wrapper">
-                        <img src="box.png" class="bs-box bs-box-small target-item" data-size="small" alt="Маленькая коробка">
+                        <img src="box.png" class="bs-box bs-box-small target-item" data-size="small">
                     </div>
                 </div>
             </div>
@@ -144,12 +137,12 @@
             <div id="draw-area" class="draw-container">
                 <div class="draw-nav">
                     <div class="nav-btn" onclick="changeDrawImage(-1)" style="width:40px; height:40px; font-size:18px;">⬅️</div>
-                    <div class="draw-title" id="draw-image-title">Котенок</div>
+                    <div class="draw-title" id="draw-image-title"></div>
                     <div class="nav-btn" onclick="changeDrawImage(1)" style="width:40px; height:40px; font-size:18px;">➡️</div>
                 </div>
                 <div class="canvas-wrapper">
                     <canvas id="paintCanvas"></canvas>
-                    <img id="contourImage" src="kitten.jpg" draggable="false" alt="">
+                    <img id="contourImage" src="kitten.jpg" draggable="false">
                 </div>
                 <div class="palette">
                     <div class="color-btn active" style="background:#FF4D4D" onclick="setBrushColor('#FF4D4D', 'color_red', this)"></div>
