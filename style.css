@@ -8,9 +8,9 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #F6F8FA;
-    color: #2C3E50;
+    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    background-color: #F7F5F0;
+    color: #5C5552;
     overflow: hidden;
     width: 100vw;
     height: 100vh;
@@ -20,10 +20,7 @@ body {
 .screen {
     display: none;
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     flex-direction: column;
 }
 
@@ -31,340 +28,138 @@ body {
     display: flex;
 }
 
-/* --- ШАПКА (HEADER) --- */
+/* --- ШАПКА --- */
 .header {
-    background-color: #FFFFFF;
-    padding: 12px 16px;
+    background-color: #F7F5F0;
+    padding: 25px 15px 10px 15px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    border-bottom: 1px solid #E8EBF0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .header-title-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    width: 100%; text-align: center; position: relative;
+    display: flex; justify-content: center; align-items: center; min-height: 32px;
 }
+#room-title { font-size: 20px; font-weight: 600; color: #7A90A4; }
 
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
+.header-top { display: flex; justify-content: space-between; width: 100%; margin-top: 15px; }
 
-.back-btn {
-    background: #EDF2F7;
-    color: #4A5568;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.quiz-toggle {
-    background: #EBF8FF;
-    color: #2B6CB0;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+.back-btn, .quiz-toggle {
+    font-size: 16px; cursor: pointer; padding: 10px 15px; background: #FFFFFF;
+    border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    color: #5C5552; font-weight: 500; white-space: nowrap; 
 }
 
 .help-icon {
-    width: 24px;
-    height: 24px;
-    background: #E2E8F0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #4A5568;
-    cursor: pointer;
+    position: absolute; left: 0; width: 32px; height: 32px;
+    background-color: #A3C9D9; color: #FFFFFF; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 18px; font-weight: bold; cursor: pointer;
 }
 
-/* --- ГЛАВНОЕ МЕНЮ (ПЛИТКА) --- */
-.hero-title {
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    margin: 15px 0 10px 0;
-    color: #2D3748;
-}
+/* --- ГЛАВНОЕ МЕНЮ --- */
+.hero-title { text-align: center; font-size: 18px; font-weight: 500; margin-bottom: 10px; color: #8C847E; }
 
 .menu-grid {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 0 16px 20px 16px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; 
+    align-content: start; overflow-y: auto; flex-grow: 1;
 }
 
 .category-card {
-    background: #FFFFFF;
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
-    border: 1px solid #E2E8F0;
-    cursor: pointer;
-    transition: transform 0.1s ease;
+    border-radius: 20px; padding: 25px 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
 }
 
-.category-card:active {
-    transform: scale(0.96);
-}
+.category-icon-placeholder { width: 100px; height: 100px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
+.category-icon-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+.category-title { font-size: 18px; font-weight: 600; text-align: center; color: #5C5552; }
 
-.category-icon-placeholder {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.premium-lock { position: absolute; top: 10px; right: 10px; font-size: 20px; display: none; }
 
-.category-icon-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+.cat-wants { background-color: #E3E9E5; } 
+.cat-wind { background-color: #E6F0F9; }
+.cat-feed { background-color: #E9F0E3; }
+.cat-draw { background-color: #FFF0E6; }
+.cat-colors { background-color: #F8E8E8; }
+.cat-animals { background-color: #F2EBE5; }
+.cat-letters { background-color: #E8EBF0; }
+.cat-numbers { background-color: #F0EAE1; }
+.cat-shapes { background-color: #E8F0F0; }
+.cat-bs { background-color: #F0F4E6; }
 
-.category-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #4A5568;
-    line-height: 1.2;
-}
-
-/* Цветные ободки для красоты меню */
-.cat-bs { border-bottom: 4px solid #FFB347; }
-.cat-animals { border-bottom: 4px solid #A3C9D9; }
-.cat-colors { border-bottom: 4px solid #FF69B4; }
-.cat-shapes { border-bottom: 4px solid #9932CC; }
-.cat-draw { border-bottom: 4px solid #4DFF4D; }
-.cat-feed { border-bottom: 4px solid #FFA500; }
-.cat-wants { border-bottom: 4px solid #4D79FF; }
-.cat-letters { border-bottom: 4px solid #FF4D4D; }
-.cat-numbers { border-bottom: 4px solid #8B4513; }
-.cat-wind { border-bottom: 4px solid #20B2AA; }
-
-/* --- ИГРОВАЯ ЗОНА (ОБЩАЯ) --- */
+/* --- ИГРОВАЯ ЗОНА --- */
 .room-content-area {
-    flex-grow: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    flex-grow: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 10px;
+    position: relative; width: 100%; box-sizing: border-box; overflow: hidden;
 }
 
-/* --- ОБУЧЕНИЕ (КАРТОЧКА) --- */
-.learning-mode {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-}
+.learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.large-card { background-color: #FFFFFF; border-radius: 30px; padding: 30px 20px; width: 85%; max-width: 320px; text-align: center; font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; }
+.large-card img { width: 200px; height: 200px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
+.slider-controls { display: flex; gap: 40px; margin-top: 25px; }
+.nav-btn { font-size: 24px; background: #FFFFFF; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; }
 
-/* --- ДРАГ-ЭНД-ДРОП ИГРЫ --- */
-.game-container {
-    display: none;
-    width: 100%;
-    height: 100%;
-    flex-direction: row;
-}
-.game-container.active { display: flex; }
+/* --- ДРАГ ИТЕМЫ --- */
+.draggable-item { cursor: grab; object-fit: contain; }
+.draggable-item.dragging { cursor: grabbing; z-index: 1000; transform: scale(1.05); }
 
-.drag-column, .target-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    padding: 10px;
-}
-
-/* --- КАРТОЧКИ ЖЕЛАНИЙ --- */
-.wants-mode {
-    display: none;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 16px;
-    overflow-y: auto;
-    width: 100%;
-    height: 100%;
-}
-.wants-mode.active { display: grid; }
-
-/* --- РАСКРАСКИ --- */
-.draw-container {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-}
-.draw-container.active { display: flex; }
-
-.draw-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: #FFF;
-    border-bottom: 1px solid #E8EBF0;
-}
-.draw-title { font-weight: bold; font-size: 16px; }
-
-.canvas-wrapper {
-    flex-grow: 1;
-    position: relative;
-    background: #FFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-#paintCanvas {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 2;
-}
-#contourImage {
-    max-width: 100%; max-height: 100%;
-    object-fit: contain;
-    z-index: 1;
-    opacity: 0.9;
-}
-
-.palette {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 12px;
-    background: #FFF;
-    border-top: 1px solid #E8EBF0;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-.color-btn {
-    width: 35px; height: 35px; border-radius: 50%;
-    border: 2px solid transparent; cursor: pointer;
-}
-.color-btn.active { border-color: #2C3E50; transform: scale(1.1); }
-
-/* --- МОДАЛКИ / ПЕЙВОЛ --- */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top:0; left:0; width:100vw; height:100vh;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    align-items: center; justify-content: center;
-    padding: 20px;
-}
-.modal-overlay.active { display: flex; }
-
-.modal-content {
-    background: #FFF; padding: 24px; border-radius: 20px;
-    width: 100%; max-width: 340px; position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    text-align: center;
-}
-.modal-close {
-    position: absolute; top: 12px; right: 12px;
-    background: none; border: none; font-size: 18px; color: #7A90A4; cursor: pointer;
-}
-.legal-info { font-size: 11px; color: #7A90A4; text-align: left; margin-top: 15px; line-height: 1.4; }
-
-.wind-start-btn {
-    border: none; padding: 14px; border-radius: 12px;
-    color: white; font-weight: bold; font-size: 16px; cursor: pointer;
-}
-.clear-btn {
-    background: #FEE2E2; color: #EF4444; border: none;
-    padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;
-}
-
-/* --- ОБЩИЕ ЭЛЕМЕНТЫ ДЛЯ ТАСКАНИЯ --- */
-.draggable-item {
-    cursor: grab;
-    object-fit: contain;
-    transition: transform 0.1s ease;
-}
-.draggable-item.dragging {
-    cursor: grabbing;
-    transform: scale(1.1);
-    opacity: 0.9;
-}
-
-/* --- СТИЛИ ДЛЯ КОМНАТЫ БОЛЬШОЙ-МАЛЕНЬКИЙ (СЛЕВА НАПРАВО) --- */
+/* --- КОМНАТА БОЛЬШОЙ-МАЛЕНЬКИЙ (СЛЕВА НАПРАВО) --- */
 .bs-container {
     display: none;
-    flex-direction: row; /* Делаем в строчку: предметы слева, коробки справа */
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    position: relative;
-    padding: 10px;
+    flex-direction: row; /* Предметы слева, коробки справа */
+    width: 100%; height: 100%;
+    box-sizing: border-box; position: relative; padding: 10px;
 }
-.bs-container.active {
-    display: flex;
-}
+.bs-container.active { display: flex; }
 
-/* Левая половина экрана для предметов */
 .bs-left-side {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px; /* Чтобы большой и маленький предметы не слипались */
-    height: 100%;
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    gap: 40px; height: 100%;
 }
 
-/* Правая половина экрана для коробок */
 .bs-right-side {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 40px; /* Расстояние между коробками */
-    height: 100%;
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    gap: 40px; height: 100%;
 }
 
-.bs-box {
-    object-fit: contain;
-}
-/* Размеры коробок */
-.bs-box-big {
-    width: 150px;
-    height: 150px;
-}
-.bs-box-small {
-    width: 90px;
-    height: 90px;
-}
+.bs-box { object-fit: contain; }
+.bs-box-big { width: 250px; height: 250px; }
+.bs-box-small { width: 130px; height: 130px; }
+.bs-box-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 260px; }
 
-.bs-box-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 160px; /* Фиксируем контейнер, чтобы центрирование было идеальным */
+/* --- КАРТОЧКИ ЖЕЛАНИЙ --- */
+.wants-mode { display: none; width: 100%; height: 100%; max-width: 500px; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
+.wants-mode.active { display: grid; }
+.wants-card { background-color: #FFFFFF; border-radius: 20px; padding: 15px; text-align: center; font-size: 18px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.wants-card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
+
+/* --- РАСКРАСКИ --- */
+.draw-container { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.draw-container.active { display: flex; }
+.canvas-wrapper { position: relative; width: 85vw; max-width: 350px; aspect-ratio: 1/1; background: #FFF; border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
+#paintCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+#contourImage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; mix-blend-mode: multiply; pointer-events: none; object-fit: contain; }
+.palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #FFF; padding: 15px; border-radius: 20px; }
+.color-btn { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+.color-btn.active { border-color: #5C5552; transform: scale(1.1); }
+.draw-nav { display: flex; gap: 20px; align-items: center; margin-bottom: 15px; }
+.draw-title { font-size: 20px; font-weight: bold; color: #7A90A4; min-width: 120px; text-align: center; }
+
+/* --- МОДАЛКИ --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(92, 85, 82, 0.6); display: none;
+    justify-content: center; align-items: center; z-index: 2000; padding: 20px;
 }
+.modal-overlay.active { display: flex; }
+.modal-content { background-color: #FFFFFF; border-radius: 25px; padding: 30px 25px; width: 100%; max-width: 380px; text-align: center; position: relative; }
+.modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #A09B98; border: none; background: transparent; }
+.legal-info { font-size: 12px; color: #A09B98; text-align: left; line-height: 1.4; }
+.wind-start-btn { background-color: #8CC084; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border-radius: 25px; border: none; cursor: pointer; }
+.clear-btn { background-color: #F8E8E8; color: #5C5552; border: none; padding: 10px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
