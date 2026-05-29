@@ -94,6 +94,7 @@ async function goToPayment() {
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
 let activeItem = null; let startX = 0, startY = 0; let matchedCount = 0;
 let audioCtx, analyser, microphone, javascriptNode, windSpeed = 0, windRotation = 0, windAnimFrame, windPraiseTimer = null, micStarted = false;
+let currentPairIndex = 0; let bsActiveItemsCount = 0; // Переменные для Большой-Маленький
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -130,7 +131,6 @@ const roomsData = {
         { id: 'star', text: 'Звезда', image: 'card_star.png', sound: 'shape_star.wav', targets: ['target_star_wand.png', 'target_star_sky.png'] },
         { id: 'rhombus', text: 'Ромб', image: 'card_romb.png', sound: 'shape_rhombus.wav', targets: ['target_romb_kite.png', 'target_romb_diamond.png'] }
     ],
-    // НОВАЯ БАЗА: БОЛЬШОЙ-МАЛЕНЬКИЙ
     'big_small': [
         { id: 'elephant', big_img: 'bs_elephant.png', big_sound: 'bs_elephant.wav', small_img: 'bs_mouse.png', small_sound: 'bs_mouse.wav' },
         { id: 'car', big_img: 'bs_car_big.png', big_sound: 'bs_car_big.wav', small_img: 'bs_car_small.png', small_sound: 'bs_car_small.wav' },
@@ -150,7 +150,6 @@ const roomsData = {
 function openRoom(roomId, title) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
-    // ИСПРАВЛЕНИЕ: Комната big_small теперь тоже считается бесплатной для тестов!
     const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors' && roomId !== 'big_small');
     if (isPremiumRoom && !isTestMode && !userHasPremium) {
         if (isMobileVK) { 
@@ -341,10 +340,7 @@ function setupDragGame() {
 
 // --- ЛОГИКА ДЛЯ КОМНАТЫ БОЛЬШОЙ-МАЛЕНЬКИЙ (ИСПРАВЛЕННАЯ) ---
 function setupBigSmallGame() {
-    // Очищаем зону для перетаскивания, коробки внизу остаются
     document.getElementById('bs-drag-zone').innerHTML = ''; 
-    
-    // Включаем общую озвучку комнаты
     playSound('bs_intro.wav');
     
     const allPairs = roomsData['big_small'];
@@ -354,11 +350,10 @@ function setupBigSmallGame() {
     }
     
     const pair = allPairs[currentPairIndex];
-    bsActiveItemsCount = 2; // Ждем две карточки
+    bsActiveItemsCount = 2; 
     
     const dragZone = document.getElementById('bs-drag-zone');
     
-    // Создаем БОЛЬШОЙ предмет
     const bigImg = document.createElement('img');
     bigImg.src = pair.big_img;
     bigImg.className = 'draggable-item';
@@ -369,7 +364,6 @@ function setupBigSmallGame() {
     bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     bigImg.addEventListener('mousedown', handlePointerStart);
     
-    // Создаем МАЛЕНЬКИЙ предмет
     const smallImg = document.createElement('img');
     smallImg.src = pair.small_img;
     smallImg.className = 'draggable-item';
@@ -380,35 +374,6 @@ function setupBigSmallGame() {
     smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     smallImg.addEventListener('mousedown', handlePointerStart);
     
-    // Перемешиваем их местами
-    const items = [bigImg, smallImg];
-    shuffleArray(items);
-    items.forEach(img => dragZone.appendChild(img));
-}
-    
-    // Создаем БОЛЬШОЙ предмет
-    const bigImg = document.createElement('img');
-    bigImg.src = pair.big_img;
-    bigImg.className = 'draggable-item';
-    bigImg.setAttribute('data-size', 'big');
-    bigImg.setAttribute('data-sound', pair.big_sound);
-    bigImg.style.cssText = 'width: 140px; height: 140px; margin: 10px;'; // Честный большой размер
-    bigImg.ondragstart = () => false;
-    bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
-    bigImg.addEventListener('mousedown', handlePointerStart);
-    
-    // Создаем МАЛЕНЬКИЙ предмет (Код сам уменьшает его!)
-    const smallImg = document.createElement('img');
-    smallImg.src = pair.small_img;
-    smallImg.className = 'draggable-item';
-    smallImg.setAttribute('data-size', 'small');
-    smallImg.setAttribute('data-sound', pair.small_sound);
-    smallImg.style.cssText = 'width: 70px; height: 70px; margin: 10px;'; // Уменьшаем в 2 раза прямо в коде!
-    smallImg.ondragstart = () => false;
-    smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
-    smallImg.addEventListener('mousedown', handlePointerStart);
-    
-    // Перемешиваем их местами в контейнере, чтобы большой не всегда был слева
     const items = [bigImg, smallImg];
     shuffleArray(items);
     items.forEach(img => dragZone.appendChild(img));
@@ -425,7 +390,6 @@ function handlePointerStart(e) {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX; 
     const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
     
-    // Вычисляем точное место касания, чтобы ничего не прыгало
     startX = clientX - rect.left; 
     startY = clientY - rect.top; 
     
@@ -440,7 +404,6 @@ function handlePointerStart(e) {
     activeItem.style.left = (clientX - startX) + 'px'; 
     activeItem.style.top = (clientY - startY) + 'px'; 
 
-    // ОЗВУЧКА ПРИ КАСАНИИ: Проговариваем название, когда малыш взял предмет!
     if (currentRoom === 'big_small' && activeItem) { 
         const currentSound = activeItem.getAttribute('data-sound');
         if (currentSound) playSound(currentSound); 
@@ -469,7 +432,6 @@ function handlePointerEnd(e) {
     
     let target = (elementUnderTouch && elementUnderTouch.classList.contains('target-item')) ? elementUnderTouch : null; 
     
-    // Логика проверки для комнаты "Большой - Маленький"
     if (currentRoom === 'big_small') {
         if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
@@ -479,19 +441,17 @@ function handlePointerEnd(e) {
             
             bsActiveItemsCount--;
             
-            // Если разложили и большого, и маленького — пара полностью готова
             if (bsActiveItemsCount === 0) {
                 currentPairIndex++;
                 setTimeout(() => {
-                    playSound('bs_win.wav'); // Проигрываем похвалу
-                    setTimeout(setupBigSmallGame, 2000); // ИСПРАВЛЕНО: Вызываем заново setupBigSmallGame!
+                    playSound('bs_win.wav'); 
+                    setTimeout(setupBigSmallGame, 2000); 
                 }, 1000); 
             }
             activeItem = null;
             return; 
         }
     } 
-    // Логика проверки для остальных комнат (Животные, Цвета, Фигуры...)
     else {
         const itemId = activeItem.getAttribute('data-id'); 
         if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) { 
@@ -520,7 +480,6 @@ function handlePointerEnd(e) {
         } 
     }
 
-    // Если промахнулся — возвращаем на место
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
     playSound('wrong.wav'); 
     activeItem.style.transition = 'all 0.3s ease'; 
