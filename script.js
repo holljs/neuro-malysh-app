@@ -349,15 +349,42 @@ function setupBigSmallGame() {
     
     const allPairs = roomsData['big_small'];
     if (currentPairIndex >= allPairs.length) {
-        // Если прошли все 12 пар, пускаем по кругу
         currentPairIndex = 0; 
         shuffleArray(allPairs);
     }
     
     const pair = allPairs[currentPairIndex];
-    bsActiveItemsCount = 2; // Ждем, пока обе карточки разложат
+    bsActiveItemsCount = 2; // Ждем две карточки
     
     const dragZone = document.getElementById('bs-drag-zone');
+    
+    // Создаем БОЛЬШОЙ предмет
+    const bigImg = document.createElement('img');
+    bigImg.src = pair.big_img;
+    bigImg.className = 'draggable-item';
+    bigImg.setAttribute('data-size', 'big');
+    bigImg.setAttribute('data-sound', pair.big_sound);
+    bigImg.style.cssText = 'width: 140px; height: 140px; margin: 10px;'; 
+    bigImg.ondragstart = () => false;
+    bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
+    bigImg.addEventListener('mousedown', handlePointerStart);
+    
+    // Создаем МАЛЕНЬКИЙ предмет
+    const smallImg = document.createElement('img');
+    smallImg.src = pair.small_img;
+    smallImg.className = 'draggable-item';
+    smallImg.setAttribute('data-size', 'small');
+    smallImg.setAttribute('data-sound', pair.small_sound);
+    smallImg.style.cssText = 'width: 70px; height: 70px; margin: 10px;'; 
+    smallImg.ondragstart = () => false;
+    smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
+    smallImg.addEventListener('mousedown', handlePointerStart);
+    
+    // Перемешиваем их местами
+    const items = [bigImg, smallImg];
+    shuffleArray(items);
+    items.forEach(img => dragZone.appendChild(img));
+}
     
     // Создаем БОЛЬШОЙ предмет
     const bigImg = document.createElement('img');
@@ -457,8 +484,8 @@ function handlePointerEnd(e) {
                 currentPairIndex++;
                 setTimeout(() => {
                     playSound('bs_win.wav'); // Проигрываем похвалу
-                    setTimeout(setupBigSmallGame, 2000); // ИСПРАВЛЕНО: Вызываем генерацию следующей пары!
-                }, 1000); // Уменьшил задержку до 1 секунды перед финальным звуком, чтобы Севе не приходилось долго ждать
+                    setTimeout(setupBigSmallGame, 2000); // ИСПРАВЛЕНО: Вызываем заново setupBigSmallGame!
+                }, 1000); 
             }
             activeItem = null;
             return; 
