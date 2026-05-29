@@ -312,48 +312,59 @@ body {
     opacity: 0.9;
 }
 
-/* --- СТИЛИ ДЛЯ КОМНАТЫ БОЛЬШОЙ-МАЛЕНЬКИЙ --- */
+/* --- СТИЛИ ДЛЯ КОМНАТЫ БОЛЬШОЙ-МАЛЕНЬКИЙ (СЛЕВА НАПРАВО) --- */
 .bs-container {
     display: none;
-    flex-direction: column;
+    flex-direction: row; /* Делаем в строчку: предметы слева, коробки справа */
     width: 100%;
     height: 100%;
     box-sizing: border-box;
     position: relative;
+    padding: 10px;
 }
 .bs-container.active {
     display: flex;
 }
-.bs-top-zone {
-    flex-grow: 1;
+
+/* Левая половина экрана для предметов */
+.bs-left-side {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
-    height: 60%;
-    width: 100%;
+    gap: 30px; /* Чтобы большой и маленький предметы не слипались */
+    height: 100%;
 }
-.bs-bottom-zone {
+
+/* Правая половина экрана для коробок */
+.bs-right-side {
+    flex: 1;
     display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    padding-bottom: 30px;
-    height: 40%;
-    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px; /* Расстояние между коробками */
+    height: 100%;
 }
+
 .bs-box {
     object-fit: contain;
 }
+/* Размеры коробок */
 .bs-box-big {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
 }
 .bs-box-small {
-    width: 85px;
-    height: 85px;
+    width: 90px;
+    height: 90px;
 }
+
 .bs-box-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 160px; /* Фиксируем контейнер, чтобы центрирование было идеальным */
 }
