@@ -1,45 +1,359 @@
-/* --- СТИЛИ ДЛЯ КОМНАТЫ "БОЛЬШОЙ-МАЛЕНЬКИЙ" --- */
-.bs-container { 
-    display: none; 
-    flex-direction: column; 
-    width: 100%; 
-    height: 100%; 
-    box-sizing: border-box; 
-    position: relative; 
+/* --- ОБЩИЕ СТИЛИ (СБРОС) --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
-.bs-container.active { 
-    display: flex; 
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #F6F8FA;
+    color: #2C3E50;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
 }
-.bs-top-zone { 
-    flex-grow: 1; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    position: relative; 
-    gap: 20px;
+
+/* --- СТРУКТУРА ЭКРАНОВ --- */
+.screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
 }
-.bs-bottom-zone { 
-    display: flex; 
-    justify-content: space-around; 
-    align-items: flex-end; 
-    padding-bottom: 40px; 
-    height: 40%; 
+
+.screen.active {
+    display: flex;
 }
-.bs-box { 
-    background-size: contain; 
-    background-repeat: no-repeat; 
-    background-position: bottom; 
+
+/* --- ШАПКА (HEADER) --- */
+.header {
+    background-color: #FFFFFF;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-bottom: 1px solid #E8EBF0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-.bs-box-big { 
-    width: 150px; 
-    height: 150px; 
+
+.header-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
-.bs-box-small { 
-    width: 90px; 
-    height: 90px; 
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
-.bs-box-wrapper { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+
+.back-btn {
+    background: #EDF2F7;
+    color: #4A5568;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.quiz-toggle {
+    background: #EBF8FF;
+    color: #2B6CB0;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.help-icon {
+    width: 24px;
+    height: 24px;
+    background: #E2E8F0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #4A5568;
+    cursor: pointer;
+}
+
+/* --- ГЛАВНОЕ МЕНЮ (ПЛИТКА) --- */
+.hero-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 15px 0 10px 0;
+    color: #2D3748;
+}
+
+.menu-grid {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 16px 20px 16px;
+}
+
+.category-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    border: 1px solid #E2E8F0;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.category-card:active {
+    transform: scale(0.96);
+}
+
+.category-icon-placeholder {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-icon-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.category-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4A5568;
+    line-height: 1.2;
+}
+
+/* Цветные ободки для красоты меню */
+.cat-bs { border-bottom: 4px solid #FFB347; }
+.cat-animals { border-bottom: 4px solid #A3C9D9; }
+.cat-colors { border-bottom: 4px solid #FF69B4; }
+.cat-shapes { border-bottom: 4px solid #9932CC; }
+.cat-draw { border-bottom: 4px solid #4DFF4D; }
+.cat-feed { border-bottom: 4px solid #FFA500; }
+.cat-wants { border-bottom: 4px solid #4D79FF; }
+.cat-letters { border-bottom: 4px solid #FF4D4D; }
+.cat-numbers { border-bottom: 4px solid #8B4513; }
+.cat-wind { border-bottom: 4px solid #20B2AA; }
+
+/* --- ИГРОВАЯ ЗОНА (ОБЩАЯ) --- */
+.room-content-area {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* --- ОБУЧЕНИЕ (КАРТОЧКА) --- */
+.learning-mode {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+/* --- ДРАГ-ЭНД-ДРОП ИГРЫ --- */
+.game-container {
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+}
+.game-container.active { display: flex; }
+
+.drag-column, .target-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+/* --- КАРТОЧКИ ЖЕЛАНИЙ --- */
+.wants-mode {
+    display: none;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 16px;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+}
+.wants-mode.active { display: grid; }
+
+/* --- РАСКРАСКИ --- */
+.draw-container {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+.draw-container.active { display: flex; }
+
+.draw-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: #FFF;
+    border-bottom: 1px solid #E8EBF0;
+}
+.draw-title { font-weight: bold; font-size: 16px; }
+
+.canvas-wrapper {
+    flex-grow: 1;
+    position: relative;
+    background: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+#paintCanvas {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 2;
+}
+#contourImage {
+    max-width: 100%; max-height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+.palette {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 12px;
+    background: #FFF;
+    border-top: 1px solid #E8EBF0;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.color-btn {
+    width: 35px; height: 35px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+}
+.color-btn.active { border-color: #2C3E50; transform: scale(1.1); }
+
+/* --- МОДАЛКИ / ПЕЙВОЛ --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0; width:100vw; height:100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-content {
+    background: #FFF; padding: 24px; border-radius: 20px;
+    width: 100%; max-width: 340px; position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    text-align: center;
+}
+.modal-close {
+    position: absolute; top: 12px; right: 12px;
+    background: none; border: none; font-size: 18px; color: #7A90A4; cursor: pointer;
+}
+.legal-info { font-size: 11px; color: #7A90A4; text-align: left; margin-top: 15px; line-height: 1.4; }
+
+.wind-start-btn {
+    border: none; padding: 14px; border-radius: 12px;
+    color: white; font-weight: bold; font-size: 16px; cursor: pointer;
+}
+.clear-btn {
+    background: #FEE2E2; color: #EF4444; border: none;
+    padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+
+/* --- ОБЩИЕ ЭЛЕМЕНТЫ ДЛЯ ТАСКАНИЯ --- */
+.draggable-item {
+    cursor: grab;
+    object-fit: contain;
+    transition: transform 0.1s ease;
+}
+.draggable-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+/* --- СТИЛИ ДЛЯ КОМНАТЫ БОЛЬШОЙ-МАЛЕНЬКИЙ --- */
+.bs-container {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+.bs-container.active {
+    display: flex;
+}
+.bs-top-zone {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 60%;
+    width: 100%;
+}
+.bs-bottom-zone {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding-bottom: 30px;
+    height: 40%;
+    width: 100%;
+}
+.bs-box {
+    object-fit: contain;
+}
+.bs-box-big {
+    width: 140px;
+    height: 140px;
+}
+.bs-box-small {
+    width: 85px;
+    height: 85px;
+}
+.bs-box-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
