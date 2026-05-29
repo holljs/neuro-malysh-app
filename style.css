@@ -113,26 +113,45 @@ body {
 
 /* ---- ИГРЫ "ПЕРЕТАСКИВАНИЕ" (ЦВЕТА, ФИГУРЫ, КТО ЧТО ЕСТ) ---- */
 .game-container {
-    display: none; width: 100%; height: 100%;
-    flex-direction: row; justify-content: space-around;
-    gap: 20px; padding: 10px;
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 20px;
+    padding: 10px;
 }
-.game-container.active { display: flex; }
+.game-container.active {
+    display: flex;
+}
 .drag-column, .target-column {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
 }
+/* Еда (перетаскиваемые предметы) – меньше */
 .draggable-item {
-    cursor: grab; object-fit: contain;
-    width: 40vw; max-width: 160px; height: auto;
+    cursor: grab;
+    object-fit: contain;
+    width: 25vw;
+    max-width: 100px;
+    height: auto;
     touch-action: none;
 }
+/* Животные, лодки, фигуры (цели) – крупнее */
 .target-item {
     object-fit: contain;
-    width: 40vw; max-width: 160px; height: auto;
+    width: 40vw;
+    max-width: 160px;
+    height: auto;
 }
 .draggable-item.dragging {
-    cursor: grabbing; z-index: 1000; transform: scale(1.05);
+    cursor: grabbing;
+    z-index: 1000;
+    transform: scale(1.05);
 }
 
 /* ---- КОМНАТА "БОЛЬШОЙ-МАЛЕНЬКИЙ" (УВЕЛИЧЕННЫЕ РАЗМЕРЫ) ---- */
