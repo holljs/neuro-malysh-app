@@ -90,111 +90,382 @@ body {
 .cat-shapes { background-color: #E8F0F0; }
 .cat-bs { background-color: #F0F4E6; }
 
-/* --- ИГРОВАЯ ЗОНА --- */
+/* --- ИГРОВАЯ ЗОНА (ОБЩАЯ АДАПТАЦИЯ) --- */
 .room-content-area {
     flex-grow: 1; display: flex; flex-direction: column;
     justify-content: center; align-items: center; padding: 10px;
     position: relative; width: 100%; box-sizing: border-box; overflow: hidden;
 }
 
-.learning-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.large-card { background-color: #FFFFFF; border-radius: 30px; padding: 30px 20px; width: 85%; max-width: 320px; text-align: center; font-size: 28px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; }
-.large-card img { width: 200px; height: 200px; object-fit: contain; border-radius: 20px; margin-bottom: 20px; }
-.slider-controls { display: flex; gap: 40px; margin-top: 25px; }
-.nav-btn { font-size: 24px; background: #FFFFFF; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; }
+/* ---- РЕЖИМ ОБУЧЕНИЯ (learning-mode) для всех комнат ---- */
+.learning-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+.large-card {
+    background-color: #FFFFFF;
+    border-radius: 30px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.large-card img {
+    max-width: 70vw;
+    max-height: 40vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.slider-controls {
+    display: flex;
+    gap: 40px;
+    margin-top: 25px;
+}
+.nav-btn {
+    font-size: 24px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    cursor: pointer;
+}
 
-/* --- ДРАГ ИТЕМЫ --- */
-.draggable-item { cursor: grab; object-fit: contain; }
-.draggable-item.dragging { cursor: grabbing; z-index: 1000; transform: scale(1.05); }
+/* ---- ИГРЫ "ПЕРЕТАСКИВАНИЕ" (drag-game) ---- */
+.game-container {
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 15px;
+    padding: 10px;
+}
+.game-container.active {
+    display: flex;
+}
+.drag-column, .target-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.draggable-item {
+    cursor: grab;
+    object-fit: contain;
+    width: 30vw;
+    max-width: 120px;
+    height: auto;
+    touch-action: none;
+}
+.target-item {
+    object-fit: contain;
+    width: 30vw;
+    max-width: 120px;
+    height: auto;
+}
+.draggable-item.dragging {
+    cursor: grabbing;
+    z-index: 1000;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
 
-/* --- КОМНАТА БОЛЬШОЙ-МАЛЕНЬКИЙ (СЛЕВА НАПРАВО) --- */
+/* ---- КОМНАТА "БОЛЬШОЙ-МАЛЕНЬКИЙ" (адаптивная) ---- */
 .bs-container {
     display: none;
-    flex-direction: row; /* Предметы слева, коробки справа */
-    width: 100%; height: 100%;
-    box-sizing: border-box; position: relative; padding: 10px;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
 }
-.bs-container.active { display: flex; }
-
+.bs-container.active {
+    display: flex;
+}
 .bs-left-side {
-    flex: 1; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    gap: 40px; height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }
-
 .bs-right-side {
-    flex: 1; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    gap: 40px; height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+.bs-drag-big {
+    width: 35vw;
+    max-width: 160px;
+    height: auto;
+}
+.bs-drag-small {
+    width: 25vw;
+    max-width: 100px;
+    height: auto;
+}
+.bs-box {
+    object-fit: contain;
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+.bs-box-big {
+    max-width: 35vw;
+    max-height: 35vw;
+}
+.bs-box-small {
+    max-width: 25vw;
+    max-height: 25vw;
+}
+.bs-box-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
-.bs-box { object-fit: contain; }
-.bs-box-big { width: 250px; height: 250px; }
-.bs-box-small { width: 130px; height: 130px; }
-.bs-box-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 260px; }
+/* ---- КАРТОЧКИ ЖЕЛАНИЙ ---- */
+.wants-mode {
+    display: none;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 10px;
+    overflow-y: auto;
+}
+.wants-mode.active {
+    display: grid;
+}
+.wants-card {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+.wants-card img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
 
-/* --- КАРТОЧКИ ЖЕЛАНИЙ --- */
-.wants-mode { display: none; width: 100%; height: 100%; max-width: 500px; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
-.wants-mode.active { display: grid; }
-.wants-card { background-color: #FFFFFF; border-radius: 20px; padding: 15px; text-align: center; font-size: 18px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-.wants-card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; border-radius: 12px; margin-bottom: 10px; }
+/* ---- РАСКРАСКИ ---- */
+.draw-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.draw-container.active {
+    display: flex;
+}
+.canvas-wrapper {
+    position: relative;
+    width: 85vw;
+    max-width: 350px;
+    aspect-ratio: 1/1;
+    background: #FFF;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+#paintCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+#contourImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    object-fit: contain;
+}
+.palette {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    background: #FFF;
+    padding: 15px;
+    border-radius: 20px;
+}
+.color-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+.color-btn.active {
+    border-color: #5C5552;
+    transform: scale(1.1);
+}
+.draw-nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.draw-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #7A90A4;
+    min-width: 120px;
+    text-align: center;
+}
 
-/* --- РАСКРАСКИ --- */
-.draw-container { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.draw-container.active { display: flex; }
-.canvas-wrapper { position: relative; width: 85vw; max-width: 350px; aspect-ratio: 1/1; background: #FFF; border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-#paintCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-#contourImage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; mix-blend-mode: multiply; pointer-events: none; object-fit: contain; }
-.palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #FFF; padding: 15px; border-radius: 20px; }
-.color-btn { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
-.color-btn.active { border-color: #5C5552; transform: scale(1.1); }
-.draw-nav { display: flex; gap: 20px; align-items: center; margin-bottom: 15px; }
-.draw-title { font-size: 20px; font-weight: bold; color: #7A90A4; min-width: 120px; text-align: center; }
+/* ---- ВИКТОРИНА (quiz-mode) ---- */
+.quiz-mode {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 20px;
+    overflow-y: auto;
+}
+.quiz-mode.active {
+    display: flex;
+}
+.quiz-card {
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+    width: 80%;
+    max-width: 250px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin: 10px auto;
+}
+.quiz-card img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+.quiz-card div {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+}
 
-/* --- МОДАЛКИ --- */
+/* ---- МОДАЛКИ ---- */
 .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(92, 85, 82, 0.6); display: none;
-    justify-content: center; align-items: center; z-index: 2000; padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(92, 85, 82, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
 }
-.modal-overlay.active { display: flex; }
-.modal-content { background-color: #FFFFFF; border-radius: 25px; padding: 30px 25px; width: 100%; max-width: 380px; text-align: center; position: relative; }
-.modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #A09B98; border: none; background: transparent; }
-.legal-info { font-size: 12px; color: #A09B98; text-align: left; line-height: 1.4; }
-.wind-start-btn { background-color: #8CC084; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border-radius: 25px; border: none; cursor: pointer; }
-.clear-btn { background-color: #F8E8E8; color: #5C5552; border: none; padding: 10px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
+.modal-overlay.active {
+    display: flex;
+}
+.modal-content {
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    padding: 30px 25px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    position: relative;
+}
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #A09B98;
+    border: none;
+    background: transparent;
+}
+.legal-info {
+    font-size: 12px;
+    color: #A09B98;
+    text-align: left;
+    line-height: 1.4;
+}
+.wind-start-btn {
+    background-color: #8CC084;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+}
+.clear-btn {
+    background-color: #F8E8E8;
+    color: #5C5552;
+    border: none;
+    padding: 10px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (КОМНАТА БОЛЬШОЙ-МАЛЕНЬКИЙ) --- */
-@media (max-width: 600px) {
-    .bs-container {
-        padding: 5px;
-        gap: 5px;
-    }
-    .bs-left-side {
-        gap: 15px;
-    }
-    .bs-drag-big {
-        width: 35vw !important;
-        height: auto !important;
-        max-width: 140px;
-    }
-    .bs-drag-small {
-        width: 25vw !important;
-        height: auto !important;
-        max-width: 90px;
-    }
-    .bs-box-big {
-        width: 35vw !important;
-        height: auto !important;
-        max-width: 140px;
-    }
-    .bs-box-small {
-        width: 25vw !important;
-        height: auto !important;
-        max-width: 90px;
-    }
-    .bs-box-wrapper {
-        height: auto;
-        margin: 5px 0;
-    }
+/* ---- ДОПОЛНИТЕЛЬНЫЕ МЕЛОЧИ ---- */
+.sound-mode-switch {
+    font-size: 14px;
+    background: #E8EBF0;
+    padding: 8px 15px;
+    border-radius: 30px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    display: inline-block;
+}
+.tap-hint {
+    font-size: 14px;
+    color: #A09B98;
+    margin-top: 15px;
 }
