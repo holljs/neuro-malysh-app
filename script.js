@@ -75,7 +75,7 @@ async function goToPayment() {
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
-let canvasInitialized = false; // <-- исправлено: переменная объявлена
+let canvasInitialized = false; 
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -124,7 +124,7 @@ const roomsData = {
         { id: 'truck', big_img: 'bs_truck.png', big_sound: 'bs_truck.wav', small_img: 'bs_block.png', small_sound: 'bs_block.wav' },
         { id: 'chair', big_img: 'bs_chair_big.png', big_sound: 'bs_chair_big.wav', small_img: 'bs_chair_small.png', small_sound: 'bs_chair_small.wav' },
         { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
-    ],
+    ], // <--- ВОТ ЭТА ЗАПЯТАЯ ВЕРНУЛАСЬ НА СВОЕ ЗАКОННОЕ МЕСТО!
     'actions': [
         { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
         { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
@@ -285,7 +285,7 @@ function setupDragGame() {
         img.className = 'draggable-item'; 
         img.setAttribute('data-id', item.id); 
         img.ondragstart = () => false; 
-        img.addEventListener('pointerdown', onDragStart); // <-- pointer events
+        img.addEventListener('pointerdown', onDragStart); 
         dragZone.appendChild(img); 
     }); 
     
@@ -320,7 +320,7 @@ function setupBigSmallGame() {
     const bigImg = document.createElement('img');
     bigImg.src = pair.big_img; bigImg.className = 'draggable-item bs-drag-big';
     bigImg.setAttribute('data-size', 'big'); bigImg.setAttribute('data-sound', pair.big_sound);
-    bigImg.addEventListener('pointerdown', onDragStart); // <-- pointer events
+    bigImg.addEventListener('pointerdown', onDragStart); 
     bigImg.ondragstart = () => false;
     
     const smallImg = document.createElement('img');
@@ -334,24 +334,18 @@ function setupBigSmallGame() {
     items.forEach(img => dragZone.appendChild(img));
 }
 
-// ----- НОВЫЕ ОБРАБОТЧИКИ ПЕРЕТАСКИВАНИЯ НА POINTER EVENTS -----
 function onDragStart(e) {
-    // Запрещаем перетаскивание, если это не draggable-элемент или он уже сопоставлен
     if (!e.target.classList.contains('draggable-item') || e.target.classList.contains('matched')) return;
     e.preventDefault();
     e.target.setPointerCapture(e.pointerId);
     
     activeItem = e.target;
     const rect = activeItem.getBoundingClientRect();
-    // Смещение от точки касания до верхнего левого угла элемента
     dragOffsetX = e.clientX - rect.left;
     dragOffsetY = e.clientY - rect.top;
     
-    // Сохраняем исходные размеры и стиль
-    // Сохраняем исходные размеры, но не переопределяем, если они уже адаптивны
     activeItem.style.width = rect.width + 'px';
     activeItem.style.height = rect.height + 'px';
-    // Добавляем фиксацию минимальных размеров, чтобы при перетаскивании не сжималось
     activeItem.style.minWidth = rect.width + 'px';
     activeItem.style.minHeight = rect.height + 'px';
     activeItem.classList.add('dragging');
@@ -360,7 +354,6 @@ function onDragStart(e) {
     activeItem.style.left = (e.clientX - dragOffsetX) + 'px';
     activeItem.style.top = (e.clientY - dragOffsetY) + 'px';
     
-    // Звук для big_small
     if (currentRoom === 'big_small' && activeItem) {
         const currentSound = activeItem.getAttribute('data-sound');
         if (currentSound) playSound(currentSound);
@@ -379,7 +372,6 @@ function onDragEnd(e) {
     activeItem.releasePointerCapture?.(e.pointerId);
     activeItem.classList.remove('dragging');
     
-    // Спрячем временно элемент, чтобы узнать, над чем палец/курсор
     activeItem.style.display = 'none';
     const elemUnderPointer = document.elementsFromPoint(e.clientX, e.clientY);
     let target = null;
@@ -391,7 +383,6 @@ function onDragEnd(e) {
     }
     activeItem.style.display = '';
     
-    // Обработка логики в зависимости от комнаты
     if (currentRoom === 'big_small') {
         if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
             vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
@@ -437,10 +428,8 @@ function onDragEnd(e) {
         }
     }
     
-    // Неправильное попадание
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     playSound('wrong.wav');
-    // Возвращаем элемент на место
     activeItem.style.transition = 'all 0.3s ease';
     activeItem.style.position = '';
     activeItem.style.left = '';
@@ -453,7 +442,6 @@ function onDragEnd(e) {
     activeItem = null;
 }
 
-// Глобальные слушатели pointermove / pointerup
 document.addEventListener('pointermove', onDragMove);
 document.addEventListener('pointerup', onDragEnd);
 
