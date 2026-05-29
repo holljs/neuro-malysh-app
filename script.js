@@ -150,7 +150,8 @@ const roomsData = {
 function openRoom(roomId, title) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
-    const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors');
+    // ИСПРАВЛЕНИЕ: Комната big_small теперь тоже считается бесплатной для тестов!
+    const isPremiumRoom = (roomId !== 'animals' && roomId !== 'colors' && roomId !== 'big_small');
     if (isPremiumRoom && !isTestMode && !userHasPremium) {
         if (isMobileVK) { 
             openModal('mobile-paywall-modal'); 
