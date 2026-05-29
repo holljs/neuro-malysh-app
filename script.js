@@ -126,15 +126,15 @@ const roomsData = {
         { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
     ]
     'actions': [
-        { id: 'run', text: 'Утя бежит', image: 'act_run.png', sound: 'act_run.wav' },
-        { id: 'swing', text: 'Утя качается', image: 'act_swing.png', sound: 'act_swing.wav' },
-        { id: 'wash', text: 'Утя моется', image: 'act_wash.png', sound: 'act_wash.wav' },
-        { id: 'play', text: 'Утя играет', image: 'act_play.png', sound: 'act_play.wav' },
-        { id: 'cry', text: 'Утя плачет', image: 'act_cry.png', sound: 'act_cry.wav' },
-        { id: 'jump', text: 'Утя прыгает', image: 'act_jump.png', sound: 'act_jump.wav' },
-        { id: 'talk', text: 'Утя говорит', image: 'act_talk.png', sound: 'act_talk.wav' },
-        { id: 'laugh', text: 'Утя смеется', image: 'act_laugh.png', sound: 'act_laugh.wav' },
-        { id: 'dance', text: 'Утя танцует', image: 'act_dance.png', sound: 'act_dance.wav' }
+        { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
+        { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
+        { id: 'wash', text: 'Утя моется', image: 'act_wash.gif', sound: 'act_wash.wav' },
+        { id: 'play', text: 'Утя играет', image: 'act_play.gif', sound: 'act_play.wav' },
+        { id: 'cry', text: 'Утя плачет', image: 'act_cry.gif', sound: 'act_cry.wav' },
+        { id: 'jump', text: 'Утя прыгает', image: 'act_jump.gif', sound: 'act_jump.wav' },
+        { id: 'talk', text: 'Утя говорит', image: 'act_talk.gif', sound: 'act_talk.wav' },
+        { id: 'laugh', text: 'Утя смеется', image: 'act_laugh.gif', sound: 'act_laugh.wav' },
+        { id: 'dance', text: 'Утя танцует', image: 'act_dance.gif', sound: 'act_dance.wav' }
     ]
 };
 
