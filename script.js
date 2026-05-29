@@ -124,7 +124,7 @@ const roomsData = {
         { id: 'truck', big_img: 'bs_truck.png', big_sound: 'bs_truck.wav', small_img: 'bs_block.png', small_sound: 'bs_block.wav' },
         { id: 'chair', big_img: 'bs_chair_big.png', big_sound: 'bs_chair_big.wav', small_img: 'bs_chair_small.png', small_sound: 'bs_chair_small.wav' },
         { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
-    ]
+    ],
     'actions': [
         { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
         { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
