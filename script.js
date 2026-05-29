@@ -1,5 +1,5 @@
 // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
-const isTestMode = true; // СТАВИМ TRUE, ЧТОБЫ МАЛЫШ ИГРАЛ БЕЗ ОГРАНИЧЕНИЙ!
+const isTestMode = true; 
 const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
 const isMobileVK = vkPlatform.includes('mobile');
 let userHasPremium = false; 
@@ -16,10 +16,7 @@ async function initAppAndCheckPremium() {
             method: 'GET',
             headers: { 'x-vk-sign': vkSignParams }
         });
-        
         const data = await response.json();
-        console.log("ОТВЕТ СЕРВЕРА:", data); 
-        
         if (data.success && data.has_premium) {
             userHasPremium = true;
         }
@@ -27,7 +24,6 @@ async function initAppAndCheckPremium() {
         console.error("Ошибка при проверке премиума:", error);
     }
 }
-
 initAppAndCheckPremium();
 
 function openModal(modalId) {
@@ -43,7 +39,6 @@ function closeModal(modalId, event) {
 
 async function goToPayment() {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-    
     const btn = document.querySelector('#paywall-modal .wind-start-btn');
     const originalText = btn.innerText;
     btn.innerText = "Создаем платеж...";
@@ -53,13 +48,9 @@ async function goToPayment() {
     try {
         const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
         const vkSignParams = window.location.search.substring(1);
-        
         const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "x-vk-sign": vkSignParams 
-            },
+            headers: { "Content-Type": "application/json", "x-vk-sign": vkSignParams },
             body: JSON.stringify({
                 user_id: userInfo.id,
                 amount: 150,
@@ -67,9 +58,7 @@ async function goToPayment() {
                 currency_type: "kids_sub" 
             })
         });
-        
         const data = await response.json();
-        
         if (data.success && data.payment_url) {
             window.open(data.payment_url, '_blank');
         } else {
@@ -79,15 +68,13 @@ async function goToPayment() {
         console.error("Ошибка сети при оплате:", error);
         alert("Нет связи с сервером. Проверьте интернет-соединение.");
     } finally {
-        btn.innerText = originalText;
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
+        btn.innerText = originalText; btn.style.opacity = "1"; btn.style.pointerEvents = "auto";
     }
 }
 
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
 let activeItem = null; let startX = 0, startY = 0; let matchedCount = 0;
-let currentPairIndex = 0; let bsActiveItemsCount = 0; // Переменные для Большой-Маленький
+let currentPairIndex = 0; let bsActiveItemsCount = 0;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -96,7 +83,6 @@ const drawData = [
     { id: 'bunny', text: 'Зайчонок', file: 'bunny.jpg' }
 ];
 let currentDrawIndex = 0;
-
 const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCanvas.getContext('2d');
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
@@ -155,6 +141,7 @@ function openRoom(roomId, title) {
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
     else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
     else if (roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); }
+    // ИСПРАВЛЕНИЕ: Убрали отсюда playSound('bs_intro.wav') — теперь полная тишина при входе!
     else if (roomId === 'big_small') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('bs-area').classList.add('active'); setupBigSmallGame(); }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
@@ -308,45 +295,32 @@ function setupDragGame() {
 }
 
 function setupBigSmallGame() {
-    // 1. Очищаем зону для предметов
     document.getElementById('bs-drag-zone').innerHTML = ''; 
     
-    // 2. Берём НАШУ ПОЛНУЮ БАЗУ ИЗ 12 ПАР
     const allPairs = roomsData['big_small'];
-    
-    // ПРОВЕРКА ИНДЕКСА: если вышли за пределы 12 пар, сбрасываем в 0 и перемешиваем для нового круга
     if (currentPairIndex >= allPairs.length || currentPairIndex < 0) {
         currentPairIndex = 0; 
         shuffleArray(allPairs);
     }
     
-    // 3. Достаем конкретную пару по текущему индексу
     const pair = allPairs[currentPairIndex];
-    bsActiveItemsCount = 2; // Ждем, пока разложат оба предмета
-    
+    bsActiveItemsCount = 2; 
     const dragZone = document.getElementById('bs-drag-zone');
     
-    // 4. Создаем БОЛЬШОЙ предмет (240px)
     const bigImg = document.createElement('img');
-    bigImg.src = pair.big_img; 
-    bigImg.className = 'draggable-item';
-    bigImg.setAttribute('data-size', 'big'); 
-    bigImg.setAttribute('data-sound', pair.big_sound);
+    bigImg.src = pair.big_img; bigImg.className = 'draggable-item';
+    bigImg.setAttribute('data-size', 'big'); bigImg.setAttribute('data-sound', pair.big_sound);
     bigImg.style.cssText = 'width: 240px; height: 240px; margin: 10px;'; 
     bigImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     bigImg.addEventListener('mousedown', handlePointerStart);
     
-    // 5. Создаем МАЛЕНЬКИЙ предмет (120px)
     const smallImg = document.createElement('img');
-    smallImg.src = pair.small_img; 
-    smallImg.className = 'draggable-item';
-    smallImg.setAttribute('data-size', 'small'); 
-    smallImg.setAttribute('data-sound', pair.small_sound);
+    smallImg.src = pair.small_img; smallImg.className = 'draggable-item';
+    smallImg.setAttribute('data-size', 'small'); smallImg.setAttribute('data-sound', pair.small_sound);
     smallImg.style.cssText = 'width: 120px; height: 120px; margin: 10px;'; 
     smallImg.addEventListener('touchstart', handlePointerStart, {passive: false});
     smallImg.addEventListener('mousedown', handlePointerStart);
     
-    // 6. Перемешиваем их случайно (лево/право), чтобы Сева не запоминал шаблон
     const items = [bigImg, smallImg];
     shuffleArray(items);
     items.forEach(img => dragZone.appendChild(img));
@@ -354,6 +328,8 @@ function setupBigSmallGame() {
 
 function handlePointerStart(e) { 
     if (e.type === 'touchstart') e.preventDefault(); 
+    // ИСПРАВЛЕНИЕ: Если ткнули в КОРОБКУ (target-item), игнорируем клик, чтобы она не прыгала!
+    if (e.target.classList.contains('target-item')) return;
     if (e.target.classList.contains('matched')) return; 
     
     activeItem = e.target; 
@@ -458,6 +434,7 @@ document.addEventListener('touchmove', handlePointerMove, {passive: false}); doc
 function startNewQuizRound() { const allCards = [...roomsData[currentRoom]]; shuffleArray(allCards); quizCards = allCards.slice(0, 4); const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)]; expectedCardId = randomTarget.id; renderQuizGrid(); if (currentRoom === 'letters') playSound(`q_b_${randomTarget.id}.wav`); else if (randomTarget.sound) { const soundFilename = randomTarget.sound.split('/').pop(); const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); playSound(`q${fileBase}.wav`); } }
 function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'); quizArea.innerHTML = ''; quizCards.forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'quiz-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => handleQuizClick(card.id); quizArea.appendChild(cardDiv); }); }
 function handleQuizClick(actionId) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
+// Функция перемешивания массивов (исправлена область видимости)
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } }
