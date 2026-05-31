@@ -6,6 +6,9 @@ let userHasPremium = false;
 
 const SERVER_URL = "https://neuro-master.online"; 
 
+// Бесплатные комнаты: Животные и Цвета
+const freeRooms = ['animals', 'colors']; 
+
 async function initAppAndCheckPremium() {
     try {
         await vkBridge.send('VKWebAppInit');
@@ -22,9 +25,40 @@ async function initAppAndCheckPremium() {
         }
     } catch (error) {
         console.error("Ошибка при проверке премиума:", error);
+    } finally {
+        applyLocks();
     }
 }
 initAppAndCheckPremium();
+
+// Функция расстановки замочков
+function applyLocks() {
+    if (userHasPremium) return; 
+
+    const roomMapping = {
+        'big_small': '.cat-bs',
+        'shapes': '.cat-shapes',
+        'draw': '.cat-draw',
+        'feeding': '.cat-feed',
+        'wants': '.cat-wants',
+        'letters': '.cat-letters',
+        'numbers': '.cat-numbers',
+        'actions': '.cat-wind'
+    };
+
+    for (const [roomId, classSelector] of Object.entries(roomMapping)) {
+        if (!freeRooms.includes(roomId)) {
+            const card = document.querySelector(classSelector);
+            if (card) {
+                const titleDiv = card.querySelector('.category-title');
+                if (titleDiv && !titleDiv.innerHTML.includes('🔒')) {
+                    titleDiv.innerHTML = '🔒 ' + titleDiv.innerHTML;
+                    card.style.opacity = '0.85'; 
+                }
+            }
+        }
+    }
+}
 
 function openModal(modalId) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
@@ -124,7 +158,7 @@ const roomsData = {
         { id: 'truck', big_img: 'bs_truck.png', big_sound: 'bs_truck.wav', small_img: 'bs_block.png', small_sound: 'bs_block.wav' },
         { id: 'chair', big_img: 'bs_chair_big.png', big_sound: 'bs_chair_big.wav', small_img: 'bs_chair_small.png', small_sound: 'bs_chair_small.wav' },
         { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
-    ], // <--- ВОТ ЭТА ЗАПЯТАЯ ВЕРНУЛАСЬ НА СВОЕ ЗАКОННОЕ МЕСТО!
+    ],
     'actions': [
         { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
         { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
@@ -140,6 +174,16 @@ const roomsData = {
 
 function openRoom(roomId, title) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    
+    // ПРОВЕРКА ДОСТУПА ПРИ КЛИКЕ
+    if (!freeRooms.includes(roomId) && !userHasPremium) {
+        if (isMobileVK) {
+            openModal('mobile-paywall-modal'); // Телефон -> окно "Свяжитесь с админом"
+        } else {
+            openModal('paywall-modal'); // Компьютер -> окно ЮKassa
+        }
+        return; 
+    }
     
     currentRoom = roomId; isQuizMode = false; currentLearningIndex = 0;
     document.getElementById('quiz-area').classList.remove('active'); 
