@@ -8,11 +8,28 @@ const SERVER_URL = "https://neuro-master.online";
 const freeRooms = ['animals', 'colors']; 
 
 // ИНИЦИАЛИЗАЦИЯ
+// Получение параметров авторизации из URL (работает и для hash, и для query)
+function getVkSignParams() {
+    let search = window.location.search;
+    let hash = window.location.hash;
+    // Если есть параметры в query – используем их (новый формат)
+    if (search && search.includes('vk_user_id=')) {
+        return search.substring(1);
+    }
+    // Иначе берём из hash (старый формат)
+    if (hash && hash.includes('vk_user_id=')) {
+        return hash.substring(1);
+    }
+    return '';
+}
+
 async function initAppAndCheckPremium() {
     try {
         await vkBridge.send('VKWebAppInit');
         const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-        const vkSignParams = window.location.hash.substring(1);
+        const vkSignParams = getVkSignParams();
+        
+        console.log("📤 Отправляем sign:", vkSignParams); // ОТЛАДКА
         
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
             method: 'GET',
@@ -22,25 +39,23 @@ async function initAppAndCheckPremium() {
         console.log("Ответ сервера:", data);
 
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
-        applyLocks(); // применяем замки после загрузки
+        applyLocks();
     } catch (error) {
         console.error("Ошибка при проверке премиума:", error);
         applyLocks();
     }
 }
-initAppAndCheckPremium();
 
-// ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА ПОДПИСКИ (с обновлением интерфейса)
 async function isPremiumActive() {
     try {
         const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-        const vkSignParams = window.location.hash.substring(1);
+        const vkSignParams = getVkSignParams();
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
             headers: { 'x-vk-sign': vkSignParams }
         });
         const data = await response.json();
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
-        applyLocks(); // обновляем замки (убираем, если подписка есть)
+        applyLocks();
         return userHasPremium;
     } catch(e) {
         console.error("Ошибка проверки премиума:", e);
