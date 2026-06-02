@@ -1,3 +1,35 @@
+// ==========================================
+// ЗАГЛУШКА НА СЛУЧАЙ ПРОБЛЕМ С VK BRIDGE
+// ==========================================
+if (typeof vkBridge === 'undefined') {
+    console.warn("⚠️ VK Bridge не загружен, создаём фиктивный объект");
+    window.vkBridge = {
+        send: (method, params) => {
+            console.log("[FAKE] VK Bridge send:", method, params);
+            if (method === 'VKWebAppGetUserInfo') {
+                return Promise.resolve({ id: 550971822, first_name: 'Тест', last_name: '' });
+            }
+            if (method === 'VKWebAppInit') {
+                return Promise.resolve({ result: true });
+            }
+            return Promise.resolve({});
+        }
+    };
+}
+
+// Безопасная обёртка для VK Bridge (никогда не падает)
+const safeVkSend = async (method, params) => {
+    try {
+        return await vkBridge.send(method, params);
+    } catch(e) {
+        console.error(`❌ Ошибка при вызове ${method}:`, e);
+        // Возвращаем заглушки для критических методов
+        if (method === 'VKWebAppGetUserInfo') return { id: 550971822, first_name: 'Гость', last_name: '' };
+        if (method === 'VKWebAppInit') return { result: true };
+        return {};
+    }
+};
+
 // --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
 const isTestMode = true; 
 const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
@@ -7,16 +39,13 @@ let userHasPremium = false;
 const SERVER_URL = "https://neuro-master.online"; 
 const freeRooms = ['animals', 'colors']; 
 
-// ИНИЦИАЛИЗАЦИЯ
 // Получение параметров авторизации из URL (работает и для hash, и для query)
 function getVkSignParams() {
     let search = window.location.search;
     let hash = window.location.hash;
-    // Если есть параметры в query – используем их (новый формат)
     if (search && search.includes('vk_user_id=')) {
         return search.substring(1);
     }
-    // Иначе берём из hash (старый формат)
     if (hash && hash.includes('vk_user_id=')) {
         return hash.substring(1);
     }
@@ -25,41 +54,49 @@ function getVkSignParams() {
 
 async function initAppAndCheckPremium() {
     try {
-        await vkBridge.send('VKWebAppInit');
-        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+        await safeVkSend('VKWebAppInit');
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
         const vkSignParams = getVkSignParams();
         
-        console.log("📤 Отправляем sign:", vkSignParams); // ОТЛАДКА
+        console.log("📤 Отправляем sign:", vkSignParams);
         
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
             method: 'GET',
-            headers: { 'x-vk-sign': vkSignParams }
+            headers: { 
+                'x-vk-sign': vkSignParams,
+                'x-bot-token': 'SuperSecret'
+            }
         });
         const data = await response.json();
-        console.log("Ответ сервера:", data);
+        console.log("✅ Ответ сервера:", data);
 
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
-        applyLocks();
     } catch (error) {
-        console.error("Ошибка при проверке премиума:", error);
-        applyLocks();
+        console.error("❌ Ошибка при проверке премиума:", error);
+        userHasPremium = false; // при ошибке считаем, что подписки нет
+    } finally {
+        applyLocks(); // всегда обновляем замки
     }
 }
 
 async function isPremiumActive() {
     try {
-        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
         const vkSignParams = getVkSignParams();
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
-            headers: { 'x-vk-sign': vkSignParams }
+            method: 'GET',
+            headers: { 
+                'x-vk-sign': vkSignParams,
+                'x-bot-token': 'SuperSecret'
+            }
         });
         const data = await response.json();
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
         applyLocks();
         return userHasPremium;
     } catch(e) {
-        console.error("Ошибка проверки премиума:", e);
-        return userHasPremium;
+        console.error("❌ Ошибка проверки премиума:", e);
+        return false; // если сервер не ответил – считаем, что доступа нет
     }
 }
 
@@ -99,18 +136,18 @@ function applyLocks() {
 }
 
 function openModal(modalId) {
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     document.getElementById(modalId).classList.add('active');
 }
 
 function closeModal(modalId, event) {
     if (event && event.target !== document.getElementById(modalId)) return;
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     document.getElementById(modalId).classList.remove('active');
 }
 
 async function goToPayment() {
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
     const btn = document.querySelector('#paywall-modal .wind-start-btn');
     const originalText = btn.innerText;
     btn.innerText = "Создаем платеж...";
@@ -118,8 +155,8 @@ async function goToPayment() {
     btn.style.pointerEvents = "none";
     
     try {
-        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-        const vkSignParams = window.location.search.substring(1);
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+        const vkSignParams = getVkSignParams();  // исправлено
         const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "x-vk-sign": vkSignParams },
@@ -212,10 +249,10 @@ const roomsData = {
 
 // ОСНОВНАЯ ФУНКЦИЯ ОТКРЫТИЯ КОМНАТЫ (с проверкой подписки)
 async function openRoom(roomId, title) {
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
     if (!freeRooms.includes(roomId)) {
-        const hasAccess = await isPremiumActive(); // проверяем и обновляем интерфейс
+        const hasAccess = await isPremiumActive();
         if (!hasAccess) {
             if (isMobileVK) openModal('mobile-paywall-modal');
             else openModal('paywall-modal');
@@ -256,17 +293,17 @@ function initDrawCanvas() {
 }
 
 function resizeCanvas() { const wrapper = document.querySelector('.canvas-wrapper'); paintCanvas.width = wrapper.clientWidth; paintCanvas.height = wrapper.clientHeight; }
-function changeDrawImage(dir) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); currentDrawIndex += dir; if (currentDrawIndex < 0) currentDrawIndex = drawData.length - 1; if (currentDrawIndex >= drawData.length) currentDrawIndex = 0; updateDrawImage(); clearDrawCanvas(false); }
+function changeDrawImage(dir) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); currentDrawIndex += dir; if (currentDrawIndex < 0) currentDrawIndex = drawData.length - 1; if (currentDrawIndex >= drawData.length) currentDrawIndex = 0; updateDrawImage(); clearDrawCanvas(false); }
 function updateDrawImage() { document.getElementById('contourImage').src = drawData[currentDrawIndex].file; document.getElementById('draw-image-title').innerText = drawData[currentDrawIndex].text; }
-function setBrushColor(colorHex, soundName, btnElem) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound(soundName + '.wav'); brushColor = colorHex; document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active')); btnElem.classList.add('active'); }
+function setBrushColor(colorHex, soundName, btnElem) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound(soundName + '.wav'); brushColor = colorHex; document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active')); btnElem.classList.add('active'); }
 function clearDrawCanvas(playAudio = true) { if(playAudio) playSound('paint_clear.wav'); ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height); ctx.fillStyle = "white"; ctx.fillRect(0, 0, paintCanvas.width, paintCanvas.height); }
 function getMousePos(evt) { const rect = paintCanvas.getBoundingClientRect(); const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX; const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY; return { x: (clientX - rect.left) * (paintCanvas.width / rect.width), y: (clientY - rect.top) * (paintCanvas.height / rect.height) }; }
 function startDrawing(e) { e.preventDefault(); isDrawing = true; const pos = getMousePos(e); ctx.beginPath(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.moveTo(pos.x, pos.y); ctx.lineTo(pos.x, pos.y + 0.1); ctx.stroke(); }
 function drawPath(e) { if (!isDrawing) return; e.preventDefault(); const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; }
 function stopDrawing(e) { if (isDrawing && Math.random() < 0.1) { playSound(Math.random() > 0.5 ? 'paint_good.wav' : 'paint_beautiful.wav'); } isDrawing = false; }
 
-function toggleSoundMode(event) { if (event) event.stopPropagation(); vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playNamesMode = !playNamesMode; renderLearningCard(); }
-function renderWantsBoard() { const area = document.getElementById('wants-area'); area.innerHTML = ''; roomsData['wants'].forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'wants-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound(card.sound); }; area.appendChild(cardDiv); }); }
+function toggleSoundMode(event) { if (event) event.stopPropagation(); safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playNamesMode = !playNamesMode; renderLearningCard(); }
+function renderWantsBoard() { const area = document.getElementById('wants-area'); area.innerHTML = ''; roomsData['wants'].forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'wants-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); playSound(card.sound); }; area.appendChild(cardDiv); }); }
 
 function renderLearningCard() { 
     const cards = roomsData[currentRoom]; 
@@ -291,11 +328,11 @@ function renderLearningCard() {
     if (currentSoundToPlay) playSound(currentSoundToPlay); 
 }
 
-function prevLearningCard() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; renderLearningCard(); }
-function nextLearningCard() { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; renderLearningCard(); }
+function prevLearningCard() { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; renderLearningCard(); }
+function nextLearningCard() { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; renderLearningCard(); }
 
 function toggleQuiz() { 
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
     isQuizMode = !isQuizMode; 
     updateQuizToggleUI(); 
     const learningArea = document.getElementById('learning-area'); 
@@ -468,7 +505,7 @@ function onDragEnd(e) {
     
     if (currentRoom === 'big_small') {
         if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             activeItem.style.display = 'none';
             playSound('color_correct.wav');
             bsActiveItemsCount--;
@@ -486,7 +523,7 @@ function onDragEnd(e) {
     else {
         const itemId = activeItem.getAttribute('data-id');
         if (target && target.getAttribute('data-id') === itemId && !target.classList.contains('matched')) {
-            vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             activeItem.classList.add('matched');
             target.classList.add('matched');
             activeItem.style.display = 'none';
@@ -511,7 +548,7 @@ function onDragEnd(e) {
         }
     }
     
-    vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     playSound('wrong.wav');
     activeItem.style.transition = 'all 0.3s ease';
     activeItem.style.position = '';
@@ -530,7 +567,7 @@ document.addEventListener('pointerup', onDragEnd);
 
 function startNewQuizRound() { const allCards = [...roomsData[currentRoom]]; shuffleArray(allCards); quizCards = allCards.slice(0, 4); const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)]; expectedCardId = randomTarget.id; renderQuizGrid(); if (currentRoom === 'letters') playSound(`q_b_${randomTarget.id}.wav`); else if (randomTarget.sound) { const soundFilename = randomTarget.sound.split('/').pop(); const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); playSound(`q${fileBase}.wav`); } }
 function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'); quizArea.innerHTML = ''; quizCards.forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'quiz-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => handleQuizClick(card.id); quizArea.appendChild(cardDiv); }); }
-function handleQuizClick(actionId) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
+function handleQuizClick(actionId) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } } 
@@ -539,3 +576,6 @@ function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFi
 window.addEventListener('focus', () => {
     isPremiumActive().catch(console.error);
 });
+
+// Запускаем проверку подписки после загрузки страницы
+initAppAndCheckPremium();
