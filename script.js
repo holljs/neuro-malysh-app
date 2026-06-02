@@ -20,8 +20,11 @@ async function initAppAndCheckPremium() {
             headers: { 'x-vk-sign': vkSignParams }
         });
         const data = await response.json();
-        if (data.success && data.has_premium) {
-            userHasPremium = true;
+        console.log("🚨 ВНИМАНИЕ! Ответ от сервера:", data); // Выводим ответ на чистую воду!
+
+        // Смягчаем условие. Теперь мы проверяем самые частые названия подписок и не требуем обязательного data.success
+        if (data.has_premium === true || data.is_pro === true || data.subscription === true || data.subscription_active === true || (data.success && data.has_premium)) {
+        userHasPremium = true;
         }
     } catch (error) {
         console.error("Ошибка при проверке премиума:", error);
