@@ -13,7 +13,7 @@ async function initAppAndCheckPremium() {
     try {
         await vkBridge.send('VKWebAppInit');
         const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-        const vkSignParams = window.location.search.substring(1); 
+        const vkSignParams = window.location.hash.substring(1);
         
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
             method: 'GET',
