@@ -20,11 +20,10 @@ async function initAppAndCheckPremium() {
             headers: { 'x-vk-sign': vkSignParams }
         });
         const data = await response.json();
-        console.log("🚨 ВНИМАНИЕ! Ответ от сервера:", data); // Выводим ответ на чистую воду!
+        console.log("🚨 ВНИМАНИЕ! Ответ от сервера:", data);
 
-        // Смягчаем условие. Теперь мы проверяем самые частые названия подписок и не требуем обязательного data.success
         if (data.has_premium === true || data.is_pro === true || data.subscription === true || data.subscription_active === true || (data.success && data.has_premium)) {
-        userHasPremium = true;
+            userHasPremium = true;
         }
     } catch (error) {
         console.error("Ошибка при проверке премиума:", error);
@@ -33,6 +32,23 @@ async function initAppAndCheckPremium() {
     }
 }
 initAppAndCheckPremium();
+
+// ИЗМЕНЕНО: функция для принудительной проверки статуса подписки
+async function isPremiumActive() {
+    try {
+        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+        const vkSignParams = window.location.hash.substring(1);
+        const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
+            headers: { 'x-vk-sign': vkSignParams }
+        });
+        const data = await response.json();
+        userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
+        return userHasPremium;
+    } catch(e) {
+        console.error("Ошибка проверки премиума:", e);
+        return userHasPremium;
+    }
+}
 
 // Функция расстановки замочков
 function applyLocks() {
@@ -175,17 +191,21 @@ const roomsData = {
     ]
 };
 
-function openRoom(roomId, title) {
+// ИЗМЕНЕНО: openRoom теперь асинхронная и проверяет подписку при каждом вызове
+async function openRoom(roomId, title) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
-    // ПРОВЕРКА ДОСТУПА ПРИ КЛИКЕ
-    if (!freeRooms.includes(roomId) && !userHasPremium) {
-        if (isMobileVK) {
-            openModal('mobile-paywall-modal'); // Телефон -> окно "Свяжитесь с админом"
-        } else {
-            openModal('paywall-modal'); // Компьютер -> окно ЮKassa
+    // Проверка доступа для платных комнат
+    if (!freeRooms.includes(roomId)) {
+        const hasAccess = await isPremiumActive();
+        if (!hasAccess) {
+            if (isMobileVK) {
+                openModal('mobile-paywall-modal');
+            } else {
+                openModal('paywall-modal');
+            }
+            return;
         }
-        return; 
     }
     
     currentRoom = roomId; isQuizMode = false; currentLearningIndex = 0;
@@ -497,4 +517,9 @@ function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'
 function handleQuizClick(actionId) { vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
-function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } }
+function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } } 
+
+// ИЗМЕНЕНО: при фокусе окна обновляем статус подписки (на случай возврата после оплаты)
+window.addEventListener('focus', () => {
+    isPremiumActive().catch(console.error);
+});
