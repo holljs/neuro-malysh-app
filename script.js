@@ -5,10 +5,9 @@ const isMobileVK = vkPlatform.includes('mobile');
 let userHasPremium = false; 
 
 const SERVER_URL = "https://neuro-master.online"; 
-
-// Бесплатные комнаты: Животные и Цвета
 const freeRooms = ['animals', 'colors']; 
 
+// ИНИЦИАЛИЗАЦИЯ
 async function initAppAndCheckPremium() {
     try {
         await vkBridge.send('VKWebAppInit');
@@ -20,20 +19,18 @@ async function initAppAndCheckPremium() {
             headers: { 'x-vk-sign': vkSignParams }
         });
         const data = await response.json();
-        console.log("🚨 ВНИМАНИЕ! Ответ от сервера:", data);
+        console.log("Ответ сервера:", data);
 
-        if (data.has_premium === true || data.is_pro === true || data.subscription === true || data.subscription_active === true || (data.success && data.has_premium)) {
-            userHasPremium = true;
-        }
+        userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
+        applyLocks(); // применяем замки после загрузки
     } catch (error) {
         console.error("Ошибка при проверке премиума:", error);
-    } finally {
         applyLocks();
     }
 }
 initAppAndCheckPremium();
 
-// ИЗМЕНЕНО: функция для принудительной проверки статуса подписки
+// ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА ПОДПИСКИ (с обновлением интерфейса)
 async function isPremiumActive() {
     try {
         const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
@@ -43,6 +40,7 @@ async function isPremiumActive() {
         });
         const data = await response.json();
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
+        applyLocks(); // обновляем замки (убираем, если подписка есть)
         return userHasPremium;
     } catch(e) {
         console.error("Ошибка проверки премиума:", e);
@@ -50,10 +48,8 @@ async function isPremiumActive() {
     }
 }
 
-// Функция расстановки замочков
+// Функция отображения/скрытия замков
 function applyLocks() {
-    if (userHasPremium) return; 
-
     const roomMapping = {
         'big_small': '.cat-bs',
         'shapes': '.cat-shapes',
@@ -70,9 +66,17 @@ function applyLocks() {
             const card = document.querySelector(classSelector);
             if (card) {
                 const titleDiv = card.querySelector('.category-title');
-                if (titleDiv && !titleDiv.innerHTML.includes('🔒')) {
-                    titleDiv.innerHTML = '🔒 ' + titleDiv.innerHTML;
-                    card.style.opacity = '0.85'; 
+                if (titleDiv) {
+                    const cleanTitle = titleDiv.innerText.replace('🔒 ', '');
+                    if (userHasPremium) {
+                        titleDiv.innerText = cleanTitle;
+                        card.style.opacity = '1';
+                    } else {
+                        if (!titleDiv.innerText.includes('🔒')) {
+                            titleDiv.innerText = '🔒 ' + cleanTitle;
+                        }
+                        card.style.opacity = '0.85';
+                    }
                 }
             }
         }
@@ -191,19 +195,15 @@ const roomsData = {
     ]
 };
 
-// ИЗМЕНЕНО: openRoom теперь асинхронная и проверяет подписку при каждом вызове
+// ОСНОВНАЯ ФУНКЦИЯ ОТКРЫТИЯ КОМНАТЫ (с проверкой подписки)
 async function openRoom(roomId, title) {
     vkBridge.send("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
-    // Проверка доступа для платных комнат
     if (!freeRooms.includes(roomId)) {
-        const hasAccess = await isPremiumActive();
+        const hasAccess = await isPremiumActive(); // проверяем и обновляем интерфейс
         if (!hasAccess) {
-            if (isMobileVK) {
-                openModal('mobile-paywall-modal');
-            } else {
-                openModal('paywall-modal');
-            }
+            if (isMobileVK) openModal('mobile-paywall-modal');
+            else openModal('paywall-modal');
             return;
         }
     }
@@ -224,7 +224,8 @@ async function openRoom(roomId, title) {
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
     document.getElementById('room-title').innerText = title;
-    document.getElementById('screen-menu').classList.remove('active'); document.getElementById('screen-room').classList.add('active');
+    document.getElementById('screen-menu').classList.remove('active'); 
+    document.getElementById('screen-room').classList.add('active');
 }
 
 function goHome() { document.getElementById('screen-room').classList.remove('active'); document.getElementById('screen-menu').classList.add('active'); }
@@ -519,7 +520,7 @@ function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { cons
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } } 
 
-// ИЗМЕНЕНО: при фокусе окна обновляем статус подписки (на случай возврата после оплаты)
+// При фокусе окна обновляем статус (полезно после возврата из оплаты)
 window.addEventListener('focus', () => {
     isPremiumActive().catch(console.error);
 });
