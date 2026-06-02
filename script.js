@@ -64,7 +64,7 @@ async function initAppAndCheckPremium() {
             method: 'GET',
             headers: { 
                 'x-vk-sign': vkSignParams,
-                'x-bot-token': 'SuperSecret'
+                'x-bot-token': 'SuperSecret_987654321_Token'
             }
         });
         const data = await response.json();
@@ -87,7 +87,7 @@ async function isPremiumActive() {
             method: 'GET',
             headers: { 
                 'x-vk-sign': vkSignParams,
-                'x-bot-token': 'SuperSecret'
+                'x-bot-token': 'SuperSecret_987654321_Token'
             }
         });
         const data = await response.json();
