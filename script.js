@@ -195,7 +195,9 @@ function subscribeToGroup() {
             if (data.result) {
                 const banner = document.getElementById('vip-bonus-banner');
                 if (banner) banner.style.display = 'none';
-                alert("Ура! Разрешение получено 🎉\n\nТеперь перейдите в сообщения группы и напишите слово «Привет» (или нажмите Начать). Бот мгновенно выдаст вам VIP на 24 часа и снимет все замочки!");
+                
+                // ВМЕСТО ALERT ОТКРЫВАЕМ НАШЕ НОВОЕ КРАСИВОЕ ОКНО
+                openModal('bonus-success-modal');
             }
         })
         .catch(error => {
