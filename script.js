@@ -181,6 +181,29 @@ async function goToPayment() {
     }
 }
 
+// ==========================================
+// ФУНКЦИЯ ПОДПИСКИ НА УВЕДОМЛЕНИЯ ГРУППЫ
+// ==========================================
+function subscribeToGroup() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
+    
+    // ID группы Нейро-Малыша
+    const groupId = 78549529; 
+
+    safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
+        .then(data => {
+            if (data.result) {
+                const banner = document.getElementById('vip-bonus-banner');
+                if (banner) banner.style.display = 'none';
+                alert("Ура! Разрешение получено 🎉\n\nТеперь перейдите в сообщения группы и напишите слово «Привет» (или нажмите Начать). Бот мгновенно выдаст вам VIP на 24 часа и снимет все замочки!");
+            }
+        })
+        .catch(error => {
+            console.log("Пользователь закрыл окно подписки:", error);
+        });
+}
+// ==========================================
+
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
