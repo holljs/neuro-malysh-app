@@ -23,7 +23,6 @@ const safeVkSend = async (method, params) => {
         return await vkBridge.send(method, params);
     } catch(e) {
         console.error(`❌ Ошибка при вызове ${method}:`, e);
-        // Возвращаем заглушки для критических методов
         if (method === 'VKWebAppGetUserInfo') return { id: 550971822, first_name: 'Гость', last_name: '' };
         if (method === 'VKWebAppInit') return { result: true };
         return {};
@@ -39,16 +38,11 @@ let userHasPremium = false;
 const SERVER_URL = "https://neuro-master.online"; 
 const freeRooms = ['animals', 'colors']; 
 
-// Получение параметров авторизации из URL (работает и для hash, и для query)
 function getVkSignParams() {
     let search = window.location.search;
     let hash = window.location.hash;
-    if (search && search.includes('vk_user_id=')) {
-        return search.substring(1);
-    }
-    if (hash && hash.includes('vk_user_id=')) {
-        return hash.substring(1);
-    }
+    if (search && search.includes('vk_user_id=')) return search.substring(1);
+    if (hash && hash.includes('vk_user_id=')) return hash.substring(1);
     return '';
 }
 
@@ -73,9 +67,9 @@ async function initAppAndCheckPremium() {
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
     } catch (error) {
         console.error("❌ Ошибка при проверке премиума:", error);
-        userHasPremium = false; // при ошибке считаем, что подписки нет
+        userHasPremium = false; 
     } finally {
-        applyLocks(); // всегда обновляем замки
+        applyLocks();
     }
 }
 
@@ -96,11 +90,10 @@ async function isPremiumActive() {
         return userHasPremium;
     } catch(e) {
         console.error("❌ Ошибка проверки премиума:", e);
-        return false; // если сервер не ответил – считаем, что доступа нет
+        return false; 
     }
 }
 
-// Функция отображения/скрытия замков
 function applyLocks() {
     const roomMapping = {
         'big_small': '.cat-bs',
@@ -110,7 +103,8 @@ function applyLocks() {
         'wants': '.cat-wants',
         'letters': '.cat-letters',
         'numbers': '.cat-numbers',
-        'actions': '.cat-wind'
+        'actions': '.cat-wind',
+        'wind': '.cat-breeze' // ДОБАВИЛИ ВЕТЕРОК
     };
 
     for (const [roomId, classSelector] of Object.entries(roomMapping)) {
@@ -156,7 +150,7 @@ async function goToPayment() {
     
     try {
         const userInfo = await safeVkSend('VKWebAppGetUserInfo');
-        const vkSignParams = getVkSignParams();  // исправлено
+        const vkSignParams = getVkSignParams();  
         const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "x-vk-sign": vkSignParams },
@@ -187,7 +181,6 @@ async function goToPayment() {
 function subscribeToGroup() {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
     
-    // ID группы Нейро-Малыша
     const groupId = 78549529; 
 
     safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
@@ -196,7 +189,6 @@ function subscribeToGroup() {
                 const banner = document.getElementById('vip-bonus-banner');
                 if (banner) banner.style.display = 'none';
                 
-                // ВМЕСТО ALERT ОТКРЫВАЕМ НАШЕ НОВОЕ КРАСИВОЕ ОКНО
                 openModal('bonus-success-modal');
             }
         })
@@ -272,7 +264,6 @@ const roomsData = {
     ]
 };
 
-// ОСНОВНАЯ ФУНКЦИЯ ОТКРЫТИЯ КОМНАТЫ (с проверкой подписки)
 async function openRoom(roomId, title) {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
@@ -292,12 +283,19 @@ async function openRoom(roomId, title) {
     document.getElementById('learning-area').style.display = 'none'; 
     document.getElementById('wants-area').classList.remove('active'); 
     document.getElementById('draw-area').classList.remove('active'); 
+    document.getElementById('wind-area').style.display = 'none'; 
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
     else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
     else if (roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); }
     else if (roomId === 'big_small') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('bs-area').classList.add('active'); setupBigSmallGame(); }
+    else if (roomId === 'wind') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('wind-area').style.display = 'flex'; 
+        document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!"; 
+        document.getElementById('wind-start-btn').style.display = 'block'; 
+    }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
     document.getElementById('room-title').innerText = title;
@@ -305,7 +303,11 @@ async function openRoom(roomId, title) {
     document.getElementById('screen-room').classList.add('active');
 }
 
-function goHome() { document.getElementById('screen-room').classList.remove('active'); document.getElementById('screen-menu').classList.add('active'); }
+function goHome() { 
+    if (typeof stopWindGame === 'function') stopWindGame();
+    document.getElementById('screen-room').classList.remove('active'); 
+    document.getElementById('screen-menu').classList.add('active'); 
+}
 
 function initDrawCanvas() {
     setTimeout(() => { resizeCanvas(); clearDrawCanvas(false); updateDrawImage();
@@ -597,10 +599,80 @@ function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { cons
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } } 
 
-// При фокусе окна обновляем статус (полезно после возврата из оплаты)
 window.addEventListener('focus', () => {
     isPremiumActive().catch(console.error);
 });
 
-// Запускаем проверку подписки после загрузки страницы
 initAppAndCheckPremium();
+
+// ==========================================
+// --- ВЕТЕРОК (тренажёр дыхания) ---
+// ==========================================
+let audioCtx, analyser, microphone, javascriptNode, windSpeed = 0, windRotation = 0, windAnimFrame, windPraiseTimer = null, micStarted = false;
+
+function startWindGame() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+    document.getElementById('wind-start-btn').style.display = 'none';
+    document.getElementById('wind-instruction').innerText = "Дуй сильнее!";
+    playSound('wind_intro.wav');
+    
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(function(stream) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            microphone = audioCtx.createMediaStreamSource(stream);
+            javascriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
+            
+            analyser.smoothingTimeConstant = 0.8;
+            analyser.fftSize = 1024;
+            microphone.connect(analyser);
+            analyser.connect(javascriptNode);
+            javascriptNode.connect(audioCtx.destination);
+            micStarted = true;
+            
+            javascriptNode.onaudioprocess = function() {
+                let array = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(array);
+                let values = 0;
+                let length = array.length;
+                for (let i = 0; i < length; i++) values += array[i];
+                let average = values / length;
+                
+                if (average > 15) {
+                    windSpeed += (average - 15) * 0.15;
+                    if (windSpeed > 40) windSpeed = 40;
+                }
+            };
+            updateWindSpinner();
+        })
+        .catch(function(err) {
+            document.getElementById('wind-instruction').innerText = "Разреши доступ к микрофону :(";
+            document.getElementById('wind-start-btn').style.display = 'block';
+        });
+}
+
+function updateWindSpinner() {
+    if (!micStarted) return;
+    windRotation += windSpeed;
+    windSpeed *= 0.97;
+    if (windSpeed < 0) windSpeed = 0;
+    
+    document.getElementById('wind-spinner').style.transform = `rotate(${windRotation}deg)`;
+    
+    if (windSpeed > 25 && !windPraiseTimer) {
+        playSound('wind_good.wav');
+        windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 5000);
+    } else if (windSpeed > 10 && windSpeed <= 25 && Math.random() < 0.02 && !windPraiseTimer) {
+        playSound('wind_more.wav');
+        windPraiseTimer = setTimeout(() => { windPraiseTimer = null; }, 4000);
+    }
+    windAnimFrame = requestAnimationFrame(updateWindSpinner);
+}
+
+function stopWindGame() {
+    micStarted = false;
+    cancelAnimationFrame(windAnimFrame);
+    if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close().catch(e => console.log(e));
+    }
+}
