@@ -43,7 +43,6 @@
         </div>
     </div>
 
-    <!-- ОКНО УСПЕШНОЙ ПОДПИСКИ -->
     <div id="bonus-success-modal" class="modal-overlay" onclick="closeModal('bonus-success-modal', event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('bonus-success-modal')">✖</button>
@@ -123,6 +122,11 @@
                 <div class="category-title">Утя действует</div>
             </div>
 
+            <div class="category-card cat-breeze" onclick="openRoom('wind', 'Ветерок')">
+                <div class="category-icon-placeholder">🌬️</div>
+                <div class="category-title">Ветерок</div>
+            </div>
+
         </div>
     </div>
 
@@ -181,10 +185,16 @@
                     <button class="clear-btn" onclick="clearDrawCanvas()">❌ Стереть всё</button>
                 </div>
             </div>
+
+            <div id="wind-area" class="wind-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <div class="wind-instruction" id="wind-instruction" style="font-size: 20px; font-weight: bold; color: #7A90A4; margin-bottom: 20px;">Нажми кнопку и подуй!</div>
+                <img src="wind_spinner.png" id="wind-spinner" class="wind-spinner" style="width: 150px; height: 150px; transition: transform 0.1s linear;">
+                <div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()" style="margin-top: 30px; background-color: #0077FF; color: white; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">🌬️ Включить микрофон</div>
+            </div>
             
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=14"></script>
 </body>
 </html>
