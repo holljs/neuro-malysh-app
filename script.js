@@ -104,7 +104,8 @@ function applyLocks() {
         'letters': '.cat-letters',
         'numbers': '.cat-numbers',
         'actions': '.cat-wind',
-        'wind': '.cat-breeze' // ДОБАВИЛИ ВЕТЕРОК
+        'garden': '.cat-garden',
+        'wind': '.cat-breeze'
     };
 
     for (const [roomId, classSelector] of Object.entries(roomMapping)) {
@@ -202,6 +203,7 @@ let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let cur
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
 let canvasInitialized = false; 
+let currentGardenLevel = 1; let gardenTargetCount = 0;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -295,6 +297,7 @@ async function openRoom(roomId, title) {
     document.getElementById('wants-area').classList.remove('active'); 
     document.getElementById('draw-area').classList.remove('active'); 
     document.getElementById('wind-area').style.display = 'none'; 
+    document.getElementById('garden-area').style.display = 'none'; 
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -306,6 +309,12 @@ async function openRoom(roomId, title) {
         document.getElementById('wind-area').style.display = 'flex'; 
         document.getElementById('wind-instruction').innerText = "Нажми кнопку и подуй в телефон!"; 
         document.getElementById('wind-start-btn').style.display = 'block'; 
+    }
+    else if (roomId === 'garden') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('garden-area').style.display = 'block'; 
+        currentGardenLevel = 1; 
+        setupGardenGame(); 
     }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
@@ -400,6 +409,48 @@ function toggleQuiz() {
             renderLearningCard(); 
         } 
     } 
+}
+
+function setupGardenGame() {
+    const targetZone = document.getElementById('garden-targets');
+    const dragZone = document.getElementById('garden-drags');
+    targetZone.innerHTML = ''; dragZone.innerHTML = '';
+    matchedCount = 0;
+
+    const levelData = roomsData['garden'].find(l => l.level === currentGardenLevel);
+    if (!levelData) {
+        playSound('shapes_win.wav');
+        currentGardenLevel = 1; 
+        setTimeout(setupGardenGame, 3000);
+        return;
+    }
+
+    gardenTargetCount = levelData.count;
+    document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
+    playSound(levelData.sound);
+
+    const itemSize = gardenTargetCount > 6 ? '50px' : '70px';
+
+    for(let i=0; i < gardenTargetCount; i++) {
+        const img = document.createElement('img');
+        img.src = levelData.item;
+        img.className = 'target-item';
+        img.setAttribute('data-id', 'veg');
+        img.style.filter = 'brightness(0) opacity(0.4)'; 
+        img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
+        targetZone.appendChild(img);
+    }
+
+    for(let i=0; i < gardenTargetCount; i++) {
+        const img = document.createElement('img');
+        img.src = levelData.item;
+        img.className = 'draggable-item';
+        img.setAttribute('data-id', 'veg');
+        img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
+        img.ondragstart = () => false;
+        img.addEventListener('pointerdown', onDragStart);
+        dragZone.appendChild(img);
+    }
 }
 
 function setupDragGame() { 
@@ -573,13 +624,22 @@ function onDragEnd(e) {
                 setTimeout(() => playSound(animalSound), 1000);
             } else if (currentRoom === 'shapes') {
                 playSound('shape_correct.wav');
+            } else if (currentRoom === 'garden') {
+                target.style.filter = 'none';
+                playSound('color_correct.wav');
             }
             
             matchedCount++;
-            if (matchedCount === 3) {
-                if (currentRoom === 'colors') setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500);
-                else if (currentRoom === 'feeding') setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000);
-                else if (currentRoom === 'shapes') setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000);
+            
+            if (currentRoom === 'colors' && matchedCount === 3) setTimeout(() => { playSound('color_win.wav'); setTimeout(setupDragGame, 4500); }, 1500);
+            else if (currentRoom === 'feeding' && matchedCount === 3) setTimeout(() => { playSound('f_win.wav'); setTimeout(setupDragGame, 3500); }, 3000);
+            else if (currentRoom === 'shapes' && matchedCount === 3) setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000);
+            else if (currentRoom === 'garden' && matchedCount === gardenTargetCount) {
+                setTimeout(() => {
+                    playSound('color_win.wav');
+                    currentGardenLevel++;
+                    setTimeout(setupGardenGame, 2500);
+                }, 500);
             }
             activeItem = null;
             return;
