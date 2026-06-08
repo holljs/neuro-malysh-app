@@ -251,6 +251,17 @@ const roomsData = {
         { id: 'chair', big_img: 'bs_chair_big.png', big_sound: 'bs_chair_big.wav', small_img: 'bs_chair_small.png', small_sound: 'bs_chair_small.wav' },
         { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
     ],
+    'garden': [
+        { level: 1, count: 1, sound: 'g_level1.wav', bg: 'garden_bg_1.png', item: 'garden_item_1.png' },
+        { level: 2, count: 2, sound: 'g_level2.wav', bg: 'garden_bg_2.png', item: 'garden_item_2.png' },
+        { level: 3, count: 3, sound: 'g_level3.wav', bg: 'garden_bg_3.png', item: 'garden_item_3.png' },
+        { level: 4, count: 4, sound: 'g_level4.wav', bg: 'garden_bg_4.png', item: 'garden_item_4.png' },
+        { level: 5, count: 5, sound: 'g_level5.wav', bg: 'garden_bg_5.png', item: 'garden_item_5.png' },
+        { level: 6, count: 6, sound: 'g_level6.wav', bg: 'garden_bg_6.png', item: 'garden_item_6.png' },
+        { level: 7, count: 7, sound: 'g_level7.wav', bg: 'garden_bg_7.png', item: 'garden_item_7.png' },
+        { level: 8, count: 8, sound: 'g_level8.wav', bg: 'garden_bg_8.png', item: 'garden_item_8.png' },
+        { level: 9, count: 9, sound: 'g_level9.wav', bg: 'garden_bg_9.png', item: 'garden_item_9.png' }
+    ],
     'actions': [
         { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
         { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
