@@ -305,7 +305,7 @@ async function openRoom(roomId, title) {
     }
     else if (roomId === 'garden') { 
         document.getElementById('quizToggle').style.display = 'none'; 
-        document.getElementById('garden-area').style.display = 'block'; 
+        document.getElementById('garden-area').style.display = 'flex'; // ВАЖНО ДЛЯ ОГОРОДА
         currentGardenLevel = 1; 
         setupGardenGame(); 
     }
@@ -422,25 +422,31 @@ function setupGardenGame() {
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
     playSound(levelData.sound);
 
-    // Немного увеличили овощи, чтобы детям было удобнее их хватать!
     const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
 
+    // Создаем ТЕНИ
     for(let i=0; i < gardenTargetCount; i++) {
         const img = document.createElement('img');
         img.src = levelData.item;
         img.className = 'target-item';
         img.setAttribute('data-id', 'veg');
-        img.style.filter = 'brightness(0) opacity(0.4)'; 
+        // Кроссбраузерная тень:
+        img.style.filter = 'brightness(0)';
+        img.style.WebkitFilter = 'brightness(0)'; // Спасение для iPhone
+        img.style.opacity = '0.5'; 
         img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
+        img.style.margin = '5px';
         targetZone.appendChild(img);
     }
 
+    // Создаем ЦВЕТНЫЕ ОВОЩИ
     for(let i=0; i < gardenTargetCount; i++) {
         const img = document.createElement('img');
         img.src = levelData.item;
         img.className = 'draggable-item';
         img.setAttribute('data-id', 'veg');
         img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
+        img.style.margin = '5px';
         img.ondragstart = () => false;
         img.addEventListener('pointerdown', onDragStart);
         dragZone.appendChild(img);
@@ -575,8 +581,6 @@ function onDragEnd(e) {
     activeItem.releasePointerCapture?.(e.pointerId);
     activeItem.classList.remove('dragging');
     
-    // ВАЖНОЕ ИСПРАВЛЕНИЕ ДЛЯ ДЕТЕЙ: Ищем совпадение не по кончику пальца,
-    // а по центру перетаскиваемой картинки. Это исправляет "промахивания".
     const rectDrag = activeItem.getBoundingClientRect();
     const centerX = rectDrag.left + rectDrag.width / 2;
     const centerY = rectDrag.top + rectDrag.height / 2;
@@ -626,6 +630,8 @@ function onDragEnd(e) {
                 playSound('shape_correct.wav');
             } else if (currentRoom === 'garden') {
                 target.style.filter = 'none';
+                target.style.WebkitFilter = 'none';
+                target.style.opacity = '1';
                 playSound('color_correct.wav');
             }
             
