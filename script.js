@@ -176,20 +176,14 @@ async function goToPayment() {
     }
 }
 
-// ==========================================
-// ФУНКЦИЯ ПОДПИСКИ НА УВЕДОМЛЕНИЯ ГРУППЫ
-// ==========================================
 function subscribeToGroup() {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-    
     const groupId = 78549529; 
-
     safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
         .then(data => {
             if (data.result) {
                 const banner = document.getElementById('vip-bonus-banner');
                 if (banner) banner.style.display = 'none';
-                
                 openModal('bonus-success-modal');
             }
         })
@@ -197,7 +191,6 @@ function subscribeToGroup() {
             console.log("Пользователь закрыл окно подписки:", error);
         });
 }
-// ==========================================
 
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
@@ -429,7 +422,8 @@ function setupGardenGame() {
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
     playSound(levelData.sound);
 
-    const itemSize = gardenTargetCount > 6 ? '50px' : '70px';
+    // Немного увеличили овощи, чтобы детям было удобнее их хватать!
+    const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
 
     for(let i=0; i < gardenTargetCount; i++) {
         const img = document.createElement('img');
@@ -581,8 +575,14 @@ function onDragEnd(e) {
     activeItem.releasePointerCapture?.(e.pointerId);
     activeItem.classList.remove('dragging');
     
+    // ВАЖНОЕ ИСПРАВЛЕНИЕ ДЛЯ ДЕТЕЙ: Ищем совпадение не по кончику пальца,
+    // а по центру перетаскиваемой картинки. Это исправляет "промахивания".
+    const rectDrag = activeItem.getBoundingClientRect();
+    const centerX = rectDrag.left + rectDrag.width / 2;
+    const centerY = rectDrag.top + rectDrag.height / 2;
+    
     activeItem.style.display = 'none';
-    const elemUnderPointer = document.elementsFromPoint(e.clientX, e.clientY);
+    const elemUnderPointer = document.elementsFromPoint(centerX, centerY) || [];
     let target = null;
     for (let el of elemUnderPointer) {
         if (el.classList && el.classList.contains('target-item')) {
@@ -676,9 +676,6 @@ window.addEventListener('focus', () => {
 
 initAppAndCheckPremium();
 
-// ==========================================
-// --- ВЕТЕРОК (тренажёр дыхания) ---
-// ==========================================
 let audioCtx, analyser, microphone, javascriptNode, windSpeed = 0, windRotation = 0, windAnimFrame, windPraiseTimer = null, micStarted = false;
 
 function startWindGame() {
