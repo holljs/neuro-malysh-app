@@ -648,7 +648,7 @@ function onDragEnd(e) {
                 setTimeout(() => {
                     playSound('g_win.wav');
                     currentGardenLevel++;
-                    setTimeout(setupGardenGame, 2500);
+                    setTimeout(setupGardenGame, 5000); // Теперь ждем 5 секунд!
                 }, 500);
             }
             activeItem = null;
