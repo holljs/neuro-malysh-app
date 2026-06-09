@@ -90,10 +90,14 @@ async function isPremiumActive() {
 }
 
 function applyLocks() {
-    // НОВАЯ ЛОГИКА: Прячем баннер-подарок, если у пользователя УЖЕ есть VIP/Premium
+    // ЖЕЛЕЗОБЕТОННАЯ ПРОВЕРКА БАННЕРА
     const banner = document.getElementById('vip-bonus-banner');
-    if (userHasPremium && banner) {
-        banner.style.display = 'none';
+    // Если есть премиум ИЛИ телефон помнит, что мы уже кликали подписку:
+    if (userHasPremium || localStorage.getItem('hide_vip_banner') === 'true') {
+        if (banner) banner.style.display = 'none';
+    } else {
+        // Иначе показываем
+        if (banner) banner.style.display = 'block';
     }
 
     const roomMapping = {
@@ -186,6 +190,10 @@ function subscribeToGroup() {
             if (data.result) {
                 const banner = document.getElementById('vip-bonus-banner');
                 if (banner) banner.style.display = 'none';
+                
+                // ЗАПОМИНАЕМ НАВСЕГДА в памяти телефона, что человек уже дал разрешение
+                localStorage.setItem('hide_vip_banner', 'true');
+                
                 openModal('bonus-success-modal');
             }
         })
