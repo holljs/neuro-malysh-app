@@ -421,15 +421,14 @@ function setupGardenGame() {
     gardenTargetCount = levelData.count;
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
     
-    // УМНЫЙ ФОКУС: Спасаем животных от обрезки на телефонах!
-    // Если экран вертикальный (телефон), сдвигаем фон левее (к животному).
-    // Если горизонтальный (компьютер), оставляем по центру.
+    // УМНЫЙ ФОКУС: Жестко приклеиваем левый край для телефонов!
     if (window.innerWidth < window.innerHeight) {
-        document.getElementById('garden-area').style.backgroundPosition = '15% top'; 
+        // На телефоне левый край всегда на месте, правый обрезается
+        document.getElementById('garden-area').style.backgroundPosition = 'left top'; 
     } else {
+        // На компьютере оставляем по центру
         document.getElementById('garden-area').style.backgroundPosition = 'center top';
     }
-
     playSound(levelData.sound);
 
     const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
@@ -653,7 +652,7 @@ function onDragEnd(e) {
                 setTimeout(() => {
                     playSound('g_win.wav');
                     currentGardenLevel++;
-                    setTimeout(setupGardenGame, 5000); // Теперь ждем 5 секунд!
+                    setTimeout(setupGardenGame, 6000); // Теперь ждем 6 секунд!
                 }, 500);
             }
             activeItem = null;
