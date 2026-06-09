@@ -412,7 +412,7 @@ function setupGardenGame() {
 
     const levelData = roomsData['garden'].find(l => l.level === currentGardenLevel);
     if (!levelData) {
-        playSound('bs_win.wav'); // Звук прохождения всей комнаты
+        playSound('bs_win.wav');
         currentGardenLevel = 1; 
         setTimeout(setupGardenGame, 3000);
         return;
@@ -420,14 +420,19 @@ function setupGardenGame() {
 
     gardenTargetCount = levelData.count;
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
+    
+    // УМНЫЙ ФОКУС: Спасаем животных от обрезки на телефонах!
+    // Если экран вертикальный (телефон), сдвигаем фон левее (к животному).
+    // Если горизонтальный (компьютер), оставляем по центру.
+    if (window.innerWidth < window.innerHeight) {
+        document.getElementById('garden-area').style.backgroundPosition = '15% top'; 
+    } else {
+        document.getElementById('garden-area').style.backgroundPosition = 'center top';
+    }
+
     playSound(levelData.sound);
 
-    // УМНЫЕ РАЗМЕРЫ: Чем меньше овощей, тем они крупнее!
-    let itemSize;
-    if (gardenTargetCount === 1) itemSize = '130px';      // Огромная морковка
-    else if (gardenTargetCount <= 3) itemSize = '100px';  // Крупные
-    else if (gardenTargetCount <= 6) itemSize = '75px';   // Средние
-    else itemSize = '60px';                               // Мелкие для 7-9 штук
+    const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
 
     // Создаем ТЕНИ
     for(let i=0; i < gardenTargetCount; i++) {
