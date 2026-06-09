@@ -90,6 +90,12 @@ async function isPremiumActive() {
 }
 
 function applyLocks() {
+    // НОВАЯ ЛОГИКА: Прячем баннер-подарок, если у пользователя УЖЕ есть VIP/Premium
+    const banner = document.getElementById('vip-bonus-banner');
+    if (userHasPremium && banner) {
+        banner.style.display = 'none';
+    }
+
     const roomMapping = {
         'big_small': '.cat-bs',
         'shapes': '.cat-shapes',
