@@ -17,7 +17,7 @@ if (typeof vkBridge === 'undefined') {
     };
 }
 
-// Безопасная обёртка для VK Bridge (никогда не падает)
+// Безопасная обёртка для VK Bridge
 const safeVkSend = async (method, params) => {
     try {
         return await vkBridge.send(method, params);
@@ -29,7 +29,6 @@ const safeVkSend = async (method, params) => {
     }
 };
 
-// --- ГЛАВНЫЕ НАСТРОЙКИ МОНЕТИЗАЦИИ ---
 const isTestMode = true; 
 const vkPlatform = new URLSearchParams(window.location.search).get('vk_platform') || 'desktop_web';
 const isMobileVK = vkPlatform.includes('mobile');
@@ -52,8 +51,6 @@ async function initAppAndCheckPremium() {
         const userInfo = await safeVkSend('VKWebAppGetUserInfo');
         const vkSignParams = getVkSignParams();
         
-        console.log("📤 Отправляем sign:", vkSignParams);
-        
         const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
             method: 'GET',
             headers: { 
@@ -62,8 +59,6 @@ async function initAppAndCheckPremium() {
             }
         });
         const data = await response.json();
-        console.log("✅ Ответ сервера:", data);
-
         userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
     } catch (error) {
         console.error("❌ Ошибка при проверке премиума:", error);
@@ -105,6 +100,7 @@ function applyLocks() {
         'numbers': '.cat-numbers',
         'actions': '.cat-wind',
         'garden': '.cat-garden',
+        'poems': '.cat-poems', // <-- НОВАЯ КОМНАТА
         'wind': '.cat-breeze'
     };
 
@@ -197,6 +193,7 @@ let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
 let canvasInitialized = false; 
 let currentGardenLevel = 1; let gardenTargetCount = 0;
+let currentPoemLevel = 0; let poemClickBlocked = false; // Переменные для стихов
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -209,6 +206,16 @@ const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCan
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
+    'poems': [
+        { bg: 'poem_bg_1.png', q_sound: 'p_q1.wav', f_sound: 'p_f1.wav', target: 'p_opt_myachik', options: [{ id: 'p_opt_myachik', img: 'p_opt_myachik.png', sound: 'p_opt_myachik.wav' }, { id: 'p_opt_mashinka', img: 'p_opt_mashinka.png', sound: 'p_opt_mashinka.wav' }, { id: 'p_opt_domik', img: 'p_opt_domik.png', sound: 'p_opt_domik.wav' }] },
+        { bg: 'poem_bg_2.png', q_sound: 'p_q2.wav', f_sound: 'p_f2.wav', target: 'p_opt_med', options: [{ id: 'p_opt_med', img: 'p_opt_med.png', sound: 'p_opt_med.wav' }, { id: 'p_opt_grib', img: 'p_opt_grib.png', sound: 'p_opt_grib.wav' }, { id: 'p_opt_yagoda', img: 'p_opt_yagoda.png', sound: 'p_opt_yagoda.wav' }] },
+        { bg: 'poem_bg_3.png', q_sound: 'p_q3.wav', f_sound: 'p_f3.wav', target: 'p_opt_morkovka', options: [{ id: 'p_opt_morkovka', img: 'p_opt_morkovka.png', sound: 'p_opt_morkovka.wav' }, { id: 'p_opt_kapusta', img: 'p_opt_kapusta.png', sound: 'p_opt_kapusta.wav' }, { id: 'p_opt_yabloko', img: 'p_opt_yabloko.png', sound: 'p_opt_yabloko.wav' }] },
+        { bg: 'poem_bg_4.png', q_sound: 'p_q4.wav', f_sound: 'p_f4.wav', target: 'p_opt_sir', options: [{ id: 'p_opt_sir', img: 'p_opt_sir.png', sound: 'p_opt_sir.wav' }, { id: 'p_opt_tort', img: 'p_opt_tort.png', sound: 'p_opt_tort.wav' }, { id: 'p_opt_banan', img: 'p_opt_banan.png', sound: 'p_opt_banan.wav' }] },
+        { bg: 'poem_bg_5.png', q_sound: 'p_q5.wav', f_sound: 'p_f5.wav', target: 'p_opt_banan', options: [{ id: 'p_opt_banan', img: 'p_opt_banan.png', sound: 'p_opt_banan.wav' }, { id: 'p_opt_ogurec', img: 'p_opt_ogurec.png', sound: 'p_opt_ogurec.wav' }, { id: 'p_opt_limon', img: 'p_opt_limon.png', sound: 'p_opt_limon.wav' }] },
+        { bg: 'poem_bg_6.png', q_sound: 'p_q6.wav', f_sound: 'p_f6.wav', target: 'p_opt_moloko', options: [{ id: 'p_opt_moloko', img: 'p_opt_moloko.png', sound: 'p_opt_moloko.wav' }, { id: 'p_opt_sok', img: 'p_opt_sok.png', sound: 'p_opt_sok.wav' }, { id: 'p_opt_chay', img: 'p_opt_chay.png', sound: 'p_opt_chay.wav' }] },
+        { bg: 'poem_bg_7.png', q_sound: 'p_q7.wav', f_sound: 'p_f7.wav', target: 'p_opt_mashina', options: [{ id: 'p_opt_mashina', img: 'p_opt_mashina.png', sound: 'p_opt_mashina.wav' }, { id: 'p_opt_lodka', img: 'p_opt_lodka.png', sound: 'p_opt_lodka.wav' }, { id: 'p_opt_poezd', img: 'p_opt_poezd.png', sound: 'p_opt_poezd.wav' }] },
+        { bg: 'poem_bg_8.png', q_sound: 'p_q8.wav', f_sound: 'p_f8.wav', target: 'p_opt_krisha', options: [{ id: 'p_opt_krisha', img: 'p_opt_krisha.png', sound: 'p_opt_krisha.wav' }, { id: 'p_opt_okno', img: 'p_opt_okno.png', sound: 'p_opt_okno.wav' }, { id: 'p_opt_dver', img: 'p_opt_dver.png', sound: 'p_opt_dver.wav' }] }
+    ],
     'wants': [{ id: 'drink', text: 'Пить', sound: 'w_drink.wav', image: 'w_drink.png' }, { id: 'eat', text: 'Кушать', sound: 'w_eat.wav', image: 'w_eat.png' }, { id: 'give', text: 'Дай', sound: 'w_give.wav', image: 'w_give.png' }, { id: 'help', text: 'Помоги', sound: 'w_help.wav', image: 'w_help.png' }, { id: 'cartoon', text: 'Мультик', sound: 'w_cartoon.wav', image: 'w_cartoon.png' }, { id: 'walk', text: 'Гулять', sound: 'w_walk.wav', image: 'w_walk.png' }, { id: 'more', text: 'Ещё', sound: 'w_more.wav', image: 'w_more.png' }, { id: 'play', text: 'Играть', sound: 'w_play.wav', image: 'w_play.png' }, { id: 'read', text: 'Читать', sound: 'w_read.wav', image: 'w_read.png' }, { id: 'potty', text: 'На горшок', sound: 'w_potty.wav', image: 'w_potty.png' }, { id: 'yes', text: 'Да', sound: 'w_yes.wav', image: 'w_yes.png' }, { id: 'no', text: 'Нет', sound: 'w_no.wav', image: 'w_no.png' }, { id: 'sleep', text: 'Спать', sound: 'w_sleep.wav', image: 'w_sleep.png' }],
     'feeding': [{ id: 'cat', text: 'Кошка ест', target: 'a1.jpg', drag: 'food_fish.png', sound: 'f_cat.wav' }, { id: 'dog', text: 'Собака ест', target: 'a2.jpg', drag: 'food_bone.png', sound: 'f_dog.wav' }, { id: 'cow', text: 'Корова ест', target: 'a3.jpg', drag: 'food_hay.png', sound: 'f_cow.wav' }, { id: 'horse', text: 'Лошадь ест', target: 'a4.jpg', drag: 'food_apple.png', sound: 'f_horse.wav' }, { id: 'sheep', text: 'Овца ест', target: 'a5.jpg', drag: 'food_grass.png', sound: 'f_sheep.wav' }, { id: 'pig', text: 'Свинья ест', target: 'a6.jpg', drag: 'food_acorn.png', sound: 'f_pig.wav' }, { id: 'goat', text: 'Коза ест', target: 'a7.jpg', drag: 'food_cabbage.png', sound: 'f_goat.wav' }, { id: 'wolf', text: 'Волк ест', target: 'a8.jpg', drag: 'food_steak.png', sound: 'f_wolf.wav' }, { id: 'goose', text: 'Гусь ест', target: 'a9.jpg', drag: 'food_grain.png', sound: 'f_goose.wav' }, { id: 'frog', text: 'Лягушка ест', target: 'a10.jpg', drag: 'food_fly.png', sound: 'f_frog.wav' }, { id: 'lion', text: 'Лев ест', target: 'a11.jpg', drag: 'food_steak.png', sound: 'f_lion.wav' }, { id: 'tiger', text: 'Тигр ест', target: 'a12.jpg', drag: 'food_steak.png', sound: 'f_tiger.wav' }, { id: 'bee', text: 'Пчела ест', target: 'a15.jpg', drag: 'food_flower.png', sound: 'f_bee.wav' }, { id: 'fox', text: 'Лиса ест', target: 'a16.jpg', drag: 'food_chicken.png', sound: 'f_fox.wav' }, { id: 'hedgehog', text: 'Ёжик ест', target: 'a17.jpg', drag: 'food_mushroom.png', sound: 'f_hedgehog.wav' }, { id: 'hen', text: 'Курица ест', target: 'a18.jpg', drag: 'food_grain.png', sound: 'f_hen.wav' }, { id: 'rooster', text: 'Петушок ест', target: 'a19.jpg', drag: 'food_grain.png', sound: 'f_rooster.wav' }, { id: 'donkey', text: 'Ослик ест', target: 'a21.jpg', drag: 'food_carrot.png', sound: 'f_donkey.wav' }, { id: 'mouse', text: 'Мышка ест', target: 'a24.jpg', drag: 'food_cheese.png', sound: 'f_mouse.wav' }],
     'colors': [
@@ -291,6 +298,7 @@ async function openRoom(roomId, title) {
     document.getElementById('draw-area').classList.remove('active'); 
     document.getElementById('wind-area').style.display = 'none'; 
     document.getElementById('garden-area').style.display = 'none'; 
+    document.getElementById('poems-area').style.display = 'none'; // Скрываем стихи по умолчанию
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -305,9 +313,16 @@ async function openRoom(roomId, title) {
     }
     else if (roomId === 'garden') { 
         document.getElementById('quizToggle').style.display = 'none'; 
-        document.getElementById('garden-area').style.display = 'flex'; // ВАЖНО ДЛЯ ОГОРОДА
+        document.getElementById('garden-area').style.display = 'flex'; 
         currentGardenLevel = 1; 
         setupGardenGame(); 
+    }
+    // ЗАПУСК КОМНАТЫ СО СТИХАМИ
+    else if (roomId === 'poems') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('poems-area').style.display = 'flex'; 
+        currentPoemLevel = 0; 
+        setupPoemGame(); 
     }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
@@ -404,6 +419,108 @@ function toggleQuiz() {
     } 
 }
 
+// ==========================================
+// ЛОГИКА НОВОЙ ИГРЫ: СТИХИ-РИФМЫ
+// ==========================================
+function setupPoemGame() {
+    const area = document.getElementById('poems-area');
+    const optionsContainer = document.getElementById('poem-options');
+    const successImg = document.getElementById('poem-success-img');
+
+    successImg.style.display = 'none'; // Прячем картинку с прошлого уровня
+    optionsContainer.innerHTML = '';
+    poemClickBlocked = false;
+
+    // Если прошли все стихи - начинаем сначала с фанфарами
+    if (currentPoemLevel >= roomsData['poems'].length) {
+        playSound('bs_win.wav'); 
+        currentPoemLevel = 0;
+        setTimeout(setupPoemGame, 3000);
+        return;
+    }
+
+    const levelData = roomsData['poems'][currentPoemLevel];
+    
+    // Спасаем животных от обрезки на телефонах!
+    if (window.innerWidth < window.innerHeight) {
+        area.style.backgroundPosition = 'left top'; 
+    } else {
+        area.style.backgroundPosition = 'center top';
+    }
+    area.style.backgroundImage = `url('${levelData.bg}')`;
+
+    // Читаем начало стишка
+    playSound(levelData.q_sound);
+
+    // Перемешиваем кнопочки
+    let options = shuffleArray([...levelData.options]);
+
+    // Создаем карточки-кнопки
+    options.forEach(opt => {
+        const btn = document.createElement('div');
+        // Стилизация кнопок
+        btn.style.width = '30%';
+        btn.style.maxWidth = '110px';
+        btn.style.aspectRatio = '1/1';
+        btn.style.backgroundColor = '#ffffff';
+        btn.style.borderRadius = '20px';
+        btn.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+        btn.style.display = 'flex';
+        btn.style.justifyContent = 'center';
+        btn.style.alignItems = 'center';
+        btn.style.cursor = 'pointer';
+        btn.style.transition = 'transform 0.2s, box-shadow 0.2s';
+        
+        const img = document.createElement('img');
+        img.src = opt.img;
+        img.style.width = '75%';
+        img.style.height = '75%';
+        img.style.objectFit = 'contain';
+        img.style.pointerEvents = 'none'; // Чтобы клик шел по самой карточке
+        
+        btn.appendChild(img);
+        
+        btn.onclick = () => handlePoemClick(opt, levelData, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+function handlePoemClick(opt, levelData, btnElem) {
+    if (poemClickBlocked) return;
+    
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    
+    if (opt.id === levelData.target) {
+        // УРА! ПРАВИЛЬНО!
+        poemClickBlocked = true;
+        btnElem.style.transform = 'scale(1.1)';
+        btnElem.style.boxShadow = '0 0 15px 5px #4DFF4D'; // Зеленое свечение
+        
+        // Показываем предмет в центре экрана
+        const successImg = document.getElementById('poem-success-img');
+        successImg.src = opt.img;
+        successImg.style.display = 'block';
+        
+        // Читаем концовку
+        playSound(levelData.f_sound);
+        
+        // Ждем 3.5 секунды и переходим к следующему стишку
+        setTimeout(() => {
+            currentPoemLevel++;
+            setupPoemGame();
+        }, 3500); 
+    } else {
+        // ОШИБКА
+        playSound(opt.sound); // Озвучиваем, на что он нажал (например, "Домик")
+        btnElem.style.animation = 'shakeOpt 0.4s ease'; // Трясем кнопочку
+        setTimeout(() => {
+            btnElem.style.animation = ''; // Сбрасываем анимацию для повторного клика
+        }, 400);
+    }
+}
+// ==========================================
+
+
 function setupGardenGame() {
     const targetZone = document.getElementById('garden-targets');
     const dragZone = document.getElementById('garden-drags');
@@ -421,19 +538,15 @@ function setupGardenGame() {
     gardenTargetCount = levelData.count;
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
     
-    // УМНЫЙ ФОКУС: Жестко приклеиваем левый край для телефонов!
     if (window.innerWidth < window.innerHeight) {
-        // На телефоне левый край всегда на месте, правый обрезается
         document.getElementById('garden-area').style.backgroundPosition = 'left top'; 
     } else {
-        // На компьютере оставляем по центру
         document.getElementById('garden-area').style.backgroundPosition = 'center top';
     }
     playSound(levelData.sound);
 
     const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
 
-    // Создаем ТЕНИ
     for(let i=0; i < gardenTargetCount; i++) {
         const img = document.createElement('img');
         img.src = levelData.item;
@@ -447,7 +560,6 @@ function setupGardenGame() {
         targetZone.appendChild(img);
     }
 
-    // Создаем ЦВЕТНЫЕ ОВОЩИ
     for(let i=0; i < gardenTargetCount; i++) {
         const img = document.createElement('img');
         img.src = levelData.item;
@@ -652,7 +764,7 @@ function onDragEnd(e) {
                 setTimeout(() => {
                     playSound('g_win.wav');
                     currentGardenLevel++;
-                    setTimeout(setupGardenGame, 6000); // Теперь ждем 6 секунд!
+                    setTimeout(setupGardenGame, 6000); 
                 }, 500);
             }
             activeItem = null;
