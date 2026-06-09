@@ -294,3 +294,8 @@ body {
 .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #A09B98; background: transparent; border: none; }
 .legal-info { font-size: 12px; color: #A09B98; text-align: left; line-height: 1.4; }
 .wind-start-btn { background-color: #8CC084; color: white; font-size: 18px; font-weight: bold; padding: 15px 30px; border-radius: 25px; border: none; cursor: pointer; }
+
+/* Цвета для новых комнат */
+.cat-garden { background-color: #E8F5E9; } /* Нежно-зеленый для огорода */
+.cat-poems { background-color: #FFF0F5; } /* Нежно-розовый/сиреневый для стихов */
+.cat-breeze { background-color: #E0F7FA; } /* Воздушный светло-голубой для ветерка */
