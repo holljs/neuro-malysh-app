@@ -100,7 +100,7 @@ function applyLocks() {
         'numbers': '.cat-numbers',
         'actions': '.cat-wind',
         'garden': '.cat-garden',
-        'poems': '.cat-poems', // <-- НОВАЯ КОМНАТА
+        'poems': '.cat-poems', 
         'wind': '.cat-breeze'
     };
 
@@ -193,7 +193,7 @@ let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
 let canvasInitialized = false; 
 let currentGardenLevel = 1; let gardenTargetCount = 0;
-let currentPoemLevel = 0; let poemClickBlocked = false; // Переменные для стихов
+let currentPoemLevel = 0; let poemClickBlocked = false; let poemTimeout = null;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -298,7 +298,7 @@ async function openRoom(roomId, title) {
     document.getElementById('draw-area').classList.remove('active'); 
     document.getElementById('wind-area').style.display = 'none'; 
     document.getElementById('garden-area').style.display = 'none'; 
-    document.getElementById('poems-area').style.display = 'none'; // Скрываем стихи по умолчанию
+    document.getElementById('poems-area').style.display = 'none'; 
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -317,7 +317,6 @@ async function openRoom(roomId, title) {
         currentGardenLevel = 1; 
         setupGardenGame(); 
     }
-    // ЗАПУСК КОМНАТЫ СО СТИХАМИ
     else if (roomId === 'poems') { 
         document.getElementById('quizToggle').style.display = 'none'; 
         document.getElementById('poems-area').style.display = 'flex'; 
@@ -333,6 +332,7 @@ async function openRoom(roomId, title) {
 
 function goHome() { 
     if (typeof stopWindGame === 'function') stopWindGame();
+    clearTimeout(poemTimeout); // На всякий случай чистим таймер при выходе
     document.getElementById('screen-room').classList.remove('active'); 
     document.getElementById('screen-menu').classList.add('active'); 
 }
@@ -420,28 +420,31 @@ function toggleQuiz() {
 }
 
 // ==========================================
-// ЛОГИКА НОВОЙ ИГРЫ: СТИХИ-РИФМЫ
+// ЛОГИКА ИГРЫ: СТИХИ-РИФМЫ СО СТРЕЛКАМИ
 // ==========================================
 function setupPoemGame() {
     const area = document.getElementById('poems-area');
     const optionsContainer = document.getElementById('poem-options');
     const successImg = document.getElementById('poem-success-img');
 
-    successImg.style.display = 'none'; // Прячем картинку с прошлого уровня
+    // Безопасность: очищаем таймер, если малыш нажал стрелку сам
+    clearTimeout(poemTimeout);
+    
+    successImg.style.display = 'none';
     optionsContainer.innerHTML = '';
     poemClickBlocked = false;
 
-    // Если прошли все стихи - начинаем сначала с фанфарами
+    // Проверка границ при ручном перелистывании
     if (currentPoemLevel >= roomsData['poems'].length) {
         playSound('bs_win.wav'); 
         currentPoemLevel = 0;
-        setTimeout(setupPoemGame, 3000);
-        return;
+    }
+    if (currentPoemLevel < 0) {
+        currentPoemLevel = roomsData['poems'].length - 1;
     }
 
     const levelData = roomsData['poems'][currentPoemLevel];
     
-    // Спасаем животных от обрезки на телефонах!
     if (window.innerWidth < window.innerHeight) {
         area.style.backgroundPosition = 'left top'; 
     } else {
@@ -449,16 +452,12 @@ function setupPoemGame() {
     }
     area.style.backgroundImage = `url('${levelData.bg}')`;
 
-    // Читаем начало стишка
     playSound(levelData.q_sound);
 
-    // Перемешиваем кнопочки
     let options = shuffleArray([...levelData.options]);
 
-    // Создаем карточки-кнопки
     options.forEach(opt => {
         const btn = document.createElement('div');
-        // Стилизация кнопок
         btn.style.width = '30%';
         btn.style.maxWidth = '110px';
         btn.style.aspectRatio = '1/1';
@@ -476,13 +475,25 @@ function setupPoemGame() {
         img.style.width = '75%';
         img.style.height = '75%';
         img.style.objectFit = 'contain';
-        img.style.pointerEvents = 'none'; // Чтобы клик шел по самой карточке
+        img.style.pointerEvents = 'none';
         
         btn.appendChild(img);
-        
         btn.onclick = () => handlePoemClick(opt, levelData, btn);
         optionsContainer.appendChild(btn);
     });
+}
+
+// Кнопки стрелок
+function prevPoem() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentPoemLevel--;
+    setupPoemGame();
+}
+
+function nextPoem() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentPoemLevel++;
+    setupPoemGame();
 }
 
 function handlePoemClick(opt, levelData, btnElem) {
@@ -491,30 +502,25 @@ function handlePoemClick(opt, levelData, btnElem) {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
     if (opt.id === levelData.target) {
-        // УРА! ПРАВИЛЬНО!
         poemClickBlocked = true;
         btnElem.style.transform = 'scale(1.1)';
-        btnElem.style.boxShadow = '0 0 15px 5px #4DFF4D'; // Зеленое свечение
+        btnElem.style.boxShadow = '0 0 15px 5px #4DFF4D'; 
         
-        // Показываем предмет в центре экрана
         const successImg = document.getElementById('poem-success-img');
         successImg.src = opt.img;
         successImg.style.display = 'block';
         
-        // Читаем концовку
         playSound(levelData.f_sound);
         
-        // Ждем 3.5 секунды и переходим к следующему стишку
-        setTimeout(() => {
+        poemTimeout = setTimeout(() => {
             currentPoemLevel++;
             setupPoemGame();
         }, 3500); 
     } else {
-        // ОШИБКА
-        playSound(opt.sound); // Озвучиваем, на что он нажал (например, "Домик")
-        btnElem.style.animation = 'shakeOpt 0.4s ease'; // Трясем кнопочку
+        playSound(opt.sound); 
+        btnElem.style.animation = 'shakeOpt 0.4s ease'; 
         setTimeout(() => {
-            btnElem.style.animation = ''; // Сбрасываем анимацию для повторного клика
+            btnElem.style.animation = ''; 
         }, 400);
     }
 }
