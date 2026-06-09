@@ -412,7 +412,7 @@ function setupGardenGame() {
 
     const levelData = roomsData['garden'].find(l => l.level === currentGardenLevel);
     if (!levelData) {
-        playSound('shapes_win.wav');
+        playSound('bs_win.wav'); // Звук прохождения всей комнаты
         currentGardenLevel = 1; 
         setTimeout(setupGardenGame, 3000);
         return;
@@ -422,7 +422,12 @@ function setupGardenGame() {
     document.getElementById('garden-area').style.backgroundImage = `url('${levelData.bg}')`;
     playSound(levelData.sound);
 
-    const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
+    // УМНЫЕ РАЗМЕРЫ: Чем меньше овощей, тем они крупнее!
+    let itemSize;
+    if (gardenTargetCount === 1) itemSize = '130px';      // Огромная морковка
+    else if (gardenTargetCount <= 3) itemSize = '100px';  // Крупные
+    else if (gardenTargetCount <= 6) itemSize = '75px';   // Средние
+    else itemSize = '60px';                               // Мелкие для 7-9 штук
 
     // Создаем ТЕНИ
     for(let i=0; i < gardenTargetCount; i++) {
@@ -430,9 +435,8 @@ function setupGardenGame() {
         img.src = levelData.item;
         img.className = 'target-item';
         img.setAttribute('data-id', 'veg');
-        // Кроссбраузерная тень:
         img.style.filter = 'brightness(0)';
-        img.style.WebkitFilter = 'brightness(0)'; // Спасение для iPhone
+        img.style.WebkitFilter = 'brightness(0)'; 
         img.style.opacity = '0.5'; 
         img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
         img.style.margin = '5px';
@@ -642,7 +646,7 @@ function onDragEnd(e) {
             else if (currentRoom === 'shapes' && matchedCount === 3) setTimeout(() => { playSound('shapes_win.wav'); setTimeout(setupDragGame, 4000); }, 2000);
             else if (currentRoom === 'garden' && matchedCount === gardenTargetCount) {
                 setTimeout(() => {
-                    playSound('color_win.wav');
+                    playSound('g_win.wav');
                     currentGardenLevel++;
                     setTimeout(setupGardenGame, 2500);
                 }, 500);
