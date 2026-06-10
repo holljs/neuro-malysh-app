@@ -450,7 +450,6 @@ function setupPoemGame() {
 
     // Проверка границ при ручном перелистывании
     if (currentPoemLevel >= roomsData['poems'].length) {
-        playSound('bs_win.wav'); 
         currentPoemLevel = 0;
     }
     if (currentPoemLevel < 0) {
