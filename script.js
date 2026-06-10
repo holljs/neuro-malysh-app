@@ -742,12 +742,12 @@ function onDragEnd(e) {
             playSound('color_correct.wav');
             bsActiveItemsCount--;
             if (bsActiveItemsCount === 0) {
-                currentPairIndex++;
-                setTimeout(() => {
-                    playSound('bs_win.wav');
-                    setTimeout(setupBigSmallGame, 2000);
-                }, 1000);
-            }
+                    currentPairIndex++;
+                    setTimeout(() => {
+                        playSound('molodec.wav'); // ⬅️ Теперь тут ласковое "Молодец!"
+                        setTimeout(setupBigSmallGame, 2000);
+                    }, 1000);
+                }
             activeItem = null;
             return;
         }
@@ -771,7 +771,9 @@ function onDragEnd(e) {
                 target.style.filter = 'none';
                 target.style.WebkitFilter = 'none';
                 target.style.opacity = '1';
-                playSound('color_correct.wav');
+                // ⬅️ УМНЫЙ СЧЁТ: Код берет текущее количество угаданных овощей + 1
+                // и запускает файл 1.wav, 2.wav, 3.wav и т.д.
+                playSound((matchedCount + 1) + '.wav'); 
             }
             
             matchedCount++;
@@ -784,7 +786,7 @@ function onDragEnd(e) {
                     playSound('g_win.wav');
                     currentGardenLevel++;
                     setTimeout(setupGardenGame, 6000); 
-                }, 500);
+                }, 1200);
             }
             activeItem = null;
             return;
