@@ -92,11 +92,9 @@ async function isPremiumActive() {
 function applyLocks() {
     // ЖЕЛЕЗОБЕТОННАЯ ПРОВЕРКА БАННЕРА
     const banner = document.getElementById('vip-bonus-banner');
-    // Если есть премиум ИЛИ телефон помнит, что мы уже кликали подписку:
     if (userHasPremium || localStorage.getItem('hide_vip_banner') === 'true') {
         if (banner) banner.style.display = 'none';
     } else {
-        // Иначе показываем
         if (banner) banner.style.display = 'block';
     }
 
@@ -111,6 +109,7 @@ function applyLocks() {
         'actions': '.cat-wind',
         'garden': '.cat-garden',
         'poems': '.cat-poems', 
+        'yesno': '.cat-yesno', // НОВАЯ КОМНАТА
         'wind': '.cat-breeze'
     };
 
@@ -190,10 +189,7 @@ function subscribeToGroup() {
             if (data.result) {
                 const banner = document.getElementById('vip-bonus-banner');
                 if (banner) banner.style.display = 'none';
-                
-                // ЗАПОМИНАЕМ НАВСЕГДА в памяти телефона, что человек уже дал разрешение
                 localStorage.setItem('hide_vip_banner', 'true');
-                
                 openModal('bonus-success-modal');
             }
         })
@@ -208,6 +204,7 @@ let currentPairIndex = 0; let bsActiveItemsCount = 0;
 let canvasInitialized = false; 
 let currentGardenLevel = 1; let gardenTargetCount = 0;
 let currentPoemLevel = 0; let poemClickBlocked = false; let poemTimeout = null;
+let currentYesNoLevel = 0; let yesNoClickBlocked = false; let yesNoTimeout = null;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -220,6 +217,18 @@ const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCan
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
+    'yesno': [
+        { bg: 'yn_bg_1.png', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
+        { bg: 'yn_bg_2.png', q_sound: 'yn_q2.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
+        { bg: 'yn_bg_3.png', q_sound: 'yn_q3.wav', target: 'yes', a_sound: 'yn_yes3.wav' },
+        { bg: 'yn_bg_4.png', q_sound: 'yn_q4.wav', target: 'yes', a_sound: 'yn_yes4.wav' },
+        { bg: 'yn_bg_5.png', q_sound: 'yn_q5.wav', target: 'yes', a_sound: 'yn_yes5.wav' },
+        { bg: 'yn_bg_6.png', q_sound: 'yn_q6.wav', target: 'no', a_sound: 'yn_no1.wav' },
+        { bg: 'yn_bg_7.png', q_sound: 'yn_q7.wav', target: 'no', a_sound: 'yn_no2.wav' },
+        { bg: 'yn_bg_8.png', q_sound: 'yn_q8.wav', target: 'no', a_sound: 'yn_no3.wav' },
+        { bg: 'yn_bg_9.png', q_sound: 'yn_q9.wav', target: 'no', a_sound: 'yn_no4.wav' },
+        { bg: 'yn_bg_10.png', q_sound: 'yn_q10.wav', target: 'no', a_sound: 'yn_no5.wav' }
+    ],
     'poems': [
         { bg: 'poem_bg_1.png', q_sound: 'p_q1.wav', f_sound: 'p_f1.wav', target: 'p_opt_myachik', options: [{ id: 'p_opt_myachik', img: 'p_opt_myachik.png', sound: 'p_opt_myachik.wav' }, { id: 'p_opt_mashinka', img: 'p_opt_mashinka.png', sound: 'p_opt_mashinka.wav' }, { id: 'p_opt_domik', img: 'p_opt_domik.png', sound: 'p_opt_domik.wav' }] },
         { bg: 'poem_bg_2.png', q_sound: 'p_q2.wav', f_sound: 'p_f2.wav', target: 'p_opt_med', options: [{ id: 'p_opt_med', img: 'p_opt_med.png', sound: 'p_opt_med.wav' }, { id: 'p_opt_grib', img: 'p_opt_grib.png', sound: 'p_opt_grib.wav' }, { id: 'p_opt_yagoda', img: 'p_opt_yagoda.png', sound: 'p_opt_yagoda.wav' }] },
@@ -313,6 +322,7 @@ async function openRoom(roomId, title) {
     document.getElementById('wind-area').style.display = 'none'; 
     document.getElementById('garden-area').style.display = 'none'; 
     document.getElementById('poems-area').style.display = 'none'; 
+    document.getElementById('yesno-area').style.display = 'none'; // НОВАЯ КОМНАТА
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -337,6 +347,12 @@ async function openRoom(roomId, title) {
         currentPoemLevel = 0; 
         setupPoemGame(); 
     }
+    else if (roomId === 'yesno') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('yesno-area').style.display = 'flex'; 
+        currentYesNoLevel = 0; 
+        setupYesNoGame(); 
+    }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
     document.getElementById('room-title').innerText = title;
@@ -346,7 +362,8 @@ async function openRoom(roomId, title) {
 
 function goHome() { 
     if (typeof stopWindGame === 'function') stopWindGame();
-    clearTimeout(poemTimeout); // На всякий случай чистим таймер при выходе
+    clearTimeout(poemTimeout); 
+    clearTimeout(yesNoTimeout); // Очищаем таймер Да/Нет
     document.getElementById('screen-room').classList.remove('active'); 
     document.getElementById('screen-menu').classList.add('active'); 
 }
@@ -434,21 +451,92 @@ function toggleQuiz() {
 }
 
 // ==========================================
-// ЛОГИКА ИГРЫ: СТИХИ-РИФМЫ СО СТРЕЛКАМИ
+// ЛОГИКА ИГРЫ: ДА ИЛИ НЕТ
 // ==========================================
+function setupYesNoGame() {
+    const area = document.getElementById('yesno-area');
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo = document.getElementById('btn-no');
+
+    clearTimeout(yesNoTimeout);
+    yesNoClickBlocked = false;
+
+    btnYes.style.transform = 'scale(1)';
+    btnYes.style.boxShadow = '0 8px 15px rgba(0,0,0,0.2)';
+    btnNo.style.transform = 'scale(1)';
+    btnNo.style.boxShadow = '0 8px 15px rgba(0,0,0,0.2)';
+
+    if (currentYesNoLevel >= roomsData['yesno'].length) {
+        currentYesNoLevel = 0;
+    }
+    if (currentYesNoLevel < 0) {
+        currentYesNoLevel = roomsData['yesno'].length - 1;
+    }
+
+    const levelData = roomsData['yesno'][currentYesNoLevel];
+    
+    if (window.innerWidth < window.innerHeight) {
+        area.style.backgroundPosition = 'left top'; 
+    } else {
+        area.style.backgroundPosition = 'center top';
+    }
+    area.style.backgroundImage = `url('${levelData.bg}')`;
+
+    playSound(levelData.q_sound);
+}
+
+function prevYesNo() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentYesNoLevel--;
+    setupYesNoGame();
+}
+
+function nextYesNo() {
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentYesNoLevel++;
+    setupYesNoGame();
+}
+
+function handleYesNoClick(choice) {
+    if (yesNoClickBlocked) return;
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+
+    const levelData = roomsData['yesno'][currentYesNoLevel];
+    const btn = choice === 'yes' ? document.getElementById('btn-yes') : document.getElementById('btn-no');
+
+    if (choice === levelData.target) {
+        yesNoClickBlocked = true;
+        btn.style.transform = 'scale(1.15)';
+        btn.style.boxShadow = choice === 'yes' ? '0 0 20px 10px #4DFF4D' : '0 0 20px 10px #FF4D4D';
+        
+        playSound(levelData.a_sound);
+        
+        yesNoTimeout = setTimeout(() => {
+            currentYesNoLevel++;
+            setupYesNoGame();
+        }, 2500); 
+    } else {
+        playSound('wrong.wav'); 
+        btn.style.animation = 'shakeOpt 0.4s ease'; 
+        setTimeout(() => {
+            btn.style.animation = ''; 
+        }, 400);
+    }
+}
+// ==========================================
+
+
 function setupPoemGame() {
     const area = document.getElementById('poems-area');
     const optionsContainer = document.getElementById('poem-options');
     const successImg = document.getElementById('poem-success-img');
 
-    // Безопасность: очищаем таймер, если малыш нажал стрелку сам
     clearTimeout(poemTimeout);
     
     successImg.style.display = 'none';
     optionsContainer.innerHTML = '';
     poemClickBlocked = false;
 
-    // Проверка границ при ручном перелистывании
     if (currentPoemLevel >= roomsData['poems'].length) {
         currentPoemLevel = 0;
     }
@@ -496,7 +584,6 @@ function setupPoemGame() {
     });
 }
 
-// Кнопки стрелок
 function prevPoem() {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentPoemLevel--;
@@ -537,7 +624,6 @@ function handlePoemClick(opt, levelData, btnElem) {
         }, 400);
     }
 }
-// ==========================================
 
 
 function setupGardenGame() {
@@ -744,7 +830,7 @@ function onDragEnd(e) {
             if (bsActiveItemsCount === 0) {
                     currentPairIndex++;
                     setTimeout(() => {
-                        playSound('molodec.wav'); // ⬅️ Теперь тут ласковое "Молодец!"
+                        playSound('molodec.wav'); 
                         setTimeout(setupBigSmallGame, 2000);
                     }, 1000);
                 }
@@ -771,8 +857,6 @@ function onDragEnd(e) {
                 target.style.filter = 'none';
                 target.style.WebkitFilter = 'none';
                 target.style.opacity = '1';
-                // ⬅️ УМНЫЙ СЧЁТ: Код берет текущее количество угаданных овощей + 1
-                // и запускает файл 1.wav, 2.wav, 3.wav и т.д.
                 playSound((matchedCount + 1) + '.wav'); 
             }
             
