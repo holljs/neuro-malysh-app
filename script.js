@@ -218,16 +218,16 @@ let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
     'yesno': [
-        { bg: 'yn_bg_1.png', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
-        { bg: 'yn_bg_2.png', q_sound: 'yn_q2.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
-        { bg: 'yn_bg_3.png', q_sound: 'yn_q3.wav', target: 'yes', a_sound: 'yn_yes3.wav' },
-        { bg: 'yn_bg_4.png', q_sound: 'yn_q4.wav', target: 'yes', a_sound: 'yn_yes4.wav' },
-        { bg: 'yn_bg_5.png', q_sound: 'yn_q5.wav', target: 'yes', a_sound: 'yn_yes5.wav' },
-        { bg: 'yn_bg_6.png', q_sound: 'yn_q6.wav', target: 'no', a_sound: 'yn_no1.wav' },
-        { bg: 'yn_bg_7.png', q_sound: 'yn_q7.wav', target: 'no', a_sound: 'yn_no2.wav' },
-        { bg: 'yn_bg_8.png', q_sound: 'yn_q8.wav', target: 'no', a_sound: 'yn_no3.wav' },
-        { bg: 'yn_bg_9.png', q_sound: 'yn_q9.wav', target: 'no', a_sound: 'yn_no4.wav' },
-        { bg: 'yn_bg_10.png', q_sound: 'yn_q10.wav', target: 'no', a_sound: 'yn_no5.wav' }
+        { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
+        { bg: 'yn_bg_2.jpg', q_sound: 'yn_q2.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
+        { bg: 'yn_bg_3.jpg', q_sound: 'yn_q3.wav', target: 'yes', a_sound: 'yn_yes3.wav' },
+        { bg: 'yn_bg_4.jpg', q_sound: 'yn_q4.wav', target: 'yes', a_sound: 'yn_yes4.wav' },
+        { bg: 'yn_bg_5.jpg', q_sound: 'yn_q5.wav', target: 'yes', a_sound: 'yn_yes5.wav' },
+        { bg: 'yn_bg_6.jpg', q_sound: 'yn_q6.wav', target: 'no', a_sound: 'yn_no1.wav' },
+        { bg: 'yn_bg_7.jpg', q_sound: 'yn_q7.wav', target: 'no', a_sound: 'yn_no2.wav' },
+        { bg: 'yn_bg_8.jpg', q_sound: 'yn_q8.wav', target: 'no', a_sound: 'yn_no3.wav' },
+        { bg: 'yn_bg_9.jpg', q_sound: 'yn_q9.wav', target: 'no', a_sound: 'yn_no4.wav' },
+        { bg: 'yn_bg_10.jpg', q_sound: 'yn_q10.wav', target: 'no', a_sound: 'yn_no5.wav' }
     ],
     'poems': [
         { bg: 'poem_bg_1.png', q_sound: 'p_q1.wav', f_sound: 'p_f1.wav', target: 'p_opt_myachik', options: [{ id: 'p_opt_myachik', img: 'p_opt_myachik.png', sound: 'p_opt_myachik.wav' }, { id: 'p_opt_mashinka', img: 'p_opt_mashinka.png', sound: 'p_opt_mashinka.wav' }, { id: 'p_opt_domik', img: 'p_opt_domik.png', sound: 'p_opt_domik.wav' }] },
