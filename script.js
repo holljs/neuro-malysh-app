@@ -492,10 +492,16 @@ function setupYesNoGame() {
 
     const levelData = roomsData['yesno'][currentYesNoLevel];
     
+    // Умная подгонка фона
     if (window.innerWidth < window.innerHeight) {
-        area.style.backgroundPosition = 'left top'; 
+        area.style.backgroundPosition = 'center top'; 
+        area.style.backgroundSize = 'contain'; // ⬅️ Вписываем картинку целиком по ширине
+        area.style.backgroundRepeat = 'no-repeat';
+        area.style.backgroundColor = '#FFF9C4'; // ⬅️ Добавляем нежный фон под картинкой
     } else {
         area.style.backgroundPosition = 'center top';
+        area.style.backgroundSize = 'cover';
+        area.style.backgroundRepeat = 'no-repeat';
     }
     area.style.backgroundImage = `url('${levelData.bg}')`;
 
@@ -565,21 +571,14 @@ function setupPoemGame() {
 
     const levelData = roomsData['poems'][currentPoemLevel];
     
-    // Умная подгонка фона
     if (window.innerWidth < window.innerHeight) {
-        area.style.backgroundPosition = 'center top'; 
-        area.style.backgroundSize = 'contain'; // ⬅️ Вписываем картинку целиком по ширине
-        area.style.backgroundRepeat = 'no-repeat';
-        area.style.backgroundColor = '#FFF9C4'; // ⬅️ Добавляем нежный фон под картинкой
+        area.style.backgroundPosition = 'left top'; 
     } else {
         area.style.backgroundPosition = 'center top';
-        area.style.backgroundSize = 'cover';
-        area.style.backgroundRepeat = 'no-repeat';
     }
     area.style.backgroundImage = `url('${levelData.bg}')`;
 
     playSound(levelData.q_sound);
-}
 
     let options = shuffleArray([...levelData.options]);
 
