@@ -301,6 +301,7 @@ const roomsData = {
 };
 
 async function openRoom(roomId, title) {
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
     if (!freeRooms.includes(roomId)) {
@@ -361,6 +362,7 @@ async function openRoom(roomId, title) {
 }
 
 function goHome() { 
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     if (typeof stopWindGame === 'function') stopWindGame();
     clearTimeout(poemTimeout); 
     clearTimeout(yesNoTimeout); // Очищаем таймер Да/Нет
@@ -411,11 +413,26 @@ function renderLearningCard() {
         currentSoundToPlay = card.sound; 
     } 
     area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать 🔊</div><div class="slider-controls"><div class="nav-btn" onclick="prevLearningCard()">⬅️</div><div class="nav-btn" onclick="nextLearningCard()">➡️</div></div>`; 
+    
+    // ВЕРНУЛИ ПОТЕРЯННУЮ СКОБОЧКУ ВОТ ТУТ:
     if (currentSoundToPlay) playSound(currentSoundToPlay); 
 }
 
-function prevLearningCard() { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; renderLearningCard(); }
-function nextLearningCard() { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); const cards = roomsData[currentRoom]; currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; renderLearningCard(); }
+function prevLearningCard() { 
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
+    const cards = roomsData[currentRoom]; 
+    currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; 
+    renderLearningCard(); 
+}
+
+function nextLearningCard() { 
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
+    const cards = roomsData[currentRoom]; 
+    currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; 
+    renderLearningCard(); 
+}
 
 function toggleQuiz() { 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {}); 
@@ -486,12 +503,14 @@ function setupYesNoGame() {
 }
 
 function prevYesNo() {
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentYesNoLevel--;
     setupYesNoGame();
 }
 
 function nextYesNo() {
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentYesNoLevel++;
     setupYesNoGame();
@@ -546,14 +565,21 @@ function setupPoemGame() {
 
     const levelData = roomsData['poems'][currentPoemLevel];
     
+    // Умная подгонка фона
     if (window.innerWidth < window.innerHeight) {
-        area.style.backgroundPosition = 'left top'; 
+        area.style.backgroundPosition = 'center top'; 
+        area.style.backgroundSize = 'contain'; // ⬅️ Вписываем картинку целиком по ширине
+        area.style.backgroundRepeat = 'no-repeat';
+        area.style.backgroundColor = '#FFF9C4'; // ⬅️ Добавляем нежный фон под картинкой
     } else {
         area.style.backgroundPosition = 'center top';
+        area.style.backgroundSize = 'cover';
+        area.style.backgroundRepeat = 'no-repeat';
     }
     area.style.backgroundImage = `url('${levelData.bg}')`;
 
     playSound(levelData.q_sound);
+}
 
     let options = shuffleArray([...levelData.options]);
 
@@ -585,12 +611,14 @@ function setupPoemGame() {
 }
 
 function prevPoem() {
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentPoemLevel--;
     setupPoemGame();
 }
 
 function nextPoem() {
+    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentPoemLevel++;
     setupPoemGame();
@@ -899,7 +927,22 @@ function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'
 function handleQuizClick(actionId) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
-function playSound(soundFile) { if (soundFile) { const audio = new Audio(soundFile); audio.play().catch(err => console.log(err)); } } 
+let activeAudios = [];
+function playSound(soundFile) { 
+    if (soundFile) { 
+        const audio = new Audio(soundFile); 
+        activeAudios.push(audio);
+        audio.onended = () => { activeAudios = activeAudios.filter(a => a !== audio); };
+        audio.play().catch(err => console.log(err)); 
+    } 
+}
+function stopAllAudio() {
+    activeAudios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
+    activeAudios = [];
+}
 
 window.addEventListener('focus', () => {
     isPremiumActive().catch(console.error);
