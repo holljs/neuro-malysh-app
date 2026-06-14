@@ -17,7 +17,6 @@ if (typeof vkBridge === 'undefined') {
     };
 }
 
-// Безопасная обёртка для VK Bridge
 const safeVkSend = async (method, params) => {
     try {
         return await vkBridge.send(method, params);
@@ -90,7 +89,6 @@ async function isPremiumActive() {
 }
 
 function applyLocks() {
-    // ЖЕЛЕЗОБЕТОННАЯ ПРОВЕРКА БАННЕРА
     const banner = document.getElementById('vip-bonus-banner');
     if (userHasPremium || localStorage.getItem('hide_vip_banner') === 'true') {
         if (banner) banner.style.display = 'none';
@@ -109,7 +107,8 @@ function applyLocks() {
         'actions': '.cat-wind',
         'garden': '.cat-garden',
         'poems': '.cat-poems', 
-        'yesno': '.cat-yesno', // НОВАЯ КОМНАТА
+        'yesno': '.cat-yesno',
+        'words': '.cat-words', // СЛОГИ-ПАЗЛЫ
         'wind': '.cat-breeze'
     };
 
@@ -205,6 +204,7 @@ let canvasInitialized = false;
 let currentGardenLevel = 1; let gardenTargetCount = 0;
 let currentPoemLevel = 0; let poemClickBlocked = false; let poemTimeout = null;
 let currentYesNoLevel = 0; let yesNoClickBlocked = false; let yesNoTimeout = null;
+let currentWordsLevel = 0; let wordsActiveCount = 0; let wordsTimeout = null;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -217,6 +217,14 @@ const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCan
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
+    'words': [
+        { id: 'lisa', text: 'Лиса', image: 'puzzle_lisa.png', full_sound: 'w_lisa.wav', syllables: [{ sound: 'sl_li.wav', label: 'ЛИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
+        { id: 'kasha', text: 'Каша', image: 'puzzle_kasha.png', full_sound: 'w_kasha.wav', syllables: [{ sound: 'sl_ka.wav', label: 'КА' }, { sound: 'sl_sha.wav', label: 'ША' }] },
+        { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] },
+        { id: 'mashina', text: 'Машина', image: 'puzzle_mashina.png', full_sound: 'w_mashina.wav', syllables: [{ sound: 'sl_ma.wav', label: 'МА' }, { sound: 'sl_shi.wav', label: 'ШИ' }, { sound: 'sl_na.wav', label: 'НА' }] },
+        { id: 'sobaka', text: 'Собака', image: 'puzzle_sobaka.png', full_sound: 'w_sobaka.wav', syllables: [{ sound: 'sl_so.wav', label: 'СО' }, { sound: 'sl_ba.wav', label: 'БА' }, { sound: 'sl_ka.wav', label: 'КА' }] },
+        { id: 'raketa', text: 'Ракета', image: 'puzzle_raketa.png', full_sound: 'w_raketa.wav', syllables: [{ sound: 'sl_ra.wav', label: 'РА' }, { sound: 'sl_ke.wav', label: 'КЕ' }, { sound: 'sl_ta.wav', label: 'ТА' }] }
+    ],
     'yesno': [
         { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
         { bg: 'yn_bg_2.jpg', q_sound: 'yn_q2.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
@@ -301,7 +309,7 @@ const roomsData = {
 };
 
 async function openRoom(roomId, title) {
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
     if (!freeRooms.includes(roomId)) {
@@ -323,7 +331,8 @@ async function openRoom(roomId, title) {
     document.getElementById('wind-area').style.display = 'none'; 
     document.getElementById('garden-area').style.display = 'none'; 
     document.getElementById('poems-area').style.display = 'none'; 
-    document.getElementById('yesno-area').style.display = 'none'; // НОВАЯ КОМНАТА
+    document.getElementById('yesno-area').style.display = 'none'; 
+    document.getElementById('words-area').style.display = 'none'; // СЛОГИ-ПАЗЛЫ
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -354,6 +363,12 @@ async function openRoom(roomId, title) {
         currentYesNoLevel = 0; 
         setupYesNoGame(); 
     }
+    else if (roomId === 'words') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('words-area').style.display = 'flex'; 
+        currentWordsLevel = 0; 
+        setupWordsGame(); 
+    }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
     document.getElementById('room-title').innerText = title;
@@ -362,10 +377,11 @@ async function openRoom(roomId, title) {
 }
 
 function goHome() { 
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     if (typeof stopWindGame === 'function') stopWindGame();
     clearTimeout(poemTimeout); 
-    clearTimeout(yesNoTimeout); // Очищаем таймер Да/Нет
+    clearTimeout(yesNoTimeout); 
+    clearTimeout(wordsTimeout);
     document.getElementById('screen-room').classList.remove('active'); 
     document.getElementById('screen-menu').classList.add('active'); 
 }
@@ -413,13 +429,11 @@ function renderLearningCard() {
         currentSoundToPlay = card.sound; 
     } 
     area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать 🔊</div><div class="slider-controls"><div class="nav-btn" onclick="prevLearningCard()">⬅️</div><div class="nav-btn" onclick="nextLearningCard()">➡️</div></div>`; 
-    
-    // ВЕРНУЛИ ПОТЕРЯННУЮ СКОБОЧКУ ВОТ ТУТ:
     if (currentSoundToPlay) playSound(currentSoundToPlay); 
 }
 
 function prevLearningCard() { 
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
     const cards = roomsData[currentRoom]; 
     currentLearningIndex = (currentLearningIndex === 0) ? cards.length - 1 : currentLearningIndex - 1; 
@@ -427,7 +441,7 @@ function prevLearningCard() {
 }
 
 function nextLearningCard() { 
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); 
     const cards = roomsData[currentRoom]; 
     currentLearningIndex = (currentLearningIndex === cards.length - 1) ? 0 : currentLearningIndex + 1; 
@@ -492,12 +506,11 @@ function setupYesNoGame() {
 
     const levelData = roomsData['yesno'][currentYesNoLevel];
     
-    // Умная подгонка фона
     if (window.innerWidth < window.innerHeight) {
         area.style.backgroundPosition = 'center top'; 
-        area.style.backgroundSize = 'contain'; // ⬅️ Вписываем картинку целиком по ширине
+        area.style.backgroundSize = 'contain'; 
         area.style.backgroundRepeat = 'no-repeat';
-        area.style.backgroundColor = '#FFF9C4'; // ⬅️ Добавляем нежный фон под картинкой
+        area.style.backgroundColor = '#FFF9C4'; 
     } else {
         area.style.backgroundPosition = 'center top';
         area.style.backgroundSize = 'cover';
@@ -509,14 +522,14 @@ function setupYesNoGame() {
 }
 
 function prevYesNo() {
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentYesNoLevel--;
     setupYesNoGame();
 }
 
 function nextYesNo() {
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentYesNoLevel++;
     setupYesNoGame();
@@ -548,7 +561,132 @@ function handleYesNoClick(choice) {
         }, 400);
     }
 }
+
 // ==========================================
+// ЛОГИКА ИГРЫ: СЛОГИ-ПАЗЛЫ
+// ==========================================
+function setupWordsGame() {
+    clearTimeout(wordsTimeout);
+    const board = document.getElementById('words-shadow-board');
+    const dock = document.getElementById('words-dock');
+    board.innerHTML = '';
+    dock.innerHTML = '';
+    
+    if (currentWordsLevel >= roomsData['words'].length) currentWordsLevel = 0;
+    if (currentWordsLevel < 0) currentWordsLevel = roomsData['words'].length - 1;
+    
+    const levelData = roomsData['words'][currentWordsLevel];
+    
+    // При старте уровня играем приветствие комнаты, если это начало
+    if (currentWordsLevel === 0 && wordsActiveCount === 0) {
+        playSound('words_intro.wav');
+    }
+
+    // Создаем полупрозрачный силуэт-подложку по центру
+    const shadowImg = document.createElement('img');
+    shadowImg.src = levelData.image;
+    shadowImg.style.width = '100%';
+    shadowImg.style.height = '100%';
+    shadowImg.style.objectFit = 'contain';
+    shadowImg.style.filter = 'brightness(0) opacity(0.12)';
+    shadowImg.style.position = 'absolute';
+    shadowImg.style.left = '0';
+    shadowImg.style.top = '0';
+    shadowImg.style.pointerEvents = 'none';
+    board.appendChild(shadowImg);
+    
+    const count = levelData.syllables.length;
+    wordsActiveCount = count;
+    
+    // Геометрические маски разрезов
+    const clips2 = [
+        'polygon(0 0, 55% 0, 45% 50%, 55% 100%, 0 100%)',
+        'polygon(55% 0, 100% 0, 100% 100%, 55% 100%, 45% 50%)'
+    ];
+    const clips3 = [
+        'polygon(0 0, 38% 0, 28% 50%, 38% 100%, 0 100%)',
+        'polygon(38% 0, 71% 0, 61% 50%, 71% 100%, 38% 100%, 28% 50%)',
+        'polygon(71% 0, 100% 0, 100% 100%, 71% 100%, 61% 50%)'
+    ];
+    const activeClips = count === 2 ? clips2 : clips3;
+    
+    let pieces = [];
+    
+    levelData.syllables.forEach((syl, index) => {
+        // Контейнер-ячейка для удержания масштаба в нижней панели
+        const container = document.createElement('div');
+        container.style.width = '85px';
+        container.style.height = '85px';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+        
+        // Сама деталь пазла (хранит полный размер 260px, но сжата через scale)
+        const piece = document.createElement('div');
+        piece.className = 'draggable-item word-puzzle-piece';
+        piece.style.width = '260px';
+        piece.style.height = '260px';
+        piece.style.transform = 'scale(0.32)';
+        piece.style.transformOrigin = 'center center';
+        piece.style.flexShrink = '0';
+        piece.style.position = 'relative';
+        piece.style.cursor = 'pointer';
+        piece.setAttribute('data-index', index);
+        piece.setAttribute('data-sound', syl.sound);
+        
+        const img = document.createElement('img');
+        img.src = levelData.image;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.clipPath = activeClips[index];
+        img.style.webkitClipPath = activeClips[index];
+        img.style.pointerEvents = 'none';
+        
+        // Крупная яркая плашка со слогом поверх детальки
+        const label = document.createElement('div');
+        label.innerText = syl.label;
+        label.style.position = 'absolute';
+        label.style.bottom = '15px';
+        label.style.left = '50%';
+        label.style.transform = 'translateX(-50%)';
+        label.style.background = '#FFD166';
+        label.style.border = '4px solid #FFFFFF';
+        label.style.padding = '4px 18px';
+        label.style.borderRadius = '15px';
+        label.style.fontSize = '34px'; 
+        label.style.fontWeight = '900';
+        label.style.color = '#333333';
+        label.style.pointerEvents = 'none';
+        label.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+        
+        piece.appendChild(img);
+        piece.appendChild(label);
+        
+        piece.ondragstart = () => false;
+        piece.addEventListener('pointerdown', onDragStart);
+        
+        container.appendChild(piece);
+        pieces.push(container);
+    });
+    
+    shuffleArray(pieces);
+    pieces.forEach(p => dock.appendChild(p));
+}
+
+function prevWordsLevel() {
+    stopAllAudio();
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentWordsLevel--;
+    setupWordsGame();
+}
+
+function nextWordsLevel() {
+    stopAllAudio();
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    currentWordsLevel++;
+    setupWordsGame();
+}
 
 
 function setupPoemGame() {
@@ -610,14 +748,14 @@ function setupPoemGame() {
 }
 
 function prevPoem() {
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentPoemLevel--;
     setupPoemGame();
 }
 
 function nextPoem() {
-    stopAllAudio(); // ⬅️ ДОБАВИЛИ СЮДА
+    stopAllAudio(); 
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     currentPoemLevel++;
     setupPoemGame();
@@ -625,7 +763,6 @@ function nextPoem() {
 
 function handlePoemClick(opt, levelData, btnElem) {
     if (poemClickBlocked) return;
-    
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     
     if (opt.id === levelData.target) {
@@ -802,13 +939,21 @@ function onDragStart(e) {
     
     activeItem = e.target;
     const rect = activeItem.getBoundingClientRect();
-    dragOffsetX = e.clientX - rect.left;
-    dragOffsetY = e.clientY - rect.top;
     
-    activeItem.style.width = rect.width + 'px';
-    activeItem.style.height = rect.height + 'px';
-    activeItem.style.minWidth = rect.width + 'px';
-    activeItem.style.minHeight = rect.height + 'px';
+    if (currentRoom === 'words') {
+        // Деталька мгновенно вырастает до полного размера 1:1, центрируясь на пальце
+        activeItem.style.width = '260px';
+        activeItem.style.height = '260px';
+        activeItem.style.transform = 'scale(1)';
+        dragOffsetX = 130;
+        dragOffsetY = 130;
+    } else {
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        activeItem.style.width = rect.width + 'px';
+        activeItem.style.height = rect.height + 'px';
+    }
+    
     activeItem.classList.add('dragging');
     activeItem.style.position = 'fixed';
     activeItem.style.zIndex = '1000';
@@ -837,6 +982,57 @@ function onDragEnd(e) {
     const centerX = rectDrag.left + rectDrag.width / 2;
     const centerY = rectDrag.top + rectDrag.height / 2;
     
+    // ЛОГИКА ПРОВЕРКИ ДЛЯ СЛОГОВЫХ ПАЗЛОВ
+    if (currentRoom === 'words') {
+        const board = document.getElementById('words-shadow-board');
+        const boardRect = board.getBoundingClientRect();
+        
+        const diffX = Math.abs(rectDrag.left - boardRect.left);
+        const diffY = Math.abs(rectDrag.top - boardRect.top);
+        
+        // Магнитное поле в 35 пикселей от идеального контура
+        if (diffX < 35 && diffY < 35) {
+            safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            
+            activeItem.classList.add('matched');
+            activeItem.style.transition = 'all 0.2s ease';
+            activeItem.style.position = 'absolute';
+            activeItem.style.left = '0';
+            activeItem.style.top = '0';
+            activeItem.style.transform = 'scale(1)';
+            board.appendChild(activeItem);
+            
+            const sound = activeItem.getAttribute('data-sound');
+            playSound(sound);
+            
+            wordsActiveCount--;
+            if (wordsActiveCount === 0) {
+                const levelData = roomsData['words'][currentWordsLevel];
+                setTimeout(() => {
+                    playSound(levelData.full_sound); 
+                    board.style.animation = 'popIn 0.5s ease-out';
+                    
+                    wordsTimeout = setTimeout(() => {
+                        board.style.animation = '';
+                        currentWordsLevel++;
+                        setupWordsGame();
+                    }, 3200);
+                }, 800);
+            }
+            activeItem = null;
+            return;
+        }
+        
+        // Возврат на место в док, если промахнулся
+        activeItem.style.transition = 'all 0.3s ease';
+        activeItem.style.position = 'relative';
+        activeItem.style.left = '';
+        activeItem.style.top = '';
+        activeItem.style.transform = 'scale(0.32)';
+        activeItem = null;
+        return;
+    }
+
     activeItem.style.display = 'none';
     const elemUnderPointer = document.elementsFromPoint(centerX, centerY) || [];
     let target = null;
@@ -926,6 +1122,7 @@ function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'
 function handleQuizClick(actionId) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
+
 let activeAudios = [];
 function playSound(soundFile) { 
     if (soundFile) { 
