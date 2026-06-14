@@ -577,12 +577,10 @@ function setupWordsGame() {
     
     const levelData = roomsData['words'][currentWordsLevel];
     
-    // При старте уровня играем приветствие комнаты, если это начало
     if (currentWordsLevel === 0 && wordsActiveCount === 0) {
         playSound('words_intro.wav');
     }
 
-    // Создаем полупрозрачный силуэт-подложку по центру
     const shadowImg = document.createElement('img');
     shadowImg.src = levelData.image;
     shadowImg.style.width = '100%';
@@ -598,7 +596,6 @@ function setupWordsGame() {
     const count = levelData.syllables.length;
     wordsActiveCount = count;
     
-    // Геометрические маски разрезов
     const clips2 = [
         'polygon(0 0, 55% 0, 45% 50%, 55% 100%, 0 100%)',
         'polygon(55% 0, 100% 0, 100% 100%, 55% 100%, 45% 50%)'
@@ -613,26 +610,24 @@ function setupWordsGame() {
     let pieces = [];
     
     levelData.syllables.forEach((syl, index) => {
-        // Контейнер-ячейка для удержания масштаба в нижней панели
         const container = document.createElement('div');
-        container.style.width = '85px';
-        container.style.height = '85px';
+        container.style.width = '100px'; // ⬅️ Увеличили контейнер
+        container.style.height = '100px';
         container.style.display = 'flex';
         container.style.justifyContent = 'center';
         container.style.alignItems = 'center';
         
-        // Сама деталь пазла (хранит полный размер 260px, но сжата через scale)
         const piece = document.createElement('div');
         piece.className = 'draggable-item word-puzzle-piece';
         piece.style.width = '260px';
         piece.style.height = '260px';
-        piece.style.transform = 'scale(0.32)';
+        piece.style.transform = 'scale(0.45)'; // ⬅️ Сделали детали огромными!
         piece.style.transformOrigin = 'center center';
         piece.style.flexShrink = '0';
         piece.style.position = 'relative';
         piece.style.cursor = 'pointer';
         piece.setAttribute('data-index', index);
-        piece.setAttribute('data-sound', syl.sound);
+        piece.setAttribute('data-sound', syl.sound); // Прячем звук внутрь детали
         
         const img = document.createElement('img');
         img.src = levelData.image;
@@ -643,25 +638,9 @@ function setupWordsGame() {
         img.style.webkitClipPath = activeClips[index];
         img.style.pointerEvents = 'none';
         
-        // Крупная яркая плашка со слогом поверх детальки
-        const label = document.createElement('div');
-        label.innerText = syl.label;
-        label.style.position = 'absolute';
-        label.style.bottom = '15px';
-        label.style.left = '50%';
-        label.style.transform = 'translateX(-50%)';
-        label.style.background = '#FFD166';
-        label.style.border = '4px solid #FFFFFF';
-        label.style.padding = '4px 18px';
-        label.style.borderRadius = '15px';
-        label.style.fontSize = '34px'; 
-        label.style.fontWeight = '900';
-        label.style.color = '#333333';
-        label.style.pointerEvents = 'none';
-        label.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+        // ⬅️ Плашки с текстом удалены!
         
         piece.appendChild(img);
-        piece.appendChild(label);
         
         piece.ondragstart = () => false;
         piece.addEventListener('pointerdown', onDragStart);
@@ -941,12 +920,17 @@ function onDragStart(e) {
     const rect = activeItem.getBoundingClientRect();
     
     if (currentRoom === 'words') {
-        // Деталька мгновенно вырастает до полного размера 1:1, центрируясь на пальце
         activeItem.style.width = '260px';
         activeItem.style.height = '260px';
         activeItem.style.transform = 'scale(1)';
+        activeItem.style.transition = 'none'; // Убираем задержку
         dragOffsetX = 130;
         dragOffsetY = 130;
+        
+        // ⬅️ МАГИЯ ЗВУКА: Произносим слог при касании!
+        const sound = activeItem.getAttribute('data-sound');
+        if (sound) playSound(sound);
+        
     } else {
         dragOffsetX = e.clientX - rect.left;
         dragOffsetY = e.clientY - rect.top;
@@ -987,11 +971,18 @@ function onDragEnd(e) {
         const board = document.getElementById('words-shadow-board');
         const boardRect = board.getBoundingClientRect();
         
-        const diffX = Math.abs(rectDrag.left - boardRect.left);
-        const diffY = Math.abs(rectDrag.top - boardRect.top);
+        // Считаем по центрам (так малышам легче попасть)
+        const pieceCenterX = rectDrag.left + rectDrag.width / 2;
+        const pieceCenterY = rectDrag.top + rectDrag.height / 2;
         
-        // Магнитное поле в 35 пикселей от идеального контура
-        if (diffX < 35 && diffY < 35) {
+        const boardCenterX = boardRect.left + boardRect.width / 2;
+        const boardCenterY = boardRect.top + boardRect.height / 2;
+        
+        const diffX = Math.abs(pieceCenterX - boardCenterX);
+        const diffY = Math.abs(pieceCenterY - boardCenterY);
+        
+        // ⬅️ ОГРОМНОЕ МАГНИТНОЕ ПОЛЕ (100 пикселей во все стороны!)
+        if (diffX < 100 && diffY < 100) {
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
             activeItem.classList.add('matched');
@@ -1001,9 +992,6 @@ function onDragEnd(e) {
             activeItem.style.top = '0';
             activeItem.style.transform = 'scale(1)';
             board.appendChild(activeItem);
-            
-            const sound = activeItem.getAttribute('data-sound');
-            playSound(sound);
             
             wordsActiveCount--;
             if (wordsActiveCount === 0) {
@@ -1017,18 +1005,20 @@ function onDragEnd(e) {
                         currentWordsLevel++;
                         setupWordsGame();
                     }, 3200);
-                }, 800);
+                }, 400); // Диктор быстро называет всё слово
+            } else {
+                playSound('color_correct.wav'); // Приятный щелчок, если деталь встала
             }
             activeItem = null;
             return;
         }
         
-        // Возврат на место в док, если промахнулся
+        // Если промахнулся - возврат на место в док
         activeItem.style.transition = 'all 0.3s ease';
         activeItem.style.position = 'relative';
         activeItem.style.left = '';
         activeItem.style.top = '';
-        activeItem.style.transform = 'scale(0.32)';
+        activeItem.style.transform = 'scale(0.45)'; // ⬅️ Сохраняем увеличенный размер
         activeItem = null;
         return;
     }
@@ -1099,6 +1089,20 @@ function onDragEnd(e) {
             return;
         }
     }
+    
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    playSound('wrong.wav');
+    activeItem.style.transition = 'all 0.3s ease';
+    activeItem.style.position = '';
+    activeItem.style.left = '';
+    activeItem.style.top = '';
+    activeItem.style.width = '';
+    activeItem.style.height = '';
+    setTimeout(() => {
+        if (activeItem) activeItem.style.transition = '';
+    }, 300);
+    activeItem = null;
+}
     
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
     playSound('wrong.wav');
