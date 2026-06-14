@@ -569,6 +569,10 @@ function setupWordsGame() {
     clearTimeout(wordsTimeout);
     const board = document.getElementById('words-shadow-board');
     const dock = document.getElementById('words-dock');
+    
+    // Делаем игровое поле огромным, чтобы малышам было удобно!
+    board.style.width = '320px';
+    board.style.height = '320px';
     board.innerHTML = '';
     dock.innerHTML = '';
     
@@ -596,14 +600,15 @@ function setupWordsGame() {
     const count = levelData.syllables.length;
     wordsActiveCount = count;
     
+    // Красивые волнистые разрезы как у настоящих пазлов
     const clips2 = [
-        'polygon(0 0, 55% 0, 45% 50%, 55% 100%, 0 100%)',
-        'polygon(55% 0, 100% 0, 100% 100%, 55% 100%, 45% 50%)'
+        'polygon(0 0, 52% 0, 45% 30%, 55% 70%, 48% 100%, 0 100%)',
+        'polygon(52% 0, 100% 0, 100% 100%, 48% 100%, 55% 70%, 45% 30%)'
     ];
     const clips3 = [
-        'polygon(0 0, 38% 0, 28% 50%, 38% 100%, 0 100%)',
-        'polygon(38% 0, 71% 0, 61% 50%, 71% 100%, 38% 100%, 28% 50%)',
-        'polygon(71% 0, 100% 0, 100% 100%, 71% 100%, 61% 50%)'
+        'polygon(0 0, 35% 0, 30% 50%, 35% 100%, 0 100%)',
+        'polygon(35% 0, 68% 0, 62% 50%, 68% 100%, 35% 100%, 30% 50%)',
+        'polygon(68% 0, 100% 0, 100% 100%, 68% 100%, 62% 50%)'
     ];
     const activeClips = count === 2 ? clips2 : clips3;
     
@@ -611,23 +616,24 @@ function setupWordsGame() {
     
     levelData.syllables.forEach((syl, index) => {
         const container = document.createElement('div');
-        container.style.width = '100px'; // ⬅️ Увеличили контейнер
-        container.style.height = '100px';
+        container.style.width = count === 2 ? '110px' : '85px'; 
+        container.style.height = '120px';
         container.style.display = 'flex';
         container.style.justifyContent = 'center';
         container.style.alignItems = 'center';
+        container.style.position = 'relative';
         
         const piece = document.createElement('div');
         piece.className = 'draggable-item word-puzzle-piece';
-        piece.style.width = '260px';
-        piece.style.height = '260px';
-        piece.style.transform = 'scale(0.45)'; // ⬅️ Сделали детали огромными!
+        piece.style.width = '320px';
+        piece.style.height = '320px';
+        piece.style.transform = 'scale(0.55)'; // Детальки внизу стали большими!
         piece.style.transformOrigin = 'center center';
         piece.style.flexShrink = '0';
         piece.style.position = 'relative';
         piece.style.cursor = 'pointer';
         piece.setAttribute('data-index', index);
-        piece.setAttribute('data-sound', syl.sound); // Прячем звук внутрь детали
+        piece.setAttribute('data-sound', syl.sound); 
         
         const img = document.createElement('img');
         img.src = levelData.image;
@@ -637,8 +643,6 @@ function setupWordsGame() {
         img.style.clipPath = activeClips[index];
         img.style.webkitClipPath = activeClips[index];
         img.style.pointerEvents = 'none';
-        
-        // ⬅️ Плашки с текстом удалены!
         
         piece.appendChild(img);
         
@@ -920,14 +924,17 @@ function onDragStart(e) {
     const rect = activeItem.getBoundingClientRect();
     
     if (currentRoom === 'words') {
-        activeItem.style.width = '260px';
-        activeItem.style.height = '260px';
-        activeItem.style.transform = 'scale(1)';
-        activeItem.style.transition = 'none'; // Убираем задержку
-        dragOffsetX = 130;
-        dragOffsetY = 130;
+        // Вычисляем точное место касания, чтобы картинка никуда не дергалась!
+        const dockScale = 0.55; 
+        dragOffsetX = (e.clientX - rect.left) / dockScale;
+        dragOffsetY = (e.clientY - rect.top) / dockScale;
         
-        // ⬅️ МАГИЯ ЗВУКА: Произносим слог при касании!
+        activeItem.style.width = '320px';
+        activeItem.style.height = '320px';
+        activeItem.style.transform = 'scale(1)';
+        activeItem.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)'; 
+        
+        // Звук слога сразу при взятии
         const sound = activeItem.getAttribute('data-sound');
         if (sound) playSound(sound);
         
@@ -971,7 +978,6 @@ function onDragEnd(e) {
         const board = document.getElementById('words-shadow-board');
         const boardRect = board.getBoundingClientRect();
         
-        // Считаем по центрам (так малышам легче попасть)
         const pieceCenterX = rectDrag.left + rectDrag.width / 2;
         const pieceCenterY = rectDrag.top + rectDrag.height / 2;
         
@@ -981,12 +987,12 @@ function onDragEnd(e) {
         const diffX = Math.abs(pieceCenterX - boardCenterX);
         const diffY = Math.abs(pieceCenterY - boardCenterY);
         
-        // ⬅️ ОГРОМНОЕ МАГНИТНОЕ ПОЛЕ (100 пикселей во все стороны!)
-        if (diffX < 100 && diffY < 100) {
+        // ГИГАНТСКОЕ магнитное поле! Малышу не нужно целиться идеально.
+        if (diffX < 150 && diffY < 150) {
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
             activeItem.classList.add('matched');
-            activeItem.style.transition = 'all 0.2s ease';
+            activeItem.style.transition = 'all 0.2s ease-out';
             activeItem.style.position = 'absolute';
             activeItem.style.left = '0';
             activeItem.style.top = '0';
@@ -1005,20 +1011,21 @@ function onDragEnd(e) {
                         currentWordsLevel++;
                         setupWordsGame();
                     }, 3200);
-                }, 400); // Диктор быстро называет всё слово
+                }, 400); 
             } else {
-                playSound('color_correct.wav'); // Приятный щелчок, если деталь встала
+                playSound('color_correct.wav'); // Щелчок правильной постановки
             }
             activeItem = null;
             return;
         }
         
-        // Если промахнулся - возврат на место в док
+        // Если промахнулся - возвращаем в док
         activeItem.style.transition = 'all 0.3s ease';
         activeItem.style.position = 'relative';
         activeItem.style.left = '';
         activeItem.style.top = '';
-        activeItem.style.transform = 'scale(0.45)'; // ⬅️ Сохраняем увеличенный размер
+        activeItem.style.transform = 'scale(0.55)'; // Возвращаем размер дока
+        playSound('wrong.wav');
         activeItem = null;
         return;
     }
@@ -1103,7 +1110,7 @@ function onDragEnd(e) {
     }, 300);
     activeItem = null;
 }
-    
+     
 document.addEventListener('pointermove', onDragMove);
 document.addEventListener('pointerup', onDragEnd);
 
