@@ -218,12 +218,18 @@ let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
     'words': [
+        { id: 'kisa', text: 'Киса', image: 'puzzle_kisa.png', full_sound: 'w_kisa.wav', syllables: [{ sound: 'sl_ki.wav', label: 'КИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
+        { id: 'zayka', text: 'Зайка', image: 'puzzle_zayka.png', full_sound: 'w_zayka.wav', syllables: [{ sound: 'sl_zay.wav', label: 'ЗАЙ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
+        { id: 'yozhik', text: 'Ёжик', image: 'puzzle_yozhik.png', full_sound: 'w_yozhik.wav', syllables: [{ sound: 'sl_yo.wav', label: 'Ё' }, { sound: 'sl_zhik.wav', label: 'ЖИК' }] },
+        { id: 'slonik', text: 'Слоник', image: 'puzzle_slonik.png', full_sound: 'w_slonik.wav', syllables: [{ sound: 'sl_slo.wav', label: 'СЛО' }, { sound: 'sl_nik.wav', label: 'НИК' }] },
+        { id: 'oslik', text: 'Ослик', image: 'puzzle_oslik.png', full_sound: 'w_oslik.wav', syllables: [{ sound: 'sl_os.wav', label: 'ОС' }, { sound: 'sl_lik.wav', label: 'ЛИК' }] },
+        { id: 'svinka', text: 'Свинка', image: 'puzzle_svinka.png', full_sound: 'w_svinka.wav', syllables: [{ sound: 'sl_svin.wav', label: 'СВИН' }, { sound: 'sl_ka.wav', label: 'КА' }] },
+        { id: 'loshad', text: 'Лошадь', image: 'puzzle_loshad.png', full_sound: 'w_loshad.wav', syllables: [{ sound: 'sl_lo.wav', label: 'ЛО' }, { sound: 'sl_shad.wav', label: 'ШАДЬ' }] },
+        { id: 'domik', text: 'Домик', image: 'puzzle_domik.png', full_sound: 'w_domik.wav', syllables: [{ sound: 'sl_do.wav', label: 'ДО' }, { sound: 'sl_mik.wav', label: 'МИК' }] },
+        { id: 'myachik', text: 'Мячик', image: 'puzzle_myachik.png', full_sound: 'w_myachik.wav', syllables: [{ sound: 'sl_mya.wav', label: 'МЯ' }, { sound: 'sl_chik.wav', label: 'ЧИК' }] },
         { id: 'lisa', text: 'Лиса', image: 'puzzle_lisa.png', full_sound: 'w_lisa.wav', syllables: [{ sound: 'sl_li.wav', label: 'ЛИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'kasha', text: 'Каша', image: 'puzzle_kasha.png', full_sound: 'w_kasha.wav', syllables: [{ sound: 'sl_ka.wav', label: 'КА' }, { sound: 'sl_sha.wav', label: 'ША' }] },
-        { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] },
-        { id: 'myshka', text: 'Мышка', image: 'puzzle_myshka.png', full_sound: 'w_myshka.wav', syllables: [{ sound: 'sl_mysh.wav', label: 'МЫШ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
-        { id: 'tykva', text: 'Тыква', image: 'puzzle_tykva.png', full_sound: 'w_tykva.wav', syllables: [{ sound: 'sl_tyk.wav', label: 'ТЫК' }, { sound: 'sl_va.wav', label: 'ВА' }] },
-        { id: 'zholud', text: 'Жёлудь', image: 'puzzle_zholud.png', full_sound: 'w_zholud.wav', syllables: [{ sound: 'sl_zho.wav', label: 'ЖО' }, { sound: 'sl_lud.wav', label: 'ЛУДЬ' }] }
+        { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] }
     ],
     'yesno': [
         { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
