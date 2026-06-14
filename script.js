@@ -204,7 +204,7 @@ let canvasInitialized = false;
 let currentGardenLevel = 1; let gardenTargetCount = 0;
 let currentPoemLevel = 0; let poemClickBlocked = false; let poemTimeout = null;
 let currentYesNoLevel = 0; let yesNoClickBlocked = false; let yesNoTimeout = null;
-let currentWordsLevel = 0; let wordsActiveCount = 0; let wordsTimeout = null;
+let currentWordsLevel = 0; let wordsActiveCount = 0; let wordsPlacedCount = 0; let wordsTimeout = null;
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -221,9 +221,9 @@ const roomsData = {
         { id: 'lisa', text: 'Лиса', image: 'puzzle_lisa.png', full_sound: 'w_lisa.wav', syllables: [{ sound: 'sl_li.wav', label: 'ЛИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'kasha', text: 'Каша', image: 'puzzle_kasha.png', full_sound: 'w_kasha.wav', syllables: [{ sound: 'sl_ka.wav', label: 'КА' }, { sound: 'sl_sha.wav', label: 'ША' }] },
         { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] },
-        { id: 'mashina', text: 'Машина', image: 'puzzle_mashina.png', full_sound: 'w_mashina.wav', syllables: [{ sound: 'sl_ma.wav', label: 'МА' }, { sound: 'sl_shi.wav', label: 'ШИ' }, { sound: 'sl_na.wav', label: 'НА' }] },
-        { id: 'sobaka', text: 'Собака', image: 'puzzle_sobaka.png', full_sound: 'w_sobaka.wav', syllables: [{ sound: 'sl_so.wav', label: 'СО' }, { sound: 'sl_ba.wav', label: 'БА' }, { sound: 'sl_ka.wav', label: 'КА' }] },
-        { id: 'raketa', text: 'Ракета', image: 'puzzle_raketa.png', full_sound: 'w_raketa.wav', syllables: [{ sound: 'sl_ra.wav', label: 'РА' }, { sound: 'sl_ke.wav', label: 'КЕ' }, { sound: 'sl_ta.wav', label: 'ТА' }] }
+        { id: 'myshka', text: 'Мышка', image: 'puzzle_myshka.png', full_sound: 'w_myshka.wav', syllables: [{ sound: 'sl_mysh.wav', label: 'МЫШ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
+        { id: 'tykva', text: 'Тыква', image: 'puzzle_tykva.png', full_sound: 'w_tykva.wav', syllables: [{ sound: 'sl_tyk.wav', label: 'ТЫК' }, { sound: 'sl_va.wav', label: 'ВА' }] },
+        { id: 'zholud', text: 'Жёлудь', image: 'puzzle_zholud.png', full_sound: 'w_zholud.wav', syllables: [{ sound: 'sl_zho.wav', label: 'ЖО' }, { sound: 'sl_lud.wav', label: 'ЛУДЬ' }] }
     ],
     'yesno': [
         { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
@@ -269,42 +269,6 @@ const roomsData = {
         { id: 'rect', text: 'Прямоугольник', image: 'card_rect.png', sound: 'shape_rect.wav', targets: ['target_rect_train.png', 'target_rect_truck1.png', 'target_rect_truck2.png'] },
         { id: 'star', text: 'Звезда', image: 'card_star.png', sound: 'shape_star.wav', targets: ['target_star_wand.png', 'target_star_sky.png'] },
         { id: 'rhombus', text: 'Ромб', image: 'card_romb.png', sound: 'shape_rhombus.wav', targets: ['target_romb_kite.png', 'target_romb_diamond.png'] }
-    ],
-    'big_small': [
-        { id: 'elephant', big_img: 'bs_elephant.png', big_sound: 'bs_elephant.wav', small_img: 'bs_mouse.png', small_sound: 'bs_mouse.wav' },
-        { id: 'car', big_img: 'bs_car_big.png', big_sound: 'bs_car_big.wav', small_img: 'bs_car_small.png', small_sound: 'bs_car_small.wav' },
-        { id: 'ball', big_img: 'bs_ball_big.png', big_sound: 'bs_ball_big.wav', small_img: 'bs_ball_small.png', small_sound: 'bs_ball_small.wav' },
-        { id: 'dog', big_img: 'bs_dog.png', big_sound: 'bs_dog.wav', small_img: 'bs_puppy.png', small_sound: 'bs_puppy.wav' },
-        { id: 'apple', big_img: 'bs_apple.png', big_sound: 'bs_apple.wav', small_img: 'bs_berry.png', small_sound: 'bs_berry.wav' },
-        { id: 'house', big_img: 'bs_house_big.png', big_sound: 'bs_house_big.wav', small_img: 'bs_house_small.png', small_sound: 'bs_house_small.wav' },
-        { id: 'tree', big_img: 'bs_tree.png', big_sound: 'bs_tree.wav', small_img: 'bs_leaf.png', small_sound: 'bs_leaf.wav' },
-        { id: 'plate', big_img: 'bs_plate.png', big_sound: 'bs_plate.wav', small_img: 'bs_spoon.png', small_sound: 'bs_spoon.wav' },
-        { id: 'bear', big_img: 'bs_bear.png', big_sound: 'bs_bear.wav', small_img: 'bs_bunny.png', small_sound: 'bs_bunny.wav' },
-        { id: 'truck', big_img: 'bs_truck.png', big_sound: 'bs_truck.wav', small_img: 'bs_block.png', small_sound: 'bs_block.wav' },
-        { id: 'chair', big_img: 'bs_chair_big.png', big_sound: 'bs_chair_big.wav', small_img: 'bs_chair_small.png', small_sound: 'bs_chair_small.wav' },
-        { id: 'ship', big_img: 'bs_ship.png', big_sound: 'bs_ship.wav', small_img: 'bs_boat.png', small_sound: 'bs_boat.wav' }
-    ],
-    'garden': [
-        { level: 1, count: 1, sound: 'g_level1.wav', bg: 'garden_bg_1.png', item: 'garden_item_1.png' },
-        { level: 2, count: 2, sound: 'g_level2.wav', bg: 'garden_bg_2.png', item: 'garden_item_2.png' },
-        { level: 3, count: 3, sound: 'g_level3.wav', bg: 'garden_bg_3.png', item: 'garden_item_3.png' },
-        { level: 4, count: 4, sound: 'g_level4.wav', bg: 'garden_bg_4.png', item: 'garden_item_4.png' },
-        { level: 5, count: 5, sound: 'g_level5.wav', bg: 'garden_bg_5.png', item: 'garden_item_5.png' },
-        { level: 6, count: 6, sound: 'g_level6.wav', bg: 'garden_bg_6.png', item: 'garden_item_6.png' },
-        { level: 7, count: 7, sound: 'g_level7.wav', bg: 'garden_bg_7.png', item: 'garden_item_7.png' },
-        { level: 8, count: 8, sound: 'g_level8.wav', bg: 'garden_bg_8.png', item: 'garden_item_8.png' },
-        { level: 9, count: 9, sound: 'g_level9.wav', bg: 'garden_bg_9.png', item: 'garden_item_9.png' }
-    ],
-    'actions': [
-        { id: 'run', text: 'Утя бежит', image: 'act_run.gif', sound: 'act_run.wav' },
-        { id: 'swing', text: 'Утя качается', image: 'act_swing.gif', sound: 'act_swing.wav' },
-        { id: 'wash', text: 'Утя моется', image: 'act_wash.gif', sound: 'act_wash.wav' },
-        { id: 'play', text: 'Утя играет', image: 'act_play.gif', sound: 'act_play.wav' },
-        { id: 'cry', text: 'Утя плачет', image: 'act_cry.gif', sound: 'act_cry.wav' },
-        { id: 'jump', text: 'Утя прыгает', image: 'act_jump.gif', sound: 'act_jump.wav' },
-        { id: 'talk', text: 'Утя говорит', image: 'act_talk.gif', sound: 'act_talk.wav' },
-        { id: 'laugh', text: 'Утя смеется', image: 'act_laugh.gif', sound: 'act_laugh.wav' },
-        { id: 'dance', text: 'Утя танцует', image: 'act_dance.gif', sound: 'act_dance.wav' }
     ]
 };
 
@@ -563,7 +527,7 @@ function handleYesNoClick(choice) {
 }
 
 // ==========================================
-// ЛОГИКА ИГРЫ: СЛОГИ-ПАЗЛЫ
+// ЛОГИКА ИГРЫ: СЛОГИ-ПАЗЛЫ (ОБНОВЛЕННАЯ)
 // ==========================================
 function setupWordsGame() {
     clearTimeout(wordsTimeout);
@@ -580,7 +544,10 @@ function setupWordsGame() {
     
     const levelData = roomsData['words'][currentWordsLevel];
     
-    if (currentWordsLevel === 0 && wordsActiveCount === 0) {
+    wordsPlacedCount = 0; // Сброс счетчика установленных слогов
+    wordsActiveCount = 2; // Всегда 2 детали!
+    
+    if (currentWordsLevel === 0 && wordsPlacedCount === 0) {
         playSound('words_intro.wav');
     }
 
@@ -596,25 +563,17 @@ function setupWordsGame() {
     shadowImg.style.pointerEvents = 'none';
     board.appendChild(shadowImg);
     
-    const count = levelData.syllables.length;
-    wordsActiveCount = count;
-    
+    // Оставляем только 2 части (разрезаем ровно пополам)
     const clips2 = [
         'polygon(0 0, 52% 0, 45% 30%, 55% 70%, 48% 100%, 0 100%)',
         'polygon(52% 0, 100% 0, 100% 100%, 48% 100%, 55% 70%, 45% 30%)'
     ];
-    const clips3 = [
-        'polygon(0 0, 35% 0, 30% 50%, 35% 100%, 0 100%)',
-        'polygon(35% 0, 68% 0, 62% 50%, 68% 100%, 35% 100%, 30% 50%)',
-        'polygon(68% 0, 100% 0, 100% 100%, 68% 100%, 62% 50%)'
-    ];
-    const activeClips = count === 2 ? clips2 : clips3;
     
     let pieces = [];
     
     levelData.syllables.forEach((syl, index) => {
         const container = document.createElement('div');
-        container.style.width = count === 2 ? '110px' : '85px'; 
+        container.style.width = '110px'; 
         container.style.height = '110px';
         container.style.display = 'flex';
         container.style.justifyContent = 'center';
@@ -624,25 +583,24 @@ function setupWordsGame() {
         const piece = document.createElement('div');
         piece.className = 'draggable-item word-puzzle-piece';
         
-        // МАГИЯ ПРОТИВ CSS: заставляем быть 300х300
+        // Магия против CSS стилей, чтобы картинки были огромными
         piece.style.cssText += 'max-width: none !important; max-height: none !important;';
         piece.style.width = '300px';
         piece.style.height = '300px';
-        piece.style.transform = 'scale(0.35)'; // Визуально в доке ~105px
+        piece.style.transform = 'scale(0.35)'; 
         piece.style.transformOrigin = 'center center';
         piece.style.flexShrink = '0';
         piece.style.position = 'relative';
         piece.style.cursor = 'pointer';
         piece.setAttribute('data-index', index);
-        piece.setAttribute('data-sound', syl.sound); 
         
         const img = document.createElement('img');
         img.src = levelData.image;
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'contain';
-        img.style.clipPath = activeClips[index];
-        img.style.webkitClipPath = activeClips[index];
+        img.style.clipPath = clips2[index];
+        img.style.webkitClipPath = clips2[index];
         img.style.pointerEvents = 'none';
         
         piece.appendChild(img);
@@ -928,12 +886,13 @@ function onDragStart(e) {
         activeItem.style.transform = 'scale(1)';
         activeItem.style.transition = 'none'; 
         
-        // Центрируем деталь точно под пальцем
         dragOffsetX = 150;
         dragOffsetY = 150;
         
-        const sound = activeItem.getAttribute('data-sound');
-        if (sound) playSound(sound);
+        // УМНАЯ ОЗВУЧКА СЛОГА (всегда по порядку!)
+        const levelData = roomsData['words'][currentWordsLevel];
+        const currentSyllableSound = levelData.syllables[wordsPlacedCount].sound;
+        playSound(currentSyllableSound);
         
     } else {
         dragOffsetX = e.clientX - rect.left;
@@ -983,6 +942,7 @@ function onDragEnd(e) {
         const diffX = Math.abs(pieceCenterX - boardCenterX);
         const diffY = Math.abs(pieceCenterY - boardCenterY);
         
+        // Огромное магнитное поле, чтобы малыш 100% попал!
         if (diffX < 150 && diffY < 150) {
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
@@ -994,9 +954,14 @@ function onDragEnd(e) {
             activeItem.style.transform = 'scale(1)';
             board.appendChild(activeItem);
             
+            const levelData = roomsData['words'][currentWordsLevel];
+            
+            // Повторяем слог при постановке!
+            playSound(levelData.syllables[wordsPlacedCount].sound);
+            wordsPlacedCount++; // Переходим к следующему слогу
+            
             wordsActiveCount--;
             if (wordsActiveCount === 0) {
-                const levelData = roomsData['words'][currentWordsLevel];
                 setTimeout(() => {
                     playSound(levelData.full_sound); 
                     board.style.animation = 'popIn 0.5s ease-out';
@@ -1007,10 +972,6 @@ function onDragEnd(e) {
                         setupWordsGame();
                     }, 3200);
                 }, 500); 
-            } else {
-                // Повторяем слог при удачной постановке!
-                const sound = activeItem.getAttribute('data-sound');
-                if (sound) playSound(sound);
             }
             activeItem = null;
             return;
