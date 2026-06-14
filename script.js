@@ -553,8 +553,8 @@ function setupWordsGame() {
     
     const levelData = roomsData['words'][currentWordsLevel];
     
-    wordsPlacedCount = 0; // Сброс счетчика установленных слогов
-    wordsActiveCount = 2; // Всегда 2 детали!
+    wordsPlacedCount = 0; 
+    wordsActiveCount = 2; 
     
     if (currentWordsLevel === 0 && wordsPlacedCount === 0) {
         playSound('words_intro.wav');
@@ -572,7 +572,6 @@ function setupWordsGame() {
     shadowImg.style.pointerEvents = 'none';
     board.appendChild(shadowImg);
     
-    // Оставляем только 2 части (разрезаем ровно пополам)
     const clips2 = [
         'polygon(0 0, 52% 0, 45% 30%, 55% 70%, 48% 100%, 0 100%)',
         'polygon(52% 0, 100% 0, 100% 100%, 48% 100%, 55% 70%, 45% 30%)'
@@ -592,7 +591,6 @@ function setupWordsGame() {
         const piece = document.createElement('div');
         piece.className = 'draggable-item word-puzzle-piece';
         
-        // Магия против CSS стилей, чтобы картинки были огромными
         piece.style.cssText += 'max-width: none !important; max-height: none !important;';
         piece.style.width = '300px';
         piece.style.height = '300px';
@@ -898,7 +896,6 @@ function onDragStart(e) {
         dragOffsetX = 150;
         dragOffsetY = 150;
         
-        // УМНАЯ ОЗВУЧКА СЛОГА (всегда по порядку!)
         const levelData = roomsData['words'][currentWordsLevel];
         const currentSyllableSound = levelData.syllables[wordsPlacedCount].sound;
         playSound(currentSyllableSound);
@@ -963,9 +960,6 @@ function onDragEnd(e) {
             board.appendChild(activeItem);
             
             const levelData = roomsData['words'][currentWordsLevel];
-            
-            // Повторяем слог при постановке!
-            playSound(levelData.syllables[wordsPlacedCount].sound);
             wordsPlacedCount++; 
             
             wordsActiveCount--;
@@ -973,20 +967,21 @@ function onDragEnd(e) {
                 setTimeout(() => {
                     playSound(levelData.full_sound); 
                     
-                    // МАГИЯ АНИМАЦИИ: Делаем красивый "прыжок" на месте, без улетания в угол
                     board.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                    board.style.transform = 'scale(1.15)'; // Немного увеличиваем
+                    board.style.transform = 'scale(1.15)'; 
                     
                     setTimeout(() => {
-                        board.style.transform = 'scale(1)'; // Возвращаем в нормальный размер
+                        board.style.transform = 'scale(1)'; 
                     }, 400);
                     
                     wordsTimeout = setTimeout(() => {
-                        board.style.transition = ''; // Сбрасываем стили
+                        board.style.transition = ''; 
                         currentWordsLevel++;
                         setupWordsGame();
                     }, 3200);
                 }, 500); 
+            } else {
+                playSound('color_correct.wav'); 
             }
             activeItem = null;
             return;
