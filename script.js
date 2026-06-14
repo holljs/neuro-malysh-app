@@ -951,7 +951,6 @@ function onDragEnd(e) {
         const diffX = Math.abs(pieceCenterX - boardCenterX);
         const diffY = Math.abs(pieceCenterY - boardCenterY);
         
-        // Огромное магнитное поле, чтобы малыш 100% попал!
         if (diffX < 150 && diffY < 150) {
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             
@@ -967,16 +966,23 @@ function onDragEnd(e) {
             
             // Повторяем слог при постановке!
             playSound(levelData.syllables[wordsPlacedCount].sound);
-            wordsPlacedCount++; // Переходим к следующему слогу
+            wordsPlacedCount++; 
             
             wordsActiveCount--;
             if (wordsActiveCount === 0) {
                 setTimeout(() => {
                     playSound(levelData.full_sound); 
-                    board.style.animation = 'popIn 0.5s ease-out';
+                    
+                    // МАГИЯ АНИМАЦИИ: Делаем красивый "прыжок" на месте, без улетания в угол
+                    board.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    board.style.transform = 'scale(1.15)'; // Немного увеличиваем
+                    
+                    setTimeout(() => {
+                        board.style.transform = 'scale(1)'; // Возвращаем в нормальный размер
+                    }, 400);
                     
                     wordsTimeout = setTimeout(() => {
-                        board.style.animation = '';
+                        board.style.transition = ''; // Сбрасываем стили
                         currentWordsLevel++;
                         setupWordsGame();
                     }, 3200);
