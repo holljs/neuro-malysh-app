@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Нейро-Малыш</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=28">
+    <link rel="stylesheet" href="style.css?v=34">
     <style>
         /* Анимации для комнат */
         @keyframes popIn {
@@ -150,6 +150,11 @@
                 <div class="category-title">Да или Нет</div>
             </div>
 
+            <div class="category-card cat-words" onclick="openRoom('words', 'Слоги-Пазлы')">
+                <div class="category-icon-placeholder"><img src="icon_words.png" alt="🧩"></div>
+                <div class="category-title">Слоги-Пазлы</div>
+            </div>
+
             <div class="category-card cat-breeze" onclick="openRoom('wind', 'Ветерок')">
                 <div class="category-icon-placeholder"><img src="icon_wind.png" alt=""></div>
                 <div class="category-title">Ветерок</div>
@@ -204,16 +209,24 @@
             </div>
 
             <div id="yesno-area" style="display: none; width: 100%; height: 100%; background-size: cover; background-position: center top; border-radius: 15px; overflow: hidden; flex-direction: column; justify-content: flex-end; padding-bottom: 30px; position: relative;">
-                
                 <div style="position: absolute; top: 35%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
                     <div class="nav-btn" onclick="prevYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
                     <div class="nav-btn" onclick="nextYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
                 </div>
-
                 <div style="display: flex; justify-content: center; gap: 35px; z-index: 30;">
                     <button id="btn-yes" onclick="handleYesNoClick('yes')" style="width: 110px; height: 110px; border-radius: 50%; background-color: #4CAF50; border: 8px solid #FFFFFF; box-shadow: 0 8px 15px rgba(0,0,0,0.2); font-size: 55px; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; outline: none; font-weight: bold;">✓</button>
                     <button id="btn-no" onclick="handleYesNoClick('no')" style="width: 110px; height: 110px; border-radius: 50%; background-color: #F44336; border: 8px solid #FFFFFF; box-shadow: 0 8px 15px rgba(0,0,0,0.2); font-size: 55px; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; outline: none; font-weight: bold;">✖</button>
                 </div>
+            </div>
+
+            <div id="words-area" style="display: none; width: 100%; height: 100%; background: #FFFDE7; border-radius: 15px; overflow: hidden; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 10px 25px 10px; box-sizing: border-box; position: relative;">
+                <div style="position: absolute; top: 40%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
+                    <div class="nav-btn" onclick="prevWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
+                    <div class="nav-btn" onclick="nextWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
+                </div>
+                
+                <div id="words-shadow-board" style="position: relative; width: 260px; height: 260px; margin-top: 15px; display: flex; justify-content: center; align-items: center; background: transparent;"></div>
+                <div id="words-dock" style="width: 95%; min-height: 125px; display: flex; justify-content: center; align-items: center; gap: 15px; background: rgba(255,255,255,0.9); border-radius: 20px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 30; margin-bottom: 5px;"></div>
             </div>
 
             <div id="draw-area" class="draw-container">
@@ -248,6 +261,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=28"></script>
+    <script src="script.js?v=34"></script>
 </body>
 </html>
