@@ -981,7 +981,7 @@ function onDragEnd(e) {
                     }, 3200);
                 }, 500); 
             } else {
-                playSound('color_correct.wav'); 
+                // ТУТ БЫЛА ПРОБЛЕМА: звук удалён! Ничего не играем, деталька ставится молча.
             }
             activeItem = null;
             return;
