@@ -1104,20 +1104,6 @@ function onDragEnd(e) {
     activeItem = null;
 }
     
-    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
-    playSound('wrong.wav');
-    activeItem.style.transition = 'all 0.3s ease';
-    activeItem.style.position = '';
-    activeItem.style.left = '';
-    activeItem.style.top = '';
-    activeItem.style.width = '';
-    activeItem.style.height = '';
-    setTimeout(() => {
-        if (activeItem) activeItem.style.transition = '';
-    }, 300);
-    activeItem = null;
-}
-
 document.addEventListener('pointermove', onDragMove);
 document.addEventListener('pointerup', onDragEnd);
 
