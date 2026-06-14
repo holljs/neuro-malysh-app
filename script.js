@@ -229,7 +229,10 @@ const roomsData = {
         { id: 'myachik', text: 'Мячик', image: 'puzzle_myachik.png', full_sound: 'w_myachik.wav', syllables: [{ sound: 'sl_mya.wav', label: 'МЯ' }, { sound: 'sl_chik.wav', label: 'ЧИК' }] },
         { id: 'lisa', text: 'Лиса', image: 'puzzle_lisa.png', full_sound: 'w_lisa.wav', syllables: [{ sound: 'sl_li.wav', label: 'ЛИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'kasha', text: 'Каша', image: 'puzzle_kasha.png', full_sound: 'w_kasha.wav', syllables: [{ sound: 'sl_ka.wav', label: 'КА' }, { sound: 'sl_sha.wav', label: 'ША' }] },
-        { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] }
+        { id: 'ryba', text: 'Рыба', image: 'puzzle_ryba.png', full_sound: 'w_ryba.wav', syllables: [{ sound: 'sl_ry.wav', label: 'РЫ' }, { sound: 'sl_ba.wav', label: 'БА' }] },
+        { id: 'myshka', text: 'Мышка', image: 'puzzle_myshka.png', full_sound: 'w_myshka.wav', syllables: [{ sound: 'sl_mysh.wav', label: 'МЫШ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
+        { id: 'koza', text: 'Коза', image: 'puzzle_koza.png', full_sound: 'w_koza.wav', syllables: [{ sound: 'sl_ko.wav', label: 'КО' }, { sound: 'sl_za.wav', label: 'ЗА' }] },
+        { id: 'ovtsa', text: 'Овца', image: 'puzzle_ovtsa.png', full_sound: 'w_ovtsa.wav', syllables: [{ sound: 'sl_ov.wav', label: 'ОВ' }, { sound: 'sl_tsa.wav', label: 'ЦА' }] }
     ],
     'yesno': [
         { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
