@@ -161,7 +161,7 @@ async function goToPayment() {
             headers: { "Content-Type": "application/json", "x-vk-sign": vkSignParams },
             body: JSON.stringify({
                 user_id: userInfo.id,
-                amount: 150,
+                amount: 88,
                 description: "Подписка на развивающие игры (1 мес.)",
                 currency_type: "kids_sub" 
             })
