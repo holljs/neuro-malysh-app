@@ -34,7 +34,7 @@ const isMobileVK = vkPlatform.includes('mobile');
 let userHasPremium = false; 
 
 const SERVER_URL = "https://neuro-master.online"; 
-const freeRooms = ['animals', 'colors']; 
+const freeRooms = ['animals', 'colors', 'story']; // Сказку пока делаем бесплатной для теста
 
 function getVkSignParams() {
     let search = window.location.search;
@@ -109,7 +109,8 @@ function applyLocks() {
         'poems': '.cat-poems', 
         'yesno': '.cat-yesno',
         'words': '.cat-words', 
-        'wind': '.cat-breeze'
+        'wind': '.cat-breeze',
+        'story': '.cat-story'
     };
 
     for (const [roomId, classSelector] of Object.entries(roomMapping)) {
@@ -206,6 +207,11 @@ let currentPoemLevel = 0; let poemClickBlocked = false; let poemTimeout = null;
 let currentYesNoLevel = 0; let yesNoClickBlocked = false; let yesNoTimeout = null;
 let currentWordsLevel = 0; let wordsActiveCount = 0; let wordsPlacedCount = 0; let wordsTimeout = null;
 
+// Переменные для сказки
+let currentStoryStep = -1; 
+let storyClickBlocked = false; 
+let storyTimeout = null;
+
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
     { id: 'fox', text: 'Лисенок', file: 'fox.jpg' }, { id: 'squirrel', text: 'Бельчонок', file: 'squirrel.jpg' },
@@ -217,6 +223,43 @@ const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCan
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
+    'story': [
+        {
+            q_sound: 'st_q1.wav',
+            choices: [
+                { id: 'norm', img: 'item_umbrella.png', bg: 'st_bg_1_norm.jpg', sound: 'st_a1_norm.wav' },
+                { id: 'abs', img: 'item_pot.png', bg: 'st_bg_1_abs.jpg', sound: 'st_a1_abs.wav' }
+            ]
+        },
+        {
+            q_sound: 'st_q2.wav',
+            choices: [
+                { id: 'norm', img: 'item_boots.png', bg: 'st_bg_2_norm.jpg', sound: 'st_a2_norm.wav' },
+                { id: 'abs', img: 'item_flippers.png', bg: 'st_bg_2_abs.jpg', sound: 'st_a2_abs.wav' }
+            ]
+        },
+        {
+            q_sound: 'st_q3.wav',
+            choices: [
+                { id: 'norm', img: 'item_boat.png', bg: 'st_bg_3_norm.jpg', sound: 'st_a3_norm.wav' },
+                { id: 'abs', img: 'item_basin.png', bg: 'st_bg_3_abs.jpg', sound: 'st_a3_abs.wav' }
+            ]
+        },
+        {
+            q_sound: 'st_q4.wav',
+            choices: [
+                { id: 'norm', img: 'item_bone.png', bg: 'st_bg_4_norm.jpg', sound: 'st_a4_norm.wav' },
+                { id: 'abs', img: 'item_shoe.png', bg: 'st_bg_4_abs.jpg', sound: 'st_a4_abs.wav' }
+            ]
+        },
+        {
+            q_sound: 'st_q5.wav',
+            choices: [
+                { id: 'norm', img: 'item_towel.png', bg: 'st_bg_5_norm.jpg', sound: 'st_a5_norm.wav' },
+                { id: 'abs', img: 'item_vacuum.png', bg: 'st_bg_5_abs.jpg', sound: 'st_a5_abs.wav' }
+            ]
+        }
+    ],
     'words': [
         { id: 'kisa', text: 'Киса', image: 'puzzle_kisa.png', full_sound: 'w_kisa.wav', syllables: [{ sound: 'sl_ki.wav', label: 'КИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'zayka', text: 'Зайка', image: 'puzzle_zayka.png', full_sound: 'w_zayka.wav', syllables: [{ sound: 'sl_zay.wav', label: 'ЗАЙ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
@@ -306,6 +349,7 @@ async function openRoom(roomId, title) {
     document.getElementById('poems-area').style.display = 'none'; 
     document.getElementById('yesno-area').style.display = 'none'; 
     document.getElementById('words-area').style.display = 'none'; 
+    if(document.getElementById('story-area')) document.getElementById('story-area').style.display = 'none';
     document.getElementById('quizToggle').style.display = 'block'; 
     
     if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
@@ -342,6 +386,12 @@ async function openRoom(roomId, title) {
         currentWordsLevel = 0; 
         setupWordsGame(); 
     }
+    else if (roomId === 'story') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        const storyArea = document.getElementById('story-area');
+        if (storyArea) storyArea.style.display = 'flex';
+        setupStoryIntro(); 
+    }
     else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
 
     document.getElementById('room-title').innerText = title;
@@ -355,8 +405,113 @@ function goHome() {
     clearTimeout(poemTimeout); 
     clearTimeout(yesNoTimeout); 
     clearTimeout(wordsTimeout);
+    clearTimeout(storyTimeout);
     document.getElementById('screen-room').classList.remove('active'); 
     document.getElementById('screen-menu').classList.add('active'); 
+}
+
+// ==========================================
+// ЛОГИКА ИГРЫ: ИНТЕРАКТИВНАЯ СКАЗКА
+// ==========================================
+function setupStoryIntro() {
+    clearTimeout(storyTimeout);
+    currentStoryStep = -1;
+    storyClickBlocked = false;
+    
+    const area = document.getElementById('story-area');
+    const ui = document.getElementById('story-ui');
+    if (!area || !ui) return;
+
+    area.style.backgroundImage = `url('st_bg_start.jpg')`;
+    ui.innerHTML = '';
+
+    const startBtn = document.createElement('div');
+    startBtn.className = 'wind-start-btn';
+    startBtn.style.position = 'relative';
+    startBtn.style.bottom = 'auto';
+    startBtn.style.left = 'auto';
+    startBtn.style.transform = 'none';
+    startBtn.innerText = '▶️ Начать сказку';
+    startBtn.onclick = () => {
+        safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+        currentStoryStep = 0;
+        setupStoryStep();
+    };
+
+    ui.appendChild(startBtn);
+    playSound('st_intro.wav');
+}
+
+function setupStoryStep() {
+    clearTimeout(storyTimeout);
+    storyClickBlocked = false;
+    
+    const area = document.getElementById('story-area');
+    const ui = document.getElementById('story-ui');
+    
+    if (currentStoryStep >= roomsData['story'].length) {
+        area.style.backgroundImage = `url('st_bg_start.jpg')`;
+        ui.innerHTML = '';
+        playSound('st_end.wav');
+        storyTimeout = setTimeout(goHome, 4000);
+        return;
+    }
+
+    const stepData = roomsData['story'][currentStoryStep];
+    ui.innerHTML = '';
+    
+    // Перемешиваем кнопки (чтобы правильный ответ был на разных местах)
+    const options = shuffleArray([...stepData.choices]);
+
+    options.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.style.width = '120px';
+        btn.style.height = '120px';
+        btn.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        btn.style.borderRadius = '20px';
+        btn.style.boxShadow = '0 6px 12px rgba(0,0,0,0.2)';
+        btn.style.display = 'flex';
+        btn.style.justifyContent = 'center';
+        btn.style.alignItems = 'center';
+        btn.style.cursor = 'pointer';
+        btn.style.transition = 'transform 0.2s, box-shadow 0.2s';
+        
+        const img = document.createElement('img');
+        img.src = opt.img;
+        img.style.width = '80%';
+        img.style.height = '80%';
+        img.style.objectFit = 'contain';
+        img.style.pointerEvents = 'none';
+        
+        btn.appendChild(img);
+        btn.onclick = () => handleStoryChoice(opt, btn);
+        ui.appendChild(btn);
+    });
+
+    playSound(stepData.q_sound);
+}
+
+function handleStoryChoice(opt, btnElem) {
+    if (storyClickBlocked) return;
+    storyClickBlocked = true;
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+    stopAllAudio();
+    
+    btnElem.style.transform = 'scale(1.1)';
+    btnElem.style.boxShadow = '0 0 20px 10px #FFD700';
+    
+    const area = document.getElementById('story-area');
+    area.style.backgroundImage = `url('${opt.bg}')`;
+    
+    const ui = document.getElementById('story-ui');
+    ui.innerHTML = ''; // Прячем кнопки, чтобы ребенок смотрел картинку
+
+    playSound(opt.sound);
+    
+    storyTimeout = setTimeout(() => {
+        currentStoryStep++;
+        setupStoryStep();
+    }, 4500); // Даем время послушать реакцию и посмотреть картинку
 }
 
 function initDrawCanvas() {
@@ -454,9 +609,6 @@ function toggleQuiz() {
     } 
 }
 
-// ==========================================
-// ЛОГИКА ИГРЫ: ДА ИЛИ НЕТ
-// ==========================================
 function setupYesNoGame() {
     const area = document.getElementById('yesno-area');
     const btnYes = document.getElementById('btn-yes');
@@ -535,9 +687,6 @@ function handleYesNoClick(choice) {
     }
 }
 
-// ==========================================
-// ЛОГИКА ИГРЫ: СЛОГИ-ПАЗЛЫ (ОБНОВЛЕННАЯ)
-// ==========================================
 function setupWordsGame() {
     clearTimeout(wordsTimeout);
     const board = document.getElementById('words-shadow-board');
@@ -980,8 +1129,6 @@ function onDragEnd(e) {
                         setupWordsGame();
                     }, 3200);
                 }, 500); 
-            } else {
-                // ТУТ БЫЛА ПРОБЛЕМА: звук удалён! Ничего не играем, деталька ставится молча.
             }
             activeItem = null;
             return;
