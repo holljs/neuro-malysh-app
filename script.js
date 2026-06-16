@@ -415,6 +415,7 @@ function goHome() {
 // ==========================================
 function setupStoryIntro() {
     clearTimeout(storyTimeout);
+    stopAllAudio(); // 🛑 Обрываем любые звуки перед входом
     currentStoryStep = -1;
     storyClickBlocked = false;
     
@@ -431,9 +432,13 @@ function setupStoryIntro() {
     startBtn.style.bottom = 'auto';
     startBtn.style.left = 'auto';
     startBtn.style.transform = 'none';
-    startBtn.innerText = '▶️ Начать сказку';
+    
+    // 👇 Меняем текст кнопки на название конкретной сказки
+    startBtn.innerText = '▶️ Утя на прогулке';
+    
     startBtn.onclick = () => {
         safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+        stopAllAudio(); // 🛑 Обрываем приветствие, если малыш нажал кнопку раньше
         currentStoryStep = 0;
         setupStoryStep();
     };
@@ -445,6 +450,7 @@ function setupStoryIntro() {
 function setupStoryStep() {
     clearTimeout(storyTimeout);
     storyClickBlocked = false;
+    stopAllAudio(); // 🛑 Жестко обрываем реакцию с прошлого шага, чтобы звуки не слипались!
     
     const area = document.getElementById('story-area');
     const ui = document.getElementById('story-ui');
