@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Нейро-Малыш</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=34">
+    <link rel="stylesheet" href="style.css?v=46">
     <style>
         /* Анимации для комнат */
         @keyframes popIn {
@@ -151,8 +151,13 @@
             </div>
 
             <div class="category-card cat-words" onclick="openRoom('words', 'Слоги-Пазлы')">
-                <div class="category-icon-placeholder"><img src="icon_words.png" alt="🧩"></div>
-                <div class="category-title">Слоги-Пазлы</div>
+                <div class="category-icon">🧩</div>
+                <div class="category-title">Слоги</div>
+            </div>
+
+            <div class="category-card cat-story" onclick="openRoom('story', 'Интерактивная Сказка')">
+                <div class="category-icon">📖</div>
+                <div class="category-title">Сказка</div>
             </div>
 
             <div class="category-card cat-breeze" onclick="openRoom('wind', 'Ветерок')">
@@ -257,10 +262,11 @@
                 <img src="wind_spinner.png" id="wind-spinner" class="wind-spinner" style="width: 150px; height: 150px; transition: transform 0.1s linear;">
                 <div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()" style="margin-top: 30px; background-color: #0077FF; color: white; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">🌬️ Включить микрофон</div>
             </div>
-            
-        </div>
-    </div>
 
-    <script src="script.js?v=34"></script>
+            <div id="story-area" class="game-container" style="display: none; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; height: 100%; position: relative; background-size: cover; background-position: center;">
+                <div id="story-ui" style="display: flex; gap: 20px; padding-bottom: 40px; z-index: 10;"></div>
+            </div>
+
+        </div> </div> <script src="script.js?v=46"></script>
 </body>
 </html>
