@@ -349,13 +349,31 @@ async function openRoom(roomId, title) {
     document.getElementById('poems-area').style.display = 'none'; 
     document.getElementById('yesno-area').style.display = 'none'; 
     document.getElementById('words-area').style.display = 'none'; 
-    if(document.getElementById('story-area')) document.getElementById('story-area').style.display = 'none';
+    if (document.getElementById('story-area')) document.getElementById('story-area').style.display = 'none';
+    // Скрываем music-area, если она есть
+    const musicArea = document.getElementById('music-area');
+    if (musicArea) musicArea.style.display = 'none';
     document.getElementById('quizToggle').style.display = 'block'; 
     
-    if (roomId === 'wants') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('wants-area').classList.add('active'); renderWantsBoard(); } 
-    else if (roomId === 'draw') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('draw-area').classList.add('active'); initDrawCanvas(); } 
-    else if (roomId === 'feeding') { document.getElementById('learning-area').style.display = 'none'; toggleQuiz(); }
-    else if (roomId === 'big_small') { document.getElementById('quizToggle').style.display = 'none'; document.getElementById('bs-area').classList.add('active'); setupBigSmallGame(); }
+    if (roomId === 'wants') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('wants-area').classList.add('active'); 
+        renderWantsBoard(); 
+    } 
+    else if (roomId === 'draw') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('draw-area').classList.add('active'); 
+        initDrawCanvas(); 
+    } 
+    else if (roomId === 'feeding') { 
+        document.getElementById('learning-area').style.display = 'none'; 
+        toggleQuiz(); 
+    }
+    else if (roomId === 'big_small') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        document.getElementById('bs-area').classList.add('active'); 
+        setupBigSmallGame(); 
+    }
     else if (roomId === 'wind') { 
         document.getElementById('quizToggle').style.display = 'none'; 
         document.getElementById('wind-area').style.display = 'flex'; 
@@ -392,28 +410,21 @@ async function openRoom(roomId, title) {
         if (storyArea) storyArea.style.display = 'flex';
         setupStoryIntro(); 
     }
-    else { document.getElementById('learning-area').style.display = 'flex'; renderLearningCard(); updateQuizToggleUI(); }
-
-    document.getElementById('room-title').innerText = title;
-    document.getElementById('screen-menu').classList.remove('active'); 
-    document.getElementById('screen-room').classList.add('active');
-}
-    else if (roomId === 'music') { 
+    else if (roomId === 'music') {   // <--- ПРАВИЛЬНОЕ МЕСТО
         document.getElementById('quizToggle').style.display = 'none'; 
         const area = document.getElementById('music-area');
         if (area) area.style.display = 'flex';
         setupMusicRoom(); 
     }
+    else { 
+        document.getElementById('learning-area').style.display = 'flex'; 
+        renderLearningCard(); 
+        updateQuizToggleUI(); 
+    }
 
-function goHome() { 
-    stopAllAudio(); 
-    if (typeof stopWindGame === 'function') stopWindGame();
-    clearTimeout(poemTimeout); 
-    clearTimeout(yesNoTimeout); 
-    clearTimeout(wordsTimeout);
-    clearTimeout(storyTimeout);
-    document.getElementById('screen-room').classList.remove('active'); 
-    document.getElementById('screen-menu').classList.add('active'); 
+    document.getElementById('room-title').innerText = title;
+    document.getElementById('screen-menu').classList.remove('active'); 
+    document.getElementById('screen-room').classList.add('active');
 }
 
 // ==========================================
