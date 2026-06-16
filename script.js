@@ -398,6 +398,12 @@ async function openRoom(roomId, title) {
     document.getElementById('screen-menu').classList.remove('active'); 
     document.getElementById('screen-room').classList.add('active');
 }
+    else if (roomId === 'music') { 
+        document.getElementById('quizToggle').style.display = 'none'; 
+        const area = document.getElementById('music-area');
+        if (area) area.style.display = 'flex';
+        setupMusicRoom(); 
+    }
 
 function goHome() { 
     stopAllAudio(); 
@@ -1330,4 +1336,91 @@ function stopWindGame() {
     if (audioCtx && audioCtx.state !== 'closed') {
         audioCtx.close().catch(e => console.log(e));
     }
+}
+
+// ==========================================
+// ЛОГИКА ИГРЫ: ВОЛШЕБНОЕ ПИАНИНО
+// ==========================================
+let currentMusicMode = 'piano';
+// Множители скорости для изменения нот (от До до верхнего До)
+const noteRates = [1.0, 1.122, 1.259, 1.334, 1.498, 1.681, 1.887, 2.0]; 
+
+function setupMusicRoom() {
+    stopAllAudio();
+    setMusicMode('piano'); // По умолчанию классическое пианино
+    
+    const keysContainer = document.getElementById('piano-keys');
+    keysContainer.innerHTML = '';
+    
+    // Создаем 8 невидимых кнопок поверх картинки
+    for (let i = 0; i < 8; i++) {
+        const key = document.createElement('div');
+        key.style.flex = '1';
+        key.style.backgroundColor = 'rgba(255, 255, 255, 0)'; // Абсолютно прозрачные
+        key.style.borderRadius = '0 0 15px 15px';
+        key.style.cursor = 'pointer';
+        key.style.transition = 'background-color 0.1s, transform 0.1s';
+        
+        // Обработка нажатия
+        key.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (currentMusicMode === 'radio') return; // В режиме радио клавиши не играют ноты
+            
+            safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+            
+            // Эффект красивого свечения при нажатии
+            key.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+            
+            playPianoNote(i);
+            
+            setTimeout(() => {
+                key.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+            }, 150);
+        });
+        
+        keysContainer.appendChild(key);
+    }
+}
+
+function setMusicMode(mode) {
+    currentMusicMode = mode;
+    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+    
+    // Обновляем визуал кнопок (выделяем активную)
+    const modes = ['piano', 'cat', 'dog', 'radio'];
+    modes.forEach(m => {
+        const btn = document.getElementById('mode-btn-' + m);
+        if (btn) {
+            if (m === currentMusicMode) {
+                btn.style.transform = 'scale(1.15)';
+                btn.style.boxShadow = '0 0 15px 5px #FFD700';
+                btn.style.backgroundColor = '#FFFFFF';
+            } else {
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+                btn.style.backgroundColor = 'rgba(255,255,255,0.5)';
+            }
+        }
+    });
+
+    stopAllAudio();
+    
+    // Реакция на переключение
+    if (mode === 'radio') {
+        playSound('song_hit.wav'); // Запускаем песню (нужно будет закинуть этот файл)
+    } else {
+        // Озвучиваем, какой режим включен (если есть файл, например m_cat.wav)
+        playSound('m_' + mode + '.wav'); 
+    }
+}
+
+function playPianoNote(noteIndex) {
+    const soundFile = `${currentMusicMode}_note.wav`; // piano_note.wav, cat_note.wav, dog_note.wav
+    const audio = new Audio(soundFile);
+    
+    // МАГИЯ: отключаем сохранение тональности и ускоряем звук = получаем новую ноту!
+    audio.preservesPitch = false; 
+    audio.playbackRate = noteRates[noteIndex];
+    
+    audio.play().catch(err => console.log("Ошибка воспроизведения:", err));
 }
