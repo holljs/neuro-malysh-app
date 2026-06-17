@@ -1363,7 +1363,6 @@ function setupMusicRoom() {
     const keysContainer = document.getElementById('piano-keys');
     keysContainer.innerHTML = '';
     
-    // Красивые, сочные цвета для 8 клавиш (Радуга + Розовый)
     const keyColors = ['#FF4D4D', '#FFA500', '#FFD700', '#4DFF4D', '#4D79FF', '#0000FF', '#9932CC', '#FF69B4'];
     
     for (let i = 0; i < 8; i++) {
@@ -1378,19 +1377,38 @@ function setupMusicRoom() {
         key.style.transition = 'transform 0.1s, box-shadow 0.1s, filter 0.1s';
         key.style.transformOrigin = 'top';
         
+        // 👇 ДОБАВЛЯЕМ ЦИФРЫ ВНИЗ КЛАВИШИ 👇
+        key.style.display = 'flex';
+        key.style.alignItems = 'flex-end';
+        key.style.justifyContent = 'center';
+        key.style.paddingBottom = '15px'; // Отступ снизу
+        key.style.color = 'rgba(255, 255, 255, 0.9)';
+        key.style.fontSize = '24px';
+        key.style.fontWeight = 'bold';
+        key.style.fontFamily = 'Arial, sans-serif';
+        key.style.textShadow = '1px 1px 3px rgba(0,0,0,0.5)'; // Тень, чтобы цифра хорошо читалась
+        key.innerText = i + 1; // Нумерация от 1 до 8
+
         // Обработка нажатия
         key.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            if (currentMusicMode === 'radio') return; 
             
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             
-            // Анимация: клавиша уходит вниз и светится
+            // Анимация нажатия
             key.style.transform = 'scaleY(0.95) rotateX(10deg)';
             key.style.boxShadow = '0 2px 4px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.8)';
             key.style.filter = 'brightness(1.2)';
             
-            playPianoNote(i);
+            // 👇 ЛОГИКА ВОСПРОИЗВЕДЕНИЯ 👇
+            if (currentMusicMode === 'radio') {
+                // Если включен Магнитофон, каждая кнопка включает свою песню!
+                stopAllAudio(); // Выключаем предыдущую песню
+                playSound('song_' + (i + 1) + '.wav'); // Ищет song_1.wav, song_2.wav и т.д.
+            } else {
+                // Если включено пианино, котик или собачка — играем ноты
+                playPianoNote(i);
+            }
             
             setTimeout(() => {
                 key.style.transform = 'none';
