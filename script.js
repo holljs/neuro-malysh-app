@@ -1446,7 +1446,6 @@ function setMusicMode(mode) {
     
     // Реакция на переключение
     if (mode === 'radio') {
-        playSound('song_hit.wav'); // Запускаем песню (нужно будет закинуть этот файл)
     } else {
         // Озвучиваем, какой режим включен (если есть файл, например m_cat.wav)
         playSound('m_' + mode + '.wav'); 
