@@ -276,19 +276,22 @@
             </div>
 
             <!-- 👇 ВОЛШЕБНОЕ ПИАНИНО 👇 -->
-            <div id="music-area" class="game-container" style="display: none; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; height: 100%; position: relative; background-size: cover; background-position: center; background-image: url('piano_bg.jpg');">
+            <div id="music-area" class="game-container" style="display: none; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-bottom: 20px; background: #FFFDE7;">
                 
                 <!-- Панель переключения режимов -->
-                <div id="music-modes" style="display: flex; gap: 15px; margin-top: 20px; z-index: 10; background: rgba(255,255,255,0.6); padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div id="music-modes" style="display: flex; gap: 15px; margin-top: 20px; z-index: 10; background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div id="mode-btn-piano" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('piano')"><img src="mode_piano.png" style="width:80%; pointer-events:none;"></div>
                     <div id="mode-btn-cat" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('cat')"><img src="mode_cat.png" style="width:80%; pointer-events:none;"></div>
                     <div id="mode-btn-dog" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('dog')"><img src="mode_dog.png" style="width:80%; pointer-events:none;"></div>
                     <div id="mode-btn-radio" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('radio')"><img src="mode_radio.png" style="width:80%; pointer-events:none;"></div>
                 </div>
                 
-                <!-- Невидимые сенсорные зоны, наложенные прямо на клавиши картинки -->
-                <div id="piano-keys" style="position: absolute; top: 38%; bottom: 8%; width: 96%; left: 2%; display: flex; gap: 0.5%;">
-                    <!-- Сюда скрипт вставит 8 клавиш -->
+                <!-- Деревянный корпус пианино -->
+                <div style="width: 95%; height: 45%; background: linear-gradient(to bottom, #7b4a2b, #4a2912); border-radius: 15px; padding: 15px 10px; box-shadow: inset 0 15px 20px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3); display: flex; align-items: flex-start; justify-content: center;">
+                    <!-- Сами клавиши -->
+                    <div id="piano-keys" style="width: 100%; height: 95%; display: flex; gap: 4px; padding-top: 5px;">
+                        <!-- Сюда скрипт вставит 8 клавиш -->
+                    </div>
                 </div>
             </div>
             <!-- 👆 КОНЕЦ ПИАНИНО 👆 -->
