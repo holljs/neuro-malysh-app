@@ -1358,34 +1358,44 @@ const noteRates = [1.0, 1.122, 1.259, 1.334, 1.498, 1.681, 1.887, 2.0];
 
 function setupMusicRoom() {
     stopAllAudio();
-    setMusicMode('piano'); // По умолчанию классическое пианино
+    setMusicMode('piano'); 
     
     const keysContainer = document.getElementById('piano-keys');
     keysContainer.innerHTML = '';
     
-    // Создаем 8 невидимых кнопок поверх картинки
+    // Красивые, сочные цвета для 8 клавиш (Радуга + Розовый)
+    const keyColors = ['#FF4D4D', '#FFA500', '#FFD700', '#4DFF4D', '#4D79FF', '#0000FF', '#9932CC', '#FF69B4'];
+    
     for (let i = 0; i < 8; i++) {
         const key = document.createElement('div');
         key.style.flex = '1';
-        key.style.backgroundColor = 'rgba(255, 255, 255, 0)'; // Абсолютно прозрачные
-        key.style.borderRadius = '0 0 15px 15px';
+        key.style.background = `linear-gradient(to bottom, ${keyColors[i]}, ${keyColors[i]} 80%, #000 150%)`;
+        key.style.borderRadius = '0 0 12px 12px';
+        key.style.border = '1px solid rgba(0,0,0,0.3)';
+        key.style.borderTop = 'none';
+        key.style.boxShadow = '0 8px 10px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.5)';
         key.style.cursor = 'pointer';
-        key.style.transition = 'background-color 0.1s, transform 0.1s';
+        key.style.transition = 'transform 0.1s, box-shadow 0.1s, filter 0.1s';
+        key.style.transformOrigin = 'top';
         
         // Обработка нажатия
         key.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            if (currentMusicMode === 'radio') return; // В режиме радио клавиши не играют ноты
+            if (currentMusicMode === 'radio') return; 
             
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
             
-            // Эффект красивого свечения при нажатии
-            key.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+            // Анимация: клавиша уходит вниз и светится
+            key.style.transform = 'scaleY(0.95) rotateX(10deg)';
+            key.style.boxShadow = '0 2px 4px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.8)';
+            key.style.filter = 'brightness(1.2)';
             
             playPianoNote(i);
             
             setTimeout(() => {
-                key.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+                key.style.transform = 'none';
+                key.style.boxShadow = '0 8px 10px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.5)';
+                key.style.filter = 'none';
             }, 150);
         });
         
