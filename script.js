@@ -117,18 +117,33 @@ function applyLocks() {
         if (!freeRooms.includes(roomId)) {
             const card = document.querySelector(classSelector);
             if (card) {
+                // Обязательно добавляем relative, чтобы бейдж позиционировался относительно карточки
+                card.style.position = 'relative'; 
+
+                // Удаляем старый бейдж, если он есть (чтобы не дублировались)
+                const existingBadge = card.querySelector('.vip-badge');
+                if (existingBadge) {
+                    existingBadge.remove();
+                }
+
+                // Очищаем старые текстовые замки из заголовка (на случай, если они там остались)
                 const titleDiv = card.querySelector('.category-title');
                 if (titleDiv) {
-                    const cleanTitle = titleDiv.innerText.replace('🔒 ', '');
-                    if (userHasPremium) {
-                        titleDiv.innerText = cleanTitle;
-                        card.style.opacity = '1';
-                    } else {
-                        if (!titleDiv.innerText.includes('🔒')) {
-                            titleDiv.innerText = '🔒 ' + cleanTitle;
-                        }
-                        card.style.opacity = '0.85';
-                    }
+                    titleDiv.innerText = titleDiv.innerText.replace('🔒 ', '');
+                }
+
+                if (userHasPremium) {
+                    // Если премиум есть, карточка яркая и без бейджа
+                    card.style.opacity = '1';
+                } else {
+                    // Если премиума нет, карточка тусклая и с красивым VIP-бейджем
+                    card.style.opacity = '0.85';
+                    
+                    const badge = document.createElement('div');
+                    badge.className = 'vip-badge';
+                    // Золотой цвет для эмодзи замочка и белый текст VIP
+                    badge.innerHTML = '<span style="color: #FFD700; font-size: 12px;">🔒</span> VIP'; 
+                    card.appendChild(badge);
                 }
             }
         }
