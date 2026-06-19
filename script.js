@@ -34,7 +34,7 @@ const isMobileVK = vkPlatform.includes('mobile');
 let userHasPremium = false; 
 
 const SERVER_URL = "https://neuro-master.online"; 
-const freeRooms = ['animals', 'colors', 'story']; // Сказку пока делаем бесплатной для теста
+const freeRooms = ['animals', 'colors']; // Сказку пока делаем бесплатной для теста
 
 function getVkSignParams() {
     let search = window.location.search;
@@ -110,7 +110,8 @@ function applyLocks() {
         'yesno': '.cat-yesno',
         'words': '.cat-words', 
         'wind': '.cat-breeze',
-        'story': '.cat-story'
+        'story': '.cat-story',
+        'music': '.cat-music' // <--- ДОБАВИЛИ ПИАНИНО СЮДА!
     };
 
     for (const [roomId, classSelector] of Object.entries(roomMapping)) {
