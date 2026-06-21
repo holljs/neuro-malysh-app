@@ -294,6 +294,7 @@ const roomsData = {
         { id: 'ovtsa', text: 'Овца', image: 'puzzle_ovtsa.png', full_sound: 'w_ovtsa.wav', syllables: [{ sound: 'sl_ov.wav', label: 'ОВ' }, { sound: 'sl_tsa.wav', label: 'ЦА' }] }
     ],
     'yesno': [
+        // ВАШИ СТАРЫЕ ЗАГАДКИ (ВСЁ НА МЕСТЕ!)
         { bg: 'yn_bg_1.jpg', q_sound: 'yn_q1.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
         { bg: 'yn_bg_2.jpg', q_sound: 'yn_q2.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
         { bg: 'yn_bg_3.jpg', q_sound: 'yn_q3.wav', target: 'yes', a_sound: 'yn_yes3.wav' },
@@ -303,7 +304,16 @@ const roomsData = {
         { bg: 'yn_bg_7.jpg', q_sound: 'yn_q7.wav', target: 'no', a_sound: 'yn_no2.wav' },
         { bg: 'yn_bg_8.jpg', q_sound: 'yn_q8.wav', target: 'no', a_sound: 'yn_no3.wav' },
         { bg: 'yn_bg_9.jpg', q_sound: 'yn_q9.wav', target: 'no', a_sound: 'yn_no4.wav' },
-        { bg: 'yn_bg_10.jpg', q_sound: 'yn_q10.wav', target: 'no', a_sound: 'yn_no5.wav' }
+        { bg: 'yn_bg_10.jpg', q_sound: 'yn_q10.wav', target: 'no', a_sound: 'yn_no5.wav' },
+        
+        // НАШИ НОВЫЕ 6 ЗАГАДОК (ДОБАВЛЕНЫ В КОНЕЦ)
+        { bg: 'yesno_bag.png', q_sound: 'yesno_bag.wav', target: 'no', a_sound: 'yn_no1.wav' },
+        { bg: 'yesno_elephant.png', q_sound: 'yesno_elephant.wav', target: 'no', a_sound: 'yn_no2.wav' },
+        { bg: 'yesno_garden.png', q_sound: 'yesno_garden.wav', target: 'no', a_sound: 'yn_no3.wav' },
+        
+        { bg: 'yesno_walk.png', q_sound: 'yesno_walk.wav', target: 'yes', a_sound: 'yn_yes1.wav' },
+        { bg: 'yesno_pie.png', q_sound: 'yesno_pie.wav', target: 'yes', a_sound: 'yn_yes2.wav' },
+        { bg: 'yesno_hands.png', q_sound: 'yesno_hands.wav', target: 'yes', a_sound: 'yn_yes3.wav' }
     ],
     'poems': [
         { bg: 'poem_bg_1.png', q_sound: 'p_q1.wav', f_sound: 'p_f1.wav', target: 'p_opt_myachik', options: [{ id: 'p_opt_myachik', img: 'p_opt_myachik.png', sound: 'p_opt_myachik.wav' }, { id: 'p_opt_mashinka', img: 'p_opt_mashinka.png', sound: 'p_opt_mashinka.wav' }, { id: 'p_opt_domik', img: 'p_opt_domik.png', sound: 'p_opt_domik.wav' }] },
