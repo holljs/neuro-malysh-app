@@ -560,7 +560,7 @@ function handleStoryChoice(opt, btnElem) {
     storyTimeout = setTimeout(() => {
         currentStoryStep++;
         setupStoryStep();
-    }, 4500); // Даем время послушать реакцию и посмотреть картинку
+    }, 7000); // Увеличили паузу до 7 секунд, чтобы аудио не обрывалось!
 }
 
 function initDrawCanvas() {
