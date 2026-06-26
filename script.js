@@ -227,6 +227,7 @@ let currentWordsLevel = 0; let wordsActiveCount = 0; let wordsPlacedCount = 0; l
 let currentStoryStep = -1; 
 let storyClickBlocked = false; 
 let storyTimeout = null;
+let currentStoryId = ''; // <--- ДОБАВИТЬ ЭТУ СТРОЧКУ!
 
 const drawData = [
     { id: 'kitten', text: 'Котенок', file: 'kitten.jpg' }, { id: 'puppy', text: 'Щенок', file: 'puppy.jpg' },
@@ -239,43 +240,90 @@ const paintCanvas = document.getElementById('paintCanvas'); const ctx = paintCan
 let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 
 const roomsData = {
-    'story': [
-        {
-            q_sound: 'st_q1.wav',
-            choices: [
-                { id: 'norm', img: 'item_umbrella.png', bg: 'st_bg_1_norm.jpg', sound: 'st_a1_norm.wav' },
-                { id: 'abs', img: 'item_pot.png', bg: 'st_bg_1_abs.jpg', sound: 'st_a1_abs.wav' }
+    'story': {
+        'rain_walk': {
+            title: '🌧️ Прогулка под дождем',
+            end_sound: 'st_end.wav',
+            steps: [
+                {
+                    q_sound: 'st_q1.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_umbrella.png', bg: 'st_bg_1_norm.jpg', sound: 'st_a1_norm.wav' },
+                        { id: 'abs', img: 'item_pot.png', bg: 'st_bg_1_abs.jpg', sound: 'st_a1_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st_q2.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_boots.png', bg: 'st_bg_2_norm.jpg', sound: 'st_a2_norm.wav' },
+                        { id: 'abs', img: 'item_flippers.png', bg: 'st_bg_2_abs.jpg', sound: 'st_a2_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st_q3.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_boat.png', bg: 'st_bg_3_norm.jpg', sound: 'st_a3_norm.wav' },
+                        { id: 'abs', img: 'item_basin.png', bg: 'st_bg_3_abs.jpg', sound: 'st_a3_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st_q4.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_bone.png', bg: 'st_bg_4_norm.jpg', sound: 'st_a4_norm.wav' },
+                        { id: 'abs', img: 'item_shoe.png', bg: 'st_bg_4_abs.jpg', sound: 'st_a4_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st_q5.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_towel.png', bg: 'st_bg_5_norm.jpg', sound: 'st_a5_norm.wav' },
+                        { id: 'abs', img: 'item_vacuum.png', bg: 'st_bg_5_abs.jpg', sound: 'st_a5_abs.wav' }
+                    ]
+                }
             ]
         },
-        {
-            q_sound: 'st_q2.wav',
-            choices: [
-                { id: 'norm', img: 'item_boots.png', bg: 'st_bg_2_norm.jpg', sound: 'st_a2_norm.wav' },
-                { id: 'abs', img: 'item_flippers.png', bg: 'st_bg_2_abs.jpg', sound: 'st_a2_abs.wav' }
-            ]
-        },
-        {
-            q_sound: 'st_q3.wav',
-            choices: [
-                { id: 'norm', img: 'item_boat.png', bg: 'st_bg_3_norm.jpg', sound: 'st_a3_norm.wav' },
-                { id: 'abs', img: 'item_basin.png', bg: 'st_bg_3_abs.jpg', sound: 'st_a3_abs.wav' }
-            ]
-        },
-        {
-            q_sound: 'st_q4.wav',
-            choices: [
-                { id: 'norm', img: 'item_bone.png', bg: 'st_bg_4_norm.jpg', sound: 'st_a4_norm.wav' },
-                { id: 'abs', img: 'item_shoe.png', bg: 'st_bg_4_abs.jpg', sound: 'st_a4_abs.wav' }
-            ]
-        },
-        {
-            q_sound: 'st_q5.wav',
-            choices: [
-                { id: 'norm', img: 'item_towel.png', bg: 'st_bg_5_norm.jpg', sound: 'st_a5_norm.wav' },
-                { id: 'abs', img: 'item_vacuum.png', bg: 'st_bg_5_abs.jpg', sound: 'st_a5_abs.wav' }
+        'fun_walk': {
+            title: '☀️ Весёлая прогулка',
+            end_sound: 'st2_end.wav',
+            steps: [
+                {
+                    q_sound: 'st2_q1.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_sneakers.png', bg: 'st2_bg_1_norm.jpg', sound: 'st2_a1_norm.wav' },
+                        { id: 'abs', img: 'item_banana.png', bg: 'st2_bg_1_abs.jpg', sound: 'st2_a1_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st2_q2.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_mug.png', bg: 'st2_bg_2_norm.jpg', sound: 'st2_a2_norm.wav' },
+                        { id: 'abs', img: 'item_boot.png', bg: 'st2_bg_2_abs.jpg', sound: 'st2_a2_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st2_q3.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_crayons.png', bg: 'st2_bg_3_norm.jpg', sound: 'st2_a3_norm.wav' },
+                        { id: 'abs', img: 'item_sausage.png', bg: 'st2_bg_3_abs.jpg', sound: 'st2_a3_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st2_q4.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_bag.png', bg: 'st2_bg_4_norm.jpg', sound: 'st2_a4_norm.wav' },
+                        { id: 'abs', img: 'item_washing_machine.png', bg: 'st2_bg_4_abs.jpg', sound: 'st2_a4_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'st2_q5.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_pillow.png', bg: 'st2_bg_5_norm.jpg', sound: 'st2_a5_norm.wav' },
+                        { id: 'abs', img: 'item_cactus.png', bg: 'st2_bg_5_abs.jpg', sound: 'st2_a5_abs.wav' }
+                    ]
+                }
             ]
         }
-    ],
+    },
     'words': [
         { id: 'kisa', text: 'Киса', image: 'puzzle_kisa.png', full_sound: 'w_kisa.wav', syllables: [{ sound: 'sl_ki.wav', label: 'КИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'zayka', text: 'Зайка', image: 'puzzle_zayka.png', full_sound: 'w_zayka.wav', syllables: [{ sound: 'sl_zay.wav', label: 'ЗАЙ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
@@ -458,7 +506,7 @@ async function openRoom(roomId, title) {
 // ==========================================
 function setupStoryIntro() {
     clearTimeout(storyTimeout);
-    stopAllAudio(); // 🛑 Обрываем любые звуки перед входом
+    stopAllAudio(); 
     currentStoryStep = -1;
     storyClickBlocked = false;
     
@@ -468,48 +516,66 @@ function setupStoryIntro() {
 
     area.style.backgroundImage = `url('st_bg_start.jpg')`;
     ui.innerHTML = '';
-
-    const startBtn = document.createElement('div');
-    startBtn.className = 'wind-start-btn';
-    startBtn.style.position = 'relative';
-    startBtn.style.bottom = 'auto';
-    startBtn.style.left = 'auto';
-    startBtn.style.transform = 'none';
     
-    // 👇 Меняем текст кнопки на название конкретной сказки
-    startBtn.innerText = '▶️ Утя на прогулке';
-    
-    startBtn.onclick = () => {
-        safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
-        stopAllAudio(); // 🛑 Обрываем приветствие, если малыш нажал кнопку раньше
-        currentStoryStep = 0;
-        setupStoryStep();
-    };
+    // Делаем контейнер гибким, чтобы кнопки красиво выстраивались в ряд или столбик
+    ui.style.flexDirection = 'column';
+    ui.style.gap = '15px';
 
-    ui.appendChild(startBtn);
-    playSound('st_intro.wav');
+    // Автоматически рендерим кнопки для ВСЕХ сказок, сколько бы вы их ни добавили в будущем!
+    Object.entries(roomsData['story']).forEach(([storyId, storyData]) => {
+        const startBtn = document.createElement('div');
+        startBtn.className = 'wind-start-btn';
+        startBtn.style.position = 'relative';
+        startBtn.style.bottom = 'auto';
+        startBtn.style.left = 'auto';
+        startBtn.style.transform = 'none';
+        startBtn.style.width = '240px';
+        startBtn.style.textAlign = 'center';
+        
+        startBtn.innerText = '▶️ ' + storyData.title;
+        
+        startBtn.onclick = () => {
+            safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+            stopAllAudio(); 
+            currentStoryId = storyId; // Запоминаем ID выбранной сказки
+            currentStoryStep = 0;
+            setupStoryStep();
+        };
+
+        ui.appendChild(startBtn);
+    });
+
+    playSound('st_intro.wav'); // Звук-приветствие комнаты сказок
 }
 
 function setupStoryStep() {
     clearTimeout(storyTimeout);
     storyClickBlocked = false;
-    stopAllAudio(); // 🛑 Жестко обрываем реакцию с прошлого шага, чтобы звуки не слипались!
+    stopAllAudio(); 
     
     const area = document.getElementById('story-area');
     const ui = document.getElementById('story-ui');
     
-    if (currentStoryStep >= roomsData['story'].length) {
+    // Достаем объект текущей сказки
+    const story = roomsData['story'][currentStoryId];
+    
+    // Проверяем конец по длине шагов конкретной сказки
+    if (currentStoryStep >= story.steps.length) {
         area.style.backgroundImage = `url('st_bg_start.jpg')`;
         ui.innerHTML = '';
-        playSound('st_end.wav');
+        playSound(story.end_sound); // Концовка именно этой сказки!
         storyTimeout = setTimeout(goHome, 4000);
         return;
     }
 
-    const stepData = roomsData['story'][currentStoryStep];
+    // Берем данные текущего шага
+    const stepData = story.steps[currentStoryStep];
     ui.innerHTML = '';
     
-    // Перемешиваем кнопки (чтобы правильный ответ был на разных местах)
+    // Возвращаем кнопкам горизонтальное расположение для игрового процесса
+    ui.style.flexDirection = 'row';
+    ui.style.gap = '20px';
+
     const options = shuffleArray([...stepData.choices]);
 
     options.forEach(opt => {
