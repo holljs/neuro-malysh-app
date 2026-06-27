@@ -242,7 +242,7 @@ let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 const roomsData = {
     'story': {
         'rain_walk': {
-            title: '🌧️ Прогулка под дождем',
+            title: '🌧️ Прогулка под дождем 999',
             end_sound: 'st_end.wav',
             steps: [
                 {
@@ -1553,4 +1553,21 @@ function playPianoNote(noteIndex) {
     audio.playbackRate = noteRates[noteIndex];
     
     audio.play().catch(err => console.log("Ошибка воспроизведения:", err));
+}
+
+function goHome() {
+    stopAllAudio(); // Глушим все звуки
+    clearTimeout(storyTimeout); // Сбрасываем таймер сказок
+    clearTimeout(poemTimeout); // Сбрасываем таймер стихов
+    clearTimeout(yesNoTimeout); // Сбрасываем таймер Да/Нет
+    clearTimeout(wordsTimeout); // Сбрасываем таймер слогов
+    
+    currentStoryId = ''; // Обнуляем выбранную сказку
+    
+    // Прячем комнату и показываем главное меню
+    document.getElementById('screen-room').classList.remove('active');
+    document.getElementById('screen-menu').classList.add('active');
+    
+    // Выключаем микрофон, если работала комната ветерка
+    if (typeof stopWindGame === 'function') stopWindGame();
 }
