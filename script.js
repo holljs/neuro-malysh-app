@@ -242,7 +242,7 @@ let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 const roomsData = {
     'story': {
         'rain_walk': {
-            title: '🌧️ Прогулка под дождем 999',
+            title: '🌧️ Прогулка под дождем',
             end_sound: 'st_end.wav',
             steps: [
                 {
