@@ -320,3 +320,15 @@ body {
     z-index: 5;
     letter-spacing: 0.5px;
 }
+
+/* --- АДАПТАЦИЯ СКАЗОК И ИГР ДЛЯ КОМПЬЮТЕРОВ (ШИРОКИХ ЭКРАНОВ) --- */
+@media (min-width: 768px) {
+    #story-area, 
+    #poems-area, 
+    #yesno-area, 
+    #garden-area {
+        background-size: contain !important; 
+        background-repeat: no-repeat !important;
+        background-color: #FFFDE7 !important; /* Приятный фон по бокам, чтобы не было белых дыр */
+    }
+}
