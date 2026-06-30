@@ -517,37 +517,49 @@ function setupStoryIntro() {
     area.style.backgroundImage = `url('st_bg_start.jpg')`;
     ui.innerHTML = '';
     
-    // Делаем контейнер гибким, чтобы кнопки красиво выстраивались в ряд или столбик
+    // Сетка для красивых карточек сказок
     ui.style.flexDirection = 'column';
-    ui.style.gap = '15px';
+    ui.style.gap = '20px';
+    ui.style.width = '90%';
+    ui.style.maxWidth = '400px';
 
-    // Автоматически рендерим кнопки для ВСЕХ сказок, сколько бы вы их ни добавили в будущем!
+    // Массив иконок для каждой сказки, чтобы кнопки были яркими
+    const storyIcons = {
+        'rain_walk': '🌧️',
+        'fun_walk': '☀️',
+        'red_hat': '🧶'
+    };
+
     Object.entries(roomsData['story']).forEach(([storyId, storyData]) => {
-        const startBtn = document.createElement('div');
-        startBtn.className = 'wind-start-btn';
-        startBtn.style.position = 'relative';
-        startBtn.style.bottom = 'auto';
-        startBtn.style.left = 'auto';
-        startBtn.style.transform = 'none';
-        startBtn.style.width = '240px';
-        startBtn.style.textAlign = 'center';
+        // Создаем контейнер-карточку для сказки
+        const storyCard = document.createElement('div');
+        storyCard.className = `story-menu-card story-card-${storyId}`;
         
-        startBtn.innerText = '▶️ ' + storyData.title;
+        // Крупный значок сказки
+        const icon = storyIcons[storyId] || '📖';
         
-        startBtn.onclick = () => {
+        storyCard.innerHTML = `
+            <div class="story-card-icon">${icon}</div>
+            <div class="story-card-info">
+                <div class="story-card-title">${storyData.title}</div>
+                <div class="story-card-subtitle">Нажми, чтобы играть ▶️</div>
+            </div>
+        `;
+        
+        storyCard.onclick = () => {
             safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
             stopAllAudio(); 
-            currentStoryId = storyId; // Запоминаем ID выбранной сказки
+            currentStoryId = storyId;
             currentStoryStep = 0;
             setupStoryStep();
         };
 
-        ui.appendChild(startBtn);
+        ui.appendChild(storyCard);
     });
 
-    playSound('st_intro.wav'); // Звук-приветствие комнаты сказок
+    playSound('st_intro.wav');
 }
-
+  
 function setupStoryStep() {
     clearTimeout(storyTimeout);
     storyClickBlocked = false;
@@ -555,16 +567,16 @@ function setupStoryStep() {
     
     const area = document.getElementById('story-area');
     const ui = document.getElementById('story-ui');
+    if (!area || !ui) return;
     
-    // Достаем объект текущей сказки
     const story = roomsData['story'][currentStoryId];
     
-    // Проверяем конец по длине шагов конкретной сказки
+    // Если сказка закончилась
     if (currentStoryStep >= story.steps.length) {
         area.style.backgroundImage = `url('st_bg_start.jpg')`;
         ui.innerHTML = '';
-        playSound(story.end_sound); // Концовка именно этой сказки!
-        storyTimeout = setTimeout(goHome, 4000);
+        playSound(story.end_sound); // Проигрываем финал конкретной сказки
+        storyTimeout = setTimeout(goHome, 5000); // Возвращаемся домой через 5 секунд
         return;
     }
 
@@ -572,9 +584,11 @@ function setupStoryStep() {
     const stepData = story.steps[currentStoryStep];
     ui.innerHTML = '';
     
-    // Возвращаем кнопкам горизонтальное расположение для игрового процесса
+    // Возвращаем кнопкам выбора горизонтальный ряд для игрового процесса
     ui.style.flexDirection = 'row';
     ui.style.gap = '20px';
+    ui.style.width = 'auto';
+    ui.style.maxWidth = 'none';
 
     const options = shuffleArray([...stepData.choices]);
 
@@ -619,14 +633,15 @@ function handleStoryChoice(opt, btnElem) {
     area.style.backgroundImage = `url('${opt.bg}')`;
     
     const ui = document.getElementById('story-ui');
-    ui.innerHTML = ''; // Прячем кнопки, чтобы ребенок смотрел картинку
+    ui.innerHTML = ''; // Прячем кнопки, чтобы ребенок не нажимал лишнего и смотрел сцену
 
     playSound(opt.sound);
     
+    // Пауза 7 секунд, чтобы дослушать фразу логопеда, затем следующий шаг
     storyTimeout = setTimeout(() => {
         currentStoryStep++;
         setupStoryStep();
-    }, 7000); // Увеличили паузу до 7 секунд, чтобы аудио не обрывалось!
+    }, 7000); 
 }
 
 function initDrawCanvas() {
