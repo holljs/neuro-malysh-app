@@ -324,6 +324,55 @@ const roomsData = {
             ]
         }
     },
+    'red_hat': {
+            title: '🧶 Сказка-путаница: Утя-Шапочка', // <-- Наша новая сказка!
+            end_sound: 'rh_end.wav',
+            steps: [
+                {
+                    q_sound: 'rh_q1.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_pies.png', bg: 'rh_bg_1_norm.jpg', sound: 'rh_a1_norm.wav' },
+                        { id: 'abs', img: 'item_weight.png', bg: 'rh_bg_1_abs.jpg', sound: 'rh_a1_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'rh_q2.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_pie_wolf.png', bg: 'rh_bg_2_norm.jpg', sound: 'rh_a2_norm.wav' },
+                        { id: 'abs', img: 'item_soap.png', bg: 'rh_bg_2_abs.jpg', sound: 'rh_a2_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'rh_q3.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_flowers.png', bg: 'rh_bg_3_norm.jpg', sound: 'rh_a3_norm.wav' },
+                        { id: 'abs', img: 'item_shoe.png', bg: 'rh_bg_3_abs.jpg', sound: 'rh_a3_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'rh_q4.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_door.png', bg: 'rh_bg_4_norm.jpg', sound: 'rh_a4_norm.wav' },
+                        { id: 'abs', img: 'item_drum.png', bg: 'rh_bg_4_abs.jpg', sound: 'rh_a4_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'rh_q5.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_glasses.png', bg: 'rh_bg_5_norm.jpg', sound: 'rh_a5_norm.wav' },
+                        { id: 'abs', img: 'item_scuba_mask.png', bg: 'rh_bg_5_abs.jpg', sound: 'rh_a5_abs.wav' }
+                    ]
+                },
+                {
+                    q_sound: 'rh_q6.wav',
+                    choices: [
+                        { id: 'norm', img: 'item_tea.png', bg: 'rh_bg_6_norm.jpg', sound: 'rh_a6_norm.wav' },
+                        { id: 'abs', img: 'item_vacuum_ride.png', bg: 'rh_bg_6_abs.jpg', sound: 'rh_a6_abs.wav' }
+                    ]
+                }
+            ]
+        }
+    },
     'words': [
         { id: 'kisa', text: 'Киса', image: 'puzzle_kisa.png', full_sound: 'w_kisa.wav', syllables: [{ sound: 'sl_ki.wav', label: 'КИ' }, { sound: 'sl_sa.wav', label: 'СА' }] },
         { id: 'zayka', text: 'Зайка', image: 'puzzle_zayka.png', full_sound: 'w_zayka.wav', syllables: [{ sound: 'sl_zay.wav', label: 'ЗАЙ' }, { sound: 'sl_ka.wav', label: 'КА' }] },
