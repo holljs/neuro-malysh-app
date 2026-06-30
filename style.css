@@ -332,3 +332,63 @@ body {
         background-color: #FFFDE7 !important; /* Приятный фон по бокам, чтобы не было белых дыр */
     }
 }
+
+/* ---- КРАСИВОЕ МЕНЮ СКАЗОК ---- */
+.story-menu-card {
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 15px 20px;
+    width: 100%;
+    box-shadow: 0 8px 16px rgba(92, 85, 82, 0.15);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    border: 3px solid transparent;
+}
+
+/* Эффект нажатия для ребенка */
+.story-menu-card:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 8px rgba(92, 85, 82, 0.1);
+}
+
+/* Крупная круглая иконка слева */
+.story-card-icon {
+    font-size: 36px;
+    background: #F7F5F0;
+    width: 65px;
+    height: 65px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* Текстовый блок */
+.story-card-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.story-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #5C5552;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.story-card-subtitle {
+    font-size: 13px;
+    color: #A09B98;
+    font-weight: 500;
+}
+
+/* Индивидуальные сочные рамки для каждой сказки */
+.story-card-rain_walk { border-color: #A3C9D9; } /* Голубая для дождика */
+.story-card-fun_walk { border-color: #FFD166; }  /* Желтая для солнца */
+.story-card-red_hat { border-color: #FF9F1C; }   /* Оранжевая для Шапочки */
