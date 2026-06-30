@@ -18,6 +18,80 @@
             25% { transform: translateX(-8px) rotate(-5deg); }
             75% { transform: translateX(8px) rotate(5deg); }
         }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 159, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); }
+        }
+        
+        /* ---- КРАСИВОЕ МЕНЮ СКАЗОК ---- */
+        .story-menu-card {
+            display: flex;
+            align-items: center;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 15px 20px;
+            width: 100%;
+            box-shadow: 0 8px 16px rgba(92, 85, 82, 0.15);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            border: 3px solid transparent;
+            box-sizing: border-box;
+        }
+        .story-menu-card:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 8px rgba(92, 85, 82, 0.1);
+        }
+        .story-card-icon {
+            font-size: 36px;
+            background: #F7F5F0;
+            width: 65px;
+            height: 65px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .story-card-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .story-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #5C5552;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        .story-card-subtitle {
+            font-size: 13px;
+            color: #A09B98;
+            font-weight: 500;
+        }
+        /* Индивидуальные сочные рамки для каждой сказки */
+        .story-card-rain_walk { border-color: #A3C9D9; }
+        .story-card-fun_walk { border-color: #FFD166; }
+        .story-card-red_hat { border-color: #FF9F1C; }
+
+        /* VIP бейдж */
+        .vip-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FFD700;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        /* Музыкальная комната - стили для кнопок режимов */
+        .music-mode-btn {
+            background-color: rgba(255,255,255,0.5);
+        }
     </style>
 </head>
 <body>
@@ -84,7 +158,6 @@
         </div>
 
         <div class="menu-grid">
-            
             <div class="category-card cat-bs" onclick="openRoom('big_small', 'Большой - Маленький')">
                 <div class="category-icon-placeholder"><img src="icon_bs.png" alt=""></div>
                 <div class="category-title">Большой - Маленький</div>
@@ -150,13 +223,11 @@
                 <div class="category-title">Да или Нет</div>
             </div>
 
-            <!-- ВЕРНУЛИ КАРТИНКУ В СЛОГИ -->
             <div class="category-card cat-words" onclick="openRoom('words', 'Слоги-Пазлы')">
                 <div class="category-icon-placeholder"><img src="icon_words.png" alt="Слоги"></div>
                 <div class="category-title">Слоги</div>
             </div>
 
-            <!-- ДОБАВИЛИ КАРТИНКУ В СКАЗКУ -->
             <div class="category-card cat-story" onclick="openRoom('story', 'Сказки')">
                 <div class="category-icon-placeholder"><img src="icon_story.png" alt="Сказки"></div>
                 <div class="category-title">Сказки</div>
@@ -167,12 +238,10 @@
                 <div class="category-title">Ветерок</div>
             </div>
 
-            <!-- Музыкальная комната -->
             <div class="category-card cat-music" onclick="openRoom('music', 'Волшебное Пианино')">
                 <div class="category-icon-placeholder"><img src="icon_piano.png" alt="Пианино"></div>
                 <div class="category-title">Пианино</div>
             </div>
-
         </div>
     </div>
 
@@ -237,7 +306,6 @@
                     <div class="nav-btn" onclick="prevWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
                     <div class="nav-btn" onclick="nextWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
                 </div>
-                
                 <div id="words-shadow-board" style="position: relative; width: 260px; height: 260px; margin-top: 15px; display: flex; justify-content: center; align-items: center; background: transparent;"></div>
                 <div id="words-dock" style="width: 95%; min-height: 125px; display: flex; justify-content: center; align-items: center; gap: 15px; background: rgba(255,255,255,0.9); border-radius: 20px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 30; margin-bottom: 5px;"></div>
             </div>
@@ -271,14 +339,11 @@
                 <div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()" style="margin-top: 30px; background-color: #0077FF; color: white; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">🌬️ Включить микрофон</div>
             </div>
 
-            <div id="story-area" class="game-container" style="display: none; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; height: 100%; position: relative; background-size: cover; background-position: center;">
-                <div id="story-ui" style="display: flex; gap: 20px; padding-bottom: 40px; z-index: 10;"></div>
+            <div id="story-area" class="story-container" style="display: none; width: 100%; height: 100%; position: relative; background-size: cover; background-position: center;">
+                <div id="story-ui" style="display: flex; gap: 20px; position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; align-items: center; justify-content: center; flex-wrap: wrap;"></div>
             </div>
 
-            <!-- 👇 ВОЛШЕБНОЕ ПИАНИНО 👇 -->
-            <div id="music-area" class="game-container" style="display: none; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-bottom: 20px; background: #FFFDE7;">
-                
-                <!-- Панель переключения режимов -->
+            <div id="music-area" class="music-container" style="display: none; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-bottom: 20px; background: #FFFDE7; border-radius: 15px; box-sizing: border-box;">
                 <div id="music-modes" style="display: flex; gap: 15px; margin-top: 20px; z-index: 10; background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div id="mode-btn-piano" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('piano')"><img src="mode_piano.png" style="width:80%; pointer-events:none;"></div>
                     <div id="mode-btn-cat" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('cat')"><img src="mode_cat.png" style="width:80%; pointer-events:none;"></div>
@@ -286,16 +351,13 @@
                     <div id="mode-btn-radio" class="music-mode-btn" style="width:60px; height:60px; border-radius:15px; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:0.2s;" onclick="setMusicMode('radio')"><img src="mode_radio.png" style="width:80%; pointer-events:none;"></div>
                 </div>
                 
-                <!-- Деревянный корпус пианино -->
-                <div style="width: 95%; height: 45%; background: linear-gradient(to bottom, #7b4a2b, #4a2912); border-radius: 15px; padding: 15px 10px; box-shadow: inset 0 15px 20px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3); display: flex; align-items: flex-start; justify-content: center;">
-                    <!-- Сами клавиши -->
-                    <div id="piano-keys" style="width: 100%; height: 95%; display: flex; gap: 4px; padding-top: 5px;">
-                        <!-- Сюда скрипт вставит 8 клавиш -->
-                    </div>
+                <div style="width: 95%; height: 45%; background: linear-gradient(to bottom, #7b4a2b, #4a2912); border-radius: 15px; padding: 15px 10px; box-shadow: inset 0 15px 20px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3); display: flex; align-items: flex-start; justify-content: center; box-sizing: border-box; margin-bottom: 20px;">
+                    <div id="piano-keys" style="width: 100%; height: 95%; display: flex; gap: 4px; padding-top: 5px;"></div>
                 </div>
             </div>
-            <!-- 👆 КОНЕЦ ПИАНИНО 👆 -->
+        </div>
+    </div>
 
-        <script src="script.js?v=999"></script>
+    <script src="script.js?v=46"></script>
 </body>
 </html>
