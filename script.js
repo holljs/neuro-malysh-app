@@ -242,134 +242,37 @@ let isDrawing = false; let brushColor = '#FF4D4D'; let brushSize = 25;
 const roomsData = {
     'story': {
         'rain_walk': {
-            title: '🌧️ Прогулка под дождем',
+            title: '🌧️ Утя и дождевое приключение',
             end_sound: 'st_end.wav',
             steps: [
-                {
-                    q_sound: 'st_q1.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_umbrella.png', bg: 'st_bg_1_norm.jpg', sound: 'st_a1_norm.wav' },
-                        { id: 'abs', img: 'item_pot.png', bg: 'st_bg_1_abs.jpg', sound: 'st_a1_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st_q2.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_boots.png', bg: 'st_bg_2_norm.jpg', sound: 'st_a2_norm.wav' },
-                        { id: 'abs', img: 'item_flippers.png', bg: 'st_bg_2_abs.jpg', sound: 'st_a2_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st_q3.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_boat.png', bg: 'st_bg_3_norm.jpg', sound: 'st_a3_norm.wav' },
-                        { id: 'abs', img: 'item_basin.png', bg: 'st_bg_3_abs.jpg', sound: 'st_a3_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st_q4.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_bone.png', bg: 'st_bg_4_norm.jpg', sound: 'st_a4_norm.wav' },
-                        { id: 'abs', img: 'item_shoe.png', bg: 'st_bg_4_abs.jpg', sound: 'st_a4_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st_q5.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_towel.png', bg: 'st_bg_5_norm.jpg', sound: 'st_a5_norm.wav' },
-                        { id: 'abs', img: 'item_vacuum.png', bg: 'st_bg_5_abs.jpg', sound: 'st_a5_abs.wav' }
-                    ]
-                }
+                { q_sound: 'st_q1.wav', choices: [ { id: 'norm', img: 'item_umbrella.png', bg: 'st_bg_1_norm.jpg', sound: 'st_a1_norm.wav' }, { id: 'abs', img: 'item_pot.png', bg: 'st_bg_1_abs.jpg', sound: 'st_a1_abs.wav' } ] },
+                { q_sound: 'st_q2.wav', choices: [ { id: 'norm', img: 'item_boots.png', bg: 'st_bg_2_norm.jpg', sound: 'st_a2_norm.wav' }, { id: 'abs', img: 'item_flippers.png', bg: 'st_bg_2_abs.jpg', sound: 'st_a2_abs.wav' } ] },
+                { q_sound: 'st_q3.wav', choices: [ { id: 'norm', img: 'item_boat.png', bg: 'st_bg_3_norm.jpg', sound: 'st_a3_norm.wav' }, { id: 'abs', img: 'item_basin.png', bg: 'st_bg_3_abs.jpg', sound: 'st_a3_abs.wav' } ] },
+                { q_sound: 'st_q4.wav', choices: [ { id: 'norm', img: 'item_bone.png', bg: 'st_bg_4_norm.jpg', sound: 'st_a4_norm.wav' }, { id: 'abs', img: 'item_shoe.png', bg: 'st_bg_4_abs.jpg', sound: 'st_a4_abs.wav' } ] },
+                { q_sound: 'st_q5.wav', choices: [ { id: 'norm', img: 'item_towel.png', bg: 'st_bg_5_norm.jpg', sound: 'st_a5_norm.wav' }, { id: 'abs', img: 'item_vacuum.png', bg: 'st_bg_5_abs.jpg', sound: 'st_a5_abs.wav' } ] }
             ]
         },
         'fun_walk': {
-            title: '☀️ Весёлая прогулка',
+            title: '☀️ Солнечные хулиганства Ути',
             end_sound: 'st2_end.wav',
             steps: [
-                {
-                    q_sound: 'st2_q1.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_sneakers.png', bg: 'st2_bg_1_norm.jpg', sound: 'st2_a1_norm.wav' },
-                        { id: 'abs', img: 'item_banana.png', bg: 'st2_bg_1_abs.jpg', sound: 'st2_a1_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st2_q2.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_mug.png', bg: 'st2_bg_2_norm.jpg', sound: 'st2_a2_norm.wav' },
-                        { id: 'abs', img: 'item_boot.png', bg: 'st2_bg_2_abs.jpg', sound: 'st2_a2_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st2_q3.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_crayons.png', bg: 'st2_bg_3_norm.jpg', sound: 'st2_a3_norm.wav' },
-                        { id: 'abs', img: 'item_sausage.png', bg: 'st2_bg_3_abs.jpg', sound: 'st2_a3_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st2_q4.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_bag.png', bg: 'st2_bg_4_norm.jpg', sound: 'st2_a4_norm.wav' },
-                        { id: 'abs', img: 'item_washing_machine.png', bg: 'st2_bg_4_abs.jpg', sound: 'st2_a4_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'st2_q5.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_pillow.png', bg: 'st2_bg_5_norm.jpg', sound: 'st2_a5_norm.wav' },
-                        { id: 'abs', img: 'item_cactus.png', bg: 'st2_bg_5_abs.jpg', sound: 'st2_a5_abs.wav' }
-                    ]
-                }
+                { q_sound: 'st2_q1.wav', choices: [ { id: 'norm', img: 'item_sneakers.png', bg: 'st2_bg_1_norm.jpg', sound: 'st2_a1_norm.wav' }, { id: 'abs', img: 'item_banana.png', bg: 'st2_bg_1_abs.jpg', sound: 'st2_a1_abs.wav' } ] },
+                { q_sound: 'st2_q2.wav', choices: [ { id: 'norm', img: 'item_mug.png', bg: 'st2_bg_2_norm.jpg', sound: 'st2_a2_norm.wav' }, { id: 'abs', img: 'item_boot.png', bg: 'st2_bg_2_abs.jpg', sound: 'st2_a2_abs.wav' } ] },
+                { q_sound: 'st2_q3.wav', choices: [ { id: 'norm', img: 'item_crayons.png', bg: 'st2_bg_3_norm.jpg', sound: 'st2_a3_norm.wav' }, { id: 'abs', img: 'item_sausage.png', bg: 'st2_bg_3_abs.jpg', sound: 'st2_a3_abs.wav' } ] },
+                { q_sound: 'st2_q4.wav', choices: [ { id: 'norm', img: 'item_bag.png', bg: 'st2_bg_4_norm.jpg', sound: 'st2_a4_norm.wav' }, { id: 'abs', img: 'item_washing_machine.png', bg: 'st2_bg_4_abs.jpg', sound: 'st2_a4_abs.wav' } ] },
+                { q_sound: 'st2_q5.wav', choices: [ { id: 'norm', img: 'item_pillow.png', bg: 'st2_bg_5_norm.jpg', sound: 'st2_a5_norm.wav' }, { id: 'abs', img: 'item_cactus.png', bg: 'st2_bg_5_abs.jpg', sound: 'st2_a5_abs.wav' } ] }
             ]
-        }
-    },
-    'red_hat': {
-            title: '🧶 Сказка-путаница: Утя-Шапочка', // <-- Наша новая сказка!
+        },
+        'red_hat': {
+            title: '🧶 Сказка-путаница: Утя-Шапочка',
             end_sound: 'rh_end.wav',
             steps: [
-                {
-                    q_sound: 'rh_q1.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_pies.png', bg: 'rh_bg_1_norm.jpg', sound: 'rh_a1_norm.wav' },
-                        { id: 'abs', img: 'item_weight.png', bg: 'rh_bg_1_abs.jpg', sound: 'rh_a1_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'rh_q2.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_pie_wolf.png', bg: 'rh_bg_2_norm.jpg', sound: 'rh_a2_norm.wav' },
-                        { id: 'abs', img: 'item_soap.png', bg: 'rh_bg_2_abs.jpg', sound: 'rh_a2_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'rh_q3.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_flowers.png', bg: 'rh_bg_3_norm.jpg', sound: 'rh_a3_norm.wav' },
-                        { id: 'abs', img: 'item_shoe.png', bg: 'rh_bg_3_abs.jpg', sound: 'rh_a3_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'rh_q4.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_door.png', bg: 'rh_bg_4_norm.jpg', sound: 'rh_a4_norm.wav' },
-                        { id: 'abs', img: 'item_drum.png', bg: 'rh_bg_4_abs.jpg', sound: 'rh_a4_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'rh_q5.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_glasses.png', bg: 'rh_bg_5_norm.jpg', sound: 'rh_a5_norm.wav' },
-                        { id: 'abs', img: 'item_scuba_mask.png', bg: 'rh_bg_5_abs.jpg', sound: 'rh_a5_abs.wav' }
-                    ]
-                },
-                {
-                    q_sound: 'rh_q6.wav',
-                    choices: [
-                        { id: 'norm', img: 'item_tea.png', bg: 'rh_bg_6_norm.jpg', sound: 'rh_a6_norm.wav' },
-                        { id: 'abs', img: 'item_vacuum_ride.png', bg: 'rh_bg_6_abs.jpg', sound: 'rh_a6_abs.wav' }
-                    ]
-                }
+                { q_sound: 'rh_q1.wav', choices: [ { id: 'norm', img: 'item_pies.png', bg: 'rh_bg_1_norm.jpg', sound: 'rh_a1_norm.wav' }, { id: 'abs', img: 'item_weight.png', bg: 'rh_bg_1_abs.jpg', sound: 'rh_a1_abs.wav' } ] },
+                { q_sound: 'rh_q2.wav', choices: [ { id: 'norm', img: 'item_pie_wolf.png', bg: 'rh_bg_2_norm.jpg', sound: 'rh_a2_norm.wav' }, { id: 'abs', img: 'item_soap.png', bg: 'rh_bg_2_abs.jpg', sound: 'rh_a2_abs.wav' } ] },
+                { q_sound: 'rh_q3.wav', choices: [ { id: 'norm', img: 'item_flowers.png', bg: 'rh_bg_3_norm.jpg', sound: 'rh_a3_norm.wav' }, { id: 'abs', img: 'item_shoe.png', bg: 'rh_bg_3_abs.jpg', sound: 'rh_a3_abs.wav' } ] },
+                { q_sound: 'rh_q4.wav', choices: [ { id: 'norm', img: 'item_door.png', bg: 'rh_bg_4_norm.jpg', sound: 'rh_a4_norm.wav' }, { id: 'abs', img: 'item_drum.png', bg: 'rh_bg_4_abs.jpg', sound: 'rh_a4_abs.wav' } ] },
+                { q_sound: 'rh_q5.wav', choices: [ { id: 'norm', img: 'item_glasses.png', bg: 'rh_bg_5_norm.jpg', sound: 'rh_a5_norm.wav' }, { id: 'abs', img: 'item_scuba_mask.png', bg: 'rh_bg_5_abs.jpg', sound: 'rh_a5_abs.wav' } ] },
+                { q_sound: 'rh_q6.wav', choices: [ { id: 'norm', img: 'item_tea.png', bg: 'rh_bg_6_norm.jpg', sound: 'rh_a6_norm.wav' }, { id: 'abs', img: 'item_vacuum_ride.png', bg: 'rh_bg_6_abs.jpg', sound: 'rh_a6_abs.wav' } ] }
             ]
         }
     },
