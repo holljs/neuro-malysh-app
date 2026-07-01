@@ -585,15 +585,16 @@ function handleStoryChoice(opt, btnElem) {
     area.style.backgroundImage = `url('${opt.bg}')`;
     
     const ui = document.getElementById('story-ui');
-    ui.innerHTML = ''; // Прячем кнопки, чтобы ребенок не нажимал лишнего и смотрел сцену
+    ui.innerHTML = ''; 
 
-    playSound(opt.sound);
-    
-    // Пауза 7 секунд, чтобы дослушать фразу логопеда, затем следующий шаг
-    storyTimeout = setTimeout(() => {
+    // Создаем объект аудио и привязываем переход к событию окончания
+    const audio = new Audio(opt.sound);
+    audio.onended = () => {
         currentStoryStep++;
         setupStoryStep();
-    }, 7000); 
+    };
+    audio.play();
+    activeAudios.push(audio); // Добавляем в список активных для остановки, если что
 }
 
 function initDrawCanvas() {
