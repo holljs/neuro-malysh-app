@@ -163,37 +163,31 @@ function closeModal(modalId, event) {
 }
 
 async function goToPayment() {
-    safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-    const btn = document.querySelector('#paywall-modal .wind-start-btn');
-    const originalText = btn.innerText;
-    btn.innerText = "Создаем платеж...";
-    btn.style.opacity = "0.7";
-    btn.style.pointerEvents = "none";
-    
     try {
-        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
-        const vkSignParams = getVkSignParams();  
-        const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "x-vk-sign": vkSignParams },
+        const response = await fetch('/api/yookassa/create-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-vk-sign': window.location.search.slice(1) // Передаем параметры запуска ВК
+            },
             body: JSON.stringify({
-                user_id: userInfo.id,
-                amount: 88,
-                description: "Подписка на развивающие игры (1 мес.)",
-                currency_type: "kids_sub" 
+                user_id: userInfo.id, // ID пользователя VK
+                amount: 180,
+                description: "Доступ ко всем играм «Нейро-Малыш» навсегда",
+                currency_type: "kids_forever"
             })
         });
+
         const data = await response.json();
         if (data.success && data.payment_url) {
-            window.open(data.payment_url, '_blank');
+            // Перенаправляем родителя на страницу оплаты ЮKassa
+            window.location.href = data.payment_url;
         } else {
-            alert("Произошла ошибка при создании платежа. Попробуйте чуть позже.");
+            alert("Ошибка создания платежа. Попробуйте позже.");
         }
-    } catch (error) {
-        console.error("Ошибка сети при оплате:", error);
-        alert("Нет связи с сервером. Проверьте интернет-соединение.");
-    } finally {
-        btn.innerText = originalText; btn.style.opacity = "1"; btn.style.pointerEvents = "auto";
+    } catch (e) {
+        console.error("Ошибка оплаты:", e);
+        alert("Не удалось связаться с сервером оплаты.");
     }
 }
 
