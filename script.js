@@ -175,11 +175,21 @@ async function goToPayment() {
 
         const data = await response.json();
         if (response.ok && data.success && data.payment_url) {
-            // Открываем кассу через официальный метод ВК поверх игры!
-            safeVkSend("VKWebAppOpenUrl", {"url": data.payment_url}).catch(() => {
-                // Резервный вариант, если вдруг тестируете локально не через ВК
-                window.open(data.payment_url, "_blank");
-            });
+            try {
+                // Пытаемся открыть через официальный мост ВК напрямую
+                await vkBridge.send("VKWebAppOpenUrl", {"url": data.payment_url});
+            } catch (err) {
+                // Если ВК мост выдал ошибку (как в вашем логе), открываем в новой безопасной вкладке
+                console.warn("ВК заблокировал открытие, используем резервный метод");
+                
+                // Создаем невидимую ссылку и кликаем по ней (самый надежный способ обхода блокировок браузера)
+                const link = document.createElement('a');
+                link.href = data.payment_url;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         } else {
             alert("Ошибка оплаты: " + (data.detail || "Не удалось создать платеж"));
         }
