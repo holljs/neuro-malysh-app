@@ -47,23 +47,9 @@ function getVkSignParams() {
 async function initAppAndCheckPremium() {
     try {
         await safeVkSend('VKWebAppInit');
-        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
-        const vkSignParams = getVkSignParams();
-        
-        const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
-            method: 'GET',
-            headers: { 
-                'x-vk-sign': vkSignParams,
-                'x-bot-token': 'SuperSecret_987654321_Token'
-            }
-        });
-        const data = await response.json();
-        userHasPremium = !!(data.has_premium === true || data.is_pro === true || data.subscription === true);
-    } catch (error) {
-        console.error("❌ Ошибка при проверке премиума:", error);
-        userHasPremium = false; 
-    } finally {
-        applyLocks();
+        await isPremiumActive();
+    } catch (e) {
+        console.error("❌ Ошибка инициализации приложения:", e);
     }
 }
 
@@ -111,38 +97,32 @@ function applyLocks() {
         'words': '.cat-words', 
         'wind': '.cat-breeze',
         'story': '.cat-story',
-        'music': '.cat-music' // <--- ДОБАВИЛИ ПИАНИНО СЮДА!
+        'music': '.cat-music'
     };
 
     for (const [roomId, classSelector] of Object.entries(roomMapping)) {
         if (!freeRooms.includes(roomId)) {
             const card = document.querySelector(classSelector);
             if (card) {
-                // Обязательно добавляем relative, чтобы бейдж позиционировался относительно карточки
                 card.style.position = 'relative'; 
 
-                // Удаляем старый бейдж, если он есть (чтобы не дублировались)
                 const existingBadge = card.querySelector('.vip-badge');
                 if (existingBadge) {
                     existingBadge.remove();
                 }
 
-                // Очищаем старые текстовые замки из заголовка (на случай, если они там остались)
                 const titleDiv = card.querySelector('.category-title');
                 if (titleDiv) {
                     titleDiv.innerText = titleDiv.innerText.replace('🔒 ', '');
                 }
 
                 if (userHasPremium) {
-                    // Если премиум есть, карточка яркая и без бейджа
                     card.style.opacity = '1';
                 } else {
-                    // Если премиума нет, карточка тусклая и с красивым VIP-бейджем
                     card.style.opacity = '0.85';
                     
                     const badge = document.createElement('div');
                     badge.className = 'vip-badge';
-                    // Золотой цвет для эмодзи замочка и белый текст VIP
                     badge.innerHTML = '<span style="color: #FFD700; font-size: 12px;">🔒</span> VIP'; 
                     card.appendChild(badge);
                 }
@@ -162,16 +142,20 @@ function closeModal(modalId, event) {
     document.getElementById(modalId).classList.remove('active');
 }
 
+// === ОДНА ЕДИНСТВЕННАЯ ИСПРАВЛЕННАЯ ФУНКЦИЯ ОПЛАТЫ ===
 async function goToPayment() {
     try {
-        const response = await fetch('/api/yookassa/create-payment', {
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+        const vkSignParams = getVkSignParams();
+
+        const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-vk-sign': window.location.search.slice(1) // Передаем параметры запуска ВК
+                'x-vk-sign': vkSignParams
             },
             body: JSON.stringify({
-                user_id: userInfo.id, // ID пользователя VK
+                user_id: userInfo.id,
                 amount: 180,
                 description: "Доступ ко всем играм «Нейро-Малыш» навсегда",
                 currency_type: "kids_forever"
@@ -180,10 +164,9 @@ async function goToPayment() {
 
         const data = await response.json();
         if (data.success && data.payment_url) {
-            // Перенаправляем родителя на страницу оплаты ЮKassa
             window.location.href = data.payment_url;
         } else {
-            alert("Ошибка создания платежа. Попробуйте позже.");
+            alert("Ошибка создания платежа: " + (data.detail || "Попробуйте позже"));
         }
     } catch (e) {
         console.error("Ошибка оплаты:", e);
