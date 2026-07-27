@@ -175,7 +175,11 @@ async function goToPayment() {
 
         const data = await response.json();
         if (response.ok && data.success && data.payment_url) {
-            window.location.href = data.payment_url;
+            // Открываем кассу через официальный метод ВК поверх игры!
+            safeVkSend("VKWebAppOpenUrl", {"url": data.payment_url}).catch(() => {
+                // Резервный вариант, если вдруг тестируете локально не через ВК
+                window.open(data.payment_url, "_blank");
+            });
         } else {
             alert("Ошибка оплаты: " + (data.detail || "Не удалось создать платеж"));
         }
