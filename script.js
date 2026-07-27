@@ -145,8 +145,22 @@ function closeModal(modalId, event) {
 // === ОДНА ЕДИНСТВЕННАЯ ИСПРАВЛЕННАЯ ФУНКЦИЯ ОПЛАТЫ ===
 async function goToPayment() {
     try {
-        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
         const vkSignParams = getVkSignParams();
+        const urlParams = new URLSearchParams(vkSignParams);
+        
+        // 1. Берем ID строго из адресной строки ВК, чтобы он на 100% совпал с подписью!
+        let realVkUserId = parseInt(urlParams.get('vk_user_id'));
+        
+        // Если вдруг в ссылке нет ID, берем из профиля
+        if (!realVkUserId) {
+            const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+            realVkUserId = userInfo.id;
+        }
+
+        if (!realVkUserId) {
+            alert("Не удалось определить ваш профиль. Перезапустите игру.");
+            return;
+        }
 
         const response = await fetch(`${SERVER_URL}/api/yookassa/create-payment`, {
             method: 'POST',
@@ -155,7 +169,7 @@ async function goToPayment() {
                 'x-vk-sign': vkSignParams
             },
             body: JSON.stringify({
-                user_id: userInfo.id,
+                user_id: realVkUserId, // <--- ТЕПЕРЬ СЮДА УХОДИТ ПРАВИЛЬНЫЙ ID
                 amount: 180,
                 description: "Доступ ко всем играм «Нейро-Малыш» навсегда",
                 currency_type: "kids_forever"
