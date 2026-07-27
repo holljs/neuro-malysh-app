@@ -163,7 +163,7 @@ async function goToPayment() {
             headers: {
                 'Content-Type': 'application/json',
                 'x-vk-sign': vkSignParams,
-                'x-bot-token': 'SuperSecret_987654321_Token' // <--- ВОТ НАШ СПАСИТЕЛЬ!
+                'x-bot-token': 'SuperSecret_987654321_Token'
             },
             body: JSON.stringify({
                 user_id: realVkUserId,
@@ -176,13 +176,11 @@ async function goToPayment() {
         const data = await response.json();
         if (response.ok && data.success && data.payment_url) {
             try {
-                // Пытаемся открыть через официальный мост ВК напрямую
-                await vkBridge.send("VKWebAppOpenUrl", {"url": data.payment_url});
+                // Пытаемся открыть через официальный Bridge ВК
+                await window.vkBridge.send("VKWebAppOpenUrl", {"url": data.payment_url});
             } catch (err) {
-                // Если ВК мост выдал ошибку (как в вашем логе), открываем в новой безопасной вкладке
-                console.warn("ВК заблокировал открытие, используем резервный метод");
-                
-                // Создаем невидимую ссылку и кликаем по ней (самый надежный способ обхода блокировок браузера)
+                // Если ВК вернул ошибку (как у вас на ПК), открываем через эмуляцию клика по ссылке
+                console.warn("ВК блокирует открытие, переходим по прямой ссылке...");
                 const link = document.createElement('a');
                 link.href = data.payment_url;
                 link.target = '_blank';
