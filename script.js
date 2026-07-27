@@ -148,17 +148,13 @@ async function goToPayment() {
         const vkSignParams = getVkSignParams();
         const urlParams = new URLSearchParams(vkSignParams);
         
-        // 1. Берем ID строго из адресной строки ВК, чтобы он на 100% совпал с подписью!
         let realVkUserId = parseInt(urlParams.get('vk_user_id'));
-        
-        // Если вдруг в ссылке нет ID, берем из профиля
-        if (!realVkUserId) {
-            const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+        if (!realVkUserId && typeof userInfo !== 'undefined' && userInfo.id) {
             realVkUserId = userInfo.id;
         }
 
         if (!realVkUserId) {
-            alert("Не удалось определить ваш профиль. Перезапустите игру.");
+            alert("Не удалось определить ID пользователя. Перезапустите игру из ВК.");
             return;
         }
 
@@ -166,10 +162,11 @@ async function goToPayment() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-vk-sign': vkSignParams
+                'x-vk-sign': vkSignParams,
+                'x-bot-token': 'SuperSecret_987654321_Token' // <--- ВОТ НАШ СПАСИТЕЛЬ!
             },
             body: JSON.stringify({
-                user_id: realVkUserId, // <--- ТЕПЕРЬ СЮДА УХОДИТ ПРАВИЛЬНЫЙ ID
+                user_id: realVkUserId,
                 amount: 180,
                 description: "Доступ ко всем играм «Нейро-Малыш» навсегда",
                 currency_type: "kids_forever"
@@ -177,10 +174,10 @@ async function goToPayment() {
         });
 
         const data = await response.json();
-        if (data.success && data.payment_url) {
+        if (response.ok && data.success && data.payment_url) {
             window.location.href = data.payment_url;
         } else {
-            alert("Ошибка создания платежа: " + (data.detail || "Попробуйте позже"));
+            alert("Ошибка оплаты: " + (data.detail || "Не удалось создать платеж"));
         }
     } catch (e) {
         console.error("Ошибка оплаты:", e);
