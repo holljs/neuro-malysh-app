@@ -74,13 +74,37 @@ async function isPremiumActive() {
     }
 }
 
-function applyLocks() {
+async function applyLocks() {
     const banner = document.getElementById('vip-bonus-banner');
-    if (userHasPremium || localStorage.getItem('hide_vip_banner') === 'true') {
+    
+    // Если уже есть премиум — скрываем
+    if (userHasPremium) {
         if (banner) banner.style.display = 'none';
-    } else {
-        if (banner) banner.style.display = 'block';
+        return;
     }
+    
+    // Проверяем локально (быстро)
+    if (localStorage.getItem('hide_vip_banner') === 'true') {
+        if (banner) banner.style.display = 'none';
+        return;
+    }
+    
+    // Проверяем на сервере (надёжно)
+    try {
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+        const response = await fetch(`${SERVER_URL}/api/malysh/bonus_status/${userInfo.id}`);
+        const data = await response.json();
+        if (data.claimed) {
+            if (banner) banner.style.display = 'none';
+            localStorage.setItem('hide_vip_banner', 'true');
+            return;
+        }
+    } catch (e) {
+        console.error("Ошибка проверки бонуса:", e);
+    }
+    
+    // Если дошли сюда — показываем баннер
+    if (banner) banner.style.display = 'block';
 
     const roomMapping = {
         'big_small': '.cat-bs',
@@ -199,19 +223,27 @@ async function goToPayment() {
 
 function subscribeToGroup() {
     safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-    const groupId = 78549529; 
+    const groupId = 78549529;
     safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
-        .then(data => {
-            if (data.result) {
-                const banner = document.getElementById('vip-bonus-banner');
-                if (banner) banner.style.display = 'none';
-                localStorage.setItem('hide_vip_banner', 'true');
-                openModal('bonus-success-modal');
-            }
-        })
-        .catch(error => {
-            console.log("Пользователь закрыл окно подписки:", error);
-        });
+    .then(async data => {
+        if (data.result) {
+            const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+            // Записываем пользователя в файл на сервере
+            await fetch(`${SERVER_URL}/api/malysh/claim_bonus`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-bot-token': 'SuperSecret_987654321_Token' },
+                body: JSON.stringify({ user_id: userInfo.id })
+            });
+            
+            const banner = document.getElementById('vip-bonus-banner');
+            if (banner) banner.style.display = 'none';
+            localStorage.setItem('hide_vip_banner', 'true');
+            openModal('bonus-success-modal');
+        }
+    })
+    .catch(error => {
+        console.log("Пользователь закрыл окно подписки:", error);
+    });
 }
 
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false; 
