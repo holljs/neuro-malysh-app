@@ -70,6 +70,8 @@ async function isPremiumActive() {
         return userHasPremium;
     } catch(e) {
         console.error("❌ Ошибка проверки премиума:", e);
+        userHasPremium = false;
+        applyLocks(); // ← ВОТ ИСПРАВЛЕНИЕ: вызываем даже при ошибке
         return false; 
     }
 }
