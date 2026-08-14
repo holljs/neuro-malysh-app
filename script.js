@@ -223,6 +223,10 @@ console.log("Пользователь закрыл окно подписки:", 
 });
 }
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false;
+// Для кнопки «🔊 Ещё раз»
+let lastPlayedSound = null;
+// Звуки-эффекты, которые НЕ нужно запоминать для переслушивания
+const effectSounds = ['wrong.wav','correct.wav','color_correct.wav','f_yum.wav','molodec.wav','color_win.wav','f_win.wav','shapes_win.wav','g_win.wav','bs_win.wav','shape_correct.wav','color_intro.wav','f_intro.wav','shapes_intro.wav','wind_intro.wav','wind_good.wav','wind_more.wav','words_intro.wav','paint_clear.wav','paint_good.wav','paint_beautiful.wav','st_intro.wav','tg_quiet.wav'];
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
 let canvasInitialized = false;
@@ -1233,7 +1237,22 @@ function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'
 let activeAudios = [];
 function playSound(soundFile) {
 if (soundFile) {
+// Запоминаем звук, если это не служебный эффект
+if (!effectSounds.includes(soundFile)) {
+lastPlayedSound = soundFile;
+}
 const audio = new Audio(soundFile);
+activeAudios.push(audio);
+audio.onended = () => { activeAudios = activeAudios.filter(a => a !== audio); };
+audio.play().catch(err => console.log(err));
+}
+}
+
+// Кнопка «🔊 Ещё раз» — переслушать последний звук
+function replayLastSound() {
+safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+if (lastPlayedSound) {
+const audio = new Audio(lastPlayedSound);
 activeAudios.push(audio);
 audio.onended = () => { activeAudios = activeAudios.filter(a => a !== audio); };
 audio.play().catch(err => console.log(err));
