@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Нейро-Малыш</title>
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-<link rel="stylesheet" href="style.css?v=48">
+<link rel="stylesheet" href="style.css?v=49">
 <style>
-/* Анимации для комнат */
 @keyframes popIn {
 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
 80% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
@@ -23,7 +22,6 @@
 70% { box-shadow: 0 0 0 10px rgba(255, 159, 28, 0); }
 100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); }
 }
-/* ---- КРАСИВОЕ МЕНЮ СКАЗОК ---- */
 .story-menu-card {
 display: flex;
 align-items: center;
@@ -91,6 +89,27 @@ background-color: rgba(255,255,255,0.5);
 </head>
 <body>
 
+<!-- ===== SVG-ИКОНКИ ВМЕСТО ЭМОДЗИ ===== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-speaker" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7M18.4 5.6a9 9 0 010 12.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 10v1a7 7 0 0014 0v-1M12 18v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor"/><rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" fill="currentColor"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+<symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></symbol>
+<symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10v4M6 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="11" r="1.3" fill="currentColor"/><circle cx="18.5" cy="13.5" r="1.3" fill="currentColor"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V7a4 4 0 018 0v4" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4M3 11v-1a4 4 0 014-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 01-4 4H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1" fill="currentColor"/><path d="M5 12v8a1 1 0 001 1h12a1 1 0 001-1v-8M12 8v13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8s-4.5 0-5.5-2 1-4 3-3 2.5 5 2.5 5zm0 0s4.5 0 5.5-2-1-4-3-3-2.5 5-2.5 5z" fill="currentColor"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2.2-3.2A8 8 0 1121 12z" fill="currentColor"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l4 4 5-6 5 6 4-4v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" fill="currentColor"/></symbol>
+</svg>
+
 <div id="help-modal" class="modal-overlay" onclick="closeModal('help-modal', event)">
 <div class="modal-content" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeModal('help-modal')">✖</button>
@@ -102,14 +121,14 @@ background-color: rgba(255,255,255,0.5);
 ИНН: 502209781184<br>
 Email: holljs@mail.ru
 </div>
-<a href="https://vk.com/neiro_malish" target="_blank" style="display: block; background-color: #0077FF; color: white; padding: 12px; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 16px; margin-top: 15px;">💬 Написать разработчику</a>
+<a href="https://vk.com/neiro_malish" target="_blank" style="display: block; background-color: #0077FF; color: white; padding: 12px; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 16px; margin-top: 15px;"><svg class="ic"><use href="#i-chat"/></svg> Написать разработчику</a>
 </div>
 </div>
 
 <div id="paywall-modal" class="modal-overlay" onclick="closeModal('paywall-modal', event)">
 <div class="modal-content" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeModal('paywall-modal')">✖</button>
-<h2 style="color: #FFB347; font-size: 24px;">👑 Открой все игры!</h2>
+<h2 style="color: #FFB347; font-size: 24px;"><svg class="ic"><use href="#i-crown"/></svg> Открой все игры!</h2>
 <p style="font-size: 16px; margin: 10px 0; color: #5C5552;">Доступ навсегда всего за <b>180 руб.</b><br><small style="color: #A09B98;">Без подписок и автосписаний!</small></p>
 <button class="wind-start-btn" style="background-color: #FFB347; width: 100%; margin-top: 10px;" onclick="goToPayment()">Купить навсегда</button>
 <button class="clear-btn" style="width: 100%; margin-top: 15px; background: transparent; font-weight: normal;" onclick="closeModal('paywall-modal')">Позже</button>
@@ -119,22 +138,22 @@ Email: holljs@mail.ru
 <div id="mobile-paywall-modal" class="modal-overlay" onclick="closeModal('mobile-paywall-modal', event)">
 <div class="modal-content" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeModal('mobile-paywall-modal')">✖</button>
-<h2 style="color: #FFB347; font-size: 24px;">🔒 Комната закрыта</h2>
+<h2 style="color: #FFB347; font-size: 24px;"><svg class="ic"><use href="#i-lock"/></svg> Комната закрыта</h2>
 <p style="margin-top: 15px; color: #7A90A4; font-size: 16px; line-height: 1.4;">Для получения информации о полном доступе свяжитесь с администратором.</p>
-<a href="https://vk.com/neiro_malish" target="_blank" style="display: block; background-color: #0077FF; color: white; padding: 12px; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 16px; margin-top: 20px;">💬 Написать администратору</a>
+<a href="https://vk.com/neiro_malish" target="_blank" style="display: block; background-color: #0077FF; color: white; padding: 12px; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 16px; margin-top: 20px;"><svg class="ic"><use href="#i-chat"/></svg> Написать администратору</a>
 </div>
 </div>
 
 <div id="bonus-success-modal" class="modal-overlay" onclick="closeModal('bonus-success-modal', event)">
 <div class="modal-content" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeModal('bonus-success-modal')">✖</button>
-<h2 style="color: #FFB347; font-size: 24px;">🎉 Ура!</h2>
+<h2 style="color: #FFB347; font-size: 24px;"><svg class="ic"><use href="#i-star"/></svg> Ура!</h2>
 <p style="margin-top: 15px; color: #7A90A4; font-size: 16px; line-height: 1.4;">
 Разрешение получено! <br><br>
 Теперь нажмите на кнопку ниже и напишите нашему боту слово <b>«Привет»</b>. Он мгновенно выдаст вам VIP на 24 часа и снимет все замочки!
 </p>
 <a href="https://vk.com/write-78549529" target="_blank" style="display: block; background-color: #0077FF; color: white; padding: 14px; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 16px; margin-top: 20px;">
-💬 Открыть диалог с ботом
+<svg class="ic"><use href="#i-chat"/></svg> Открыть диалог с ботом
 </a>
 </div>
 </div>
@@ -149,7 +168,7 @@ Email: holljs@mail.ru
 <div class="hero-title">Во что поиграем?</div>
 
 <div id="vip-bonus-banner" onclick="subscribeToGroup()" style="display: none; background: linear-gradient(135deg, #FFD166, #FF9F1C); border-radius: 15px; padding: 15px; text-align: center; color: white; font-weight: bold; font-size: 16px; margin: 10px 15px 20px 15px; box-shadow: 0 4px 10px rgba(255, 159, 28, 0.3); cursor: pointer; animation: pulse 2s infinite;">
-🎁 Нажми сюда, чтобы получить VIP на 24 часа!
+<svg class="ic"><use href="#i-gift"/></svg> Нажми сюда, чтобы получить VIP на 24 часа!
 </div>
 
 <div class="menu-grid">
@@ -204,27 +223,27 @@ Email: holljs@mail.ru
 </div>
 
 <div class="category-card cat-garden" onclick="openRoom('garden', 'Счёт 1-9')">
-<div class="category-icon-placeholder"><img src="icon_garden.png" alt="🥕"></div>
+<div class="category-icon-placeholder"><img src="icon_garden.png" alt=""></div>
 <div class="category-title">Счёт 1-9</div>
 </div>
 
 <div class="category-card cat-poems" onclick="openRoom('poems', 'Стихи')">
-<div class="category-icon-placeholder"><img src="icon_poems.png" alt="📖"></div>
+<div class="category-icon-placeholder"><img src="icon_poems.png" alt=""></div>
 <div class="category-title">Стихи-Рифмы</div>
 </div>
 
 <div class="category-card cat-yesno" onclick="openRoom('yesno', 'Да или Нет')">
-<div class="category-icon-placeholder"><img src="icon_yesno.png" alt="✅❌"></div>
+<div class="category-icon-placeholder"><img src="icon_yesno.png" alt=""></div>
 <div class="category-title">Да или Нет</div>
 </div>
 
 <div class="category-card cat-words" onclick="openRoom('words', 'Слоги-Пазлы')">
-<div class="category-icon-placeholder"><img src="icon_words.png" alt="Слоги"></div>
+<div class="category-icon-placeholder"><img src="icon_words.png" alt=""></div>
 <div class="category-title">Слоги</div>
 </div>
 
 <div class="category-card cat-story" onclick="openRoom('story', 'Сказки')">
-<div class="category-icon-placeholder"><img src="icon_story.png" alt="Сказки"></div>
+<div class="category-icon-placeholder"><img src="icon_story.png" alt=""></div>
 <div class="category-title">Сказки</div>
 </div>
 
@@ -234,12 +253,12 @@ Email: holljs@mail.ru
 </div>
 
 <div class="category-card cat-music" onclick="openRoom('music', 'Волшебное Пианино')">
-<div class="category-icon-placeholder"><img src="icon_piano.png" alt="Пианино"></div>
+<div class="category-icon-placeholder"><img src="icon_piano.png" alt=""></div>
 <div class="category-title">Пианино</div>
 </div>
 
 <div class="category-card cat-tongue" onclick="openRoom('tongue', 'Скороговорки')">
-<div class="category-icon-placeholder"><img src="icon_tongue.png" alt="Скороговорки"></div>
+<div class="category-icon-placeholder"><img src="icon_tongue.png" alt=""></div>
 <div class="category-title">Скороговорки</div>
 </div>
 </div>
@@ -250,10 +269,10 @@ Email: holljs@mail.ru
 <div class="header-title-row"><span id="room-title">Комната</span></div>
 <div class="header-top">
 <div style="display:flex; gap:8px;">
-<div class="back-btn" onclick="goHome()">⬅ Назад</div>
-<div class="back-btn" id="replayBtn" onclick="replayLastSound()" style="background:#FFF3E0; color:#FF9F1C; font-weight:700;">🔊 Ещё раз</div>
+<div class="back-btn" onclick="goHome()"><svg class="ic"><use href="#i-back"/></svg> Назад</div>
+<div class="back-btn" id="replayBtn" onclick="replayLastSound()" style="background:#FFF3E0; color:#FF9F1C; font-weight:700;"><svg class="ic"><use href="#i-speaker"/></svg> Ещё раз</div>
 </div>
-<div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()">🎓 Игра</div>
+<div class="quiz-toggle" id="quizToggle" onclick="toggleQuiz()"><svg class="ic"><use href="#i-game"/></svg> Игра</div>
 </div>
 </div>
 
@@ -286,8 +305,8 @@ Email: holljs@mail.ru
 
 <div id="poems-area" style="display: none; width: 100%; height: 100%; background-size: cover; background-position: center top; border-radius: 15px; overflow: hidden; flex-direction: column; justify-content: flex-end; padding-bottom: 25px; position: relative;">
 <div style="position: absolute; top: 35%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
-<div class="nav-btn" onclick="prevPoem()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
-<div class="nav-btn" onclick="nextPoem()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
+<div class="nav-btn" onclick="prevPoem()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-left"/></svg></div>
+<div class="nav-btn" onclick="nextPoem()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-right"/></svg></div>
 </div>
 <img id="poem-success-img" src="" style="display: none; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; object-fit: contain; animation: popIn 0.5s ease-out; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); z-index: 10;">
 <div id="poem-options" style="width: 92%; margin: 0 auto; min-height: 110px; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; gap: 10px; background: rgba(255,255,255,0.85); border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; z-index: 30;"></div>
@@ -295,8 +314,8 @@ Email: holljs@mail.ru
 
 <div id="yesno-area" style="display: none; width: 100%; height: 100%; background-size: cover; background-position: center top; border-radius: 15px; overflow: hidden; flex-direction: column; justify-content: flex-end; padding-bottom: 30px; position: relative;">
 <div style="position: absolute; top: 35%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
-<div class="nav-btn" onclick="prevYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
-<div class="nav-btn" onclick="nextYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
+<div class="nav-btn" onclick="prevYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-left"/></svg></div>
+<div class="nav-btn" onclick="nextYesNo()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-right"/></svg></div>
 </div>
 <div style="display: flex; justify-content: center; gap: 35px; z-index: 30;">
 <button id="btn-yes" onclick="handleYesNoClick('yes')" style="width: 110px; height: 110px; border-radius: 50%; background-color: #4CAF50; border: 8px solid #FFFFFF; box-shadow: 0 8px 15px rgba(0,0,0,0.2); font-size: 55px; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; outline: none; font-weight: bold;">✓</button>
@@ -306,8 +325,8 @@ Email: holljs@mail.ru
 
 <div id="words-area" style="display: none; width: 100%; height: 100%; background: #FFFDE7; border-radius: 15px; overflow: hidden; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 10px 25px 10px; box-sizing: border-box; position: relative;">
 <div style="position: absolute; top: 40%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
-<div class="nav-btn" onclick="prevWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
-<div class="nav-btn" onclick="nextWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
+<div class="nav-btn" onclick="prevWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-left"/></svg></div>
+<div class="nav-btn" onclick="nextWordsLevel()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-right"/></svg></div>
 </div>
 <div id="words-shadow-board" style="position: relative; width: 260px; height: 260px; margin-top: 15px; display: flex; justify-content: center; align-items: center; background: transparent;"></div>
 <div id="words-dock" style="width: 95%; min-height: 125px; display: flex; justify-content: center; align-items: center; gap: 15px; background: rgba(255,255,255,0.9); border-radius: 20px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 30; margin-bottom: 5px;"></div>
@@ -315,9 +334,9 @@ Email: holljs@mail.ru
 
 <div id="draw-area" class="draw-container">
 <div class="draw-nav">
-<div class="nav-btn" onclick="changeDrawImage(-1)" style="width:40px; height:40px; font-size:18px;">⬅️</div>
+<div class="nav-btn" onclick="changeDrawImage(-1)" style="width:40px; height:40px; font-size:18px;"><svg class="ic"><use href="#i-left"/></svg></div>
 <div class="draw-title" id="draw-image-title"></div>
-<div class="nav-btn" onclick="changeDrawImage(1)" style="width:40px; height:40px; font-size:18px;">➡️</div>
+<div class="nav-btn" onclick="changeDrawImage(1)" style="width:40px; height:40px; font-size:18px;"><svg class="ic"><use href="#i-right"/></svg></div>
 </div>
 <div class="canvas-wrapper">
 <canvas id="paintCanvas"></canvas>
@@ -332,14 +351,14 @@ Email: holljs@mail.ru
 <div class="color-btn" style="background:#9932CC" onclick="setBrushColor('#9932CC', 'color_purple', this)"></div>
 <div class="color-btn" style="background:#FF69B4" onclick="setBrushColor('#FF69B4', 'color_pink', this)"></div>
 <div class="color-btn" style="background:#8B4513" onclick="setBrushColor('#8B4513', 'color_brown', this)"></div>
-<button class="clear-btn" onclick="clearDrawCanvas()">❌ Стереть всё</button>
+<button class="clear-btn" onclick="clearDrawCanvas()"><svg class="ic"><use href="#i-trash"/></svg> Стереть всё</button>
 </div>
 </div>
 
 <div id="wind-area" class="wind-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
 <div class="wind-instruction" id="wind-instruction" style="font-size: 20px; font-weight: bold; color: #7A90A4; margin-bottom: 20px;">Нажми кнопку и подуй!</div>
 <img src="wind_spinner.png" id="wind-spinner" class="wind-spinner" style="width: 150px; height: 150px; transition: transform 0.1s linear;">
-<div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()" style="margin-top: 30px; background-color: #0077FF; color: white; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">🌬️ Включить микрофон</div>
+<div class="wind-start-btn" id="wind-start-btn" onclick="startWindGame()" style="margin-top: 30px; background-color: #0077FF; color: white; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;"><svg class="ic"><use href="#i-mic"/></svg> Включить микрофон</div>
 </div>
 
 <div id="story-area" class="story-container" style="display: none; width: 100%; height: 100%; position: relative; background-size: cover; background-position: center;">
@@ -360,31 +379,24 @@ Email: holljs@mail.ru
 
 <!-- ===== КОМНАТА СКОРОГОВОРКИ ===== -->
 <div id="tongue-area" style="display: none; width: 100%; height: 100%; border-radius: 15px; overflow: hidden; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 25px; position: relative; background: #FFFDE7;">
-<!-- КНОПКИ ЛИСТАНИЯ ⬅️ ️ -->
 <div style="position: absolute; top: 35%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20;">
-<div class="nav-btn" onclick="prevTongue()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">⬅️</div>
-<div class="nav-btn" onclick="nextTongue()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;">➡️</div>
+<div class="nav-btn" onclick="prevTongue()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-left"/></svg></div>
+<div class="nav-btn" onclick="nextTongue()" style="pointer-events: auto; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;"><svg class="ic"><use href="#i-right"/></svg></div>
 </div>
-<!-- Кнопка возврата к разделам -->
-<div id="tongue-back-btn" onclick="showTongueMenu()" style="display: none; position: absolute; top: 12px; right: 12px; z-index: 25; background: rgba(255,255,255,0.9); border-radius: 12px; padding: 8px 14px; font-size: 14px; font-weight: 600; color: #7A90A4; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.15);">📂 Разделы</div>
-<!-- Карточка: картинка + слово -->
+<div id="tongue-back-btn" onclick="showTongueMenu()" style="display: none; position: absolute; top: 12px; right: 12px; z-index: 25; background: rgba(255,255,255,0.9); border-radius: 12px; padding: 8px 14px; font-size: 14px; font-weight: 600; color: #7A90A4; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.15);"><svg class="ic"><use href="#i-grid"/></svg> Разделы</div>
 <div id="tongue-card" onclick="playCurrentTongue()" style="display: none; width: 85%; max-width: 340px; background: #FFFFFF; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); padding: 20px; text-align: center; cursor: pointer; margin-bottom: 10px;">
 <img id="tongue-img" src="" style="width: 100%; max-height: 36vh; object-fit: contain; pointer-events: none;">
 <div id="tongue-word" style="font-size: 34px; font-weight: 800; letter-spacing: 2px; color: #FF9F1C; margin-top: 10px; pointer-events: none;"></div>
 </div>
-<!-- Подсказка «Повтори!» -->
-<div id="tongue-prompt" style="display: none; font-size: 22px; font-weight: bold; color: #FF9F1C; margin-bottom: 10px; animation: popIn 0.5s ease-out;">🗣️ Повтори!</div>
-<!-- Меню выбора раздела -->
+<div id="tongue-prompt" style="display: none; font-size: 22px; font-weight: bold; color: #FF9F1C; margin-bottom: 10px; animation: popIn 0.5s ease-out;"><svg class="ic"><use href="#i-speaker"/></svg> Повтори!</div>
 <div id="tongue-menu" style="width: 90%; max-width: 400px; display: none; flex-direction: column; gap: 20px; margin-bottom: 20px;"></div>
-<!-- Кнопки управления -->
 <div id="tongue-controls" style="display: none; gap: 15px;">
-<div onclick="playCurrentTongue()" style="background: #FFFFFF; border-radius: 15px; padding: 12px 20px; font-size: 16px; font-weight: bold; color: #5C5552; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">🔊 Ещё раз</div>
-<div id="tongue-mic-btn" onclick="startTongueMic()" style="background: #FFD166; border-radius: 15px; padding: 12px 20px; font-size: 16px; font-weight: bold; color: #5C5552; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">🎤 Утя слушает</div>
+<div onclick="playCurrentTongue()" style="background: #FFFFFF; border-radius: 15px; padding: 12px 20px; font-size: 16px; font-weight: bold; color: #5C5552; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><svg class="ic"><use href="#i-speaker"/></svg> Ещё раз</div>
+<div id="tongue-mic-btn" onclick="startTongueMic()" style="background: #FFD166; border-radius: 15px; padding: 12px 20px; font-size: 16px; font-weight: bold; color: #5C5552; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><svg class="ic"><use href="#i-mic"/></svg> Утя слушает</div>
 </div>
-<!-- Звёздочка-похвала -->
-<div id="tongue-star" style="display: none; position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%); font-size: 90px; animation: popIn 0.5s ease-out; z-index: 30; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">⭐</div>
+<div id="tongue-star" style="display: none; position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%); animation: popIn 0.5s ease-out; z-index: 30; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));"><svg class="ic" style="width:100px;height:100px;color:#FFD700;margin:0;"><use href="#i-star"/></svg></div>
 </div>
 
-</div> </div> <script src="script.js?v=52"></script>
+</div> </div> <script src="script.js?v=53"></script>
 </body>
 </html>
