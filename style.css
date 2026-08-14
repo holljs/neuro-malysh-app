@@ -300,6 +300,7 @@ body {
 .cat-poems { background-color: #FFF0F5; } /* Нежно-розовый/сиреневый для стихов */
 .cat-breeze { background-color: #E0F7FA; } /* Воздушный светло-голубой для ветерка */
 .cat-yesno { background-color: #FFF9C4; } /* Нежно-кремовый/светло-желтый для Да/Нет */
+.cat-tongue { background-color: #F3E5F5; } /* Нежно-сиреневый для скороговорок */
 
 /* Красивый VIP-замочек для закрытых комнат */
 .vip-badge {
