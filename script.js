@@ -133,7 +133,7 @@ card.style.opacity = '1';
 card.style.opacity = '0.85';
 const badge = document.createElement('div');
 badge.className = 'vip-badge';
-badge.innerHTML = '<span style="color: #FFD700; font-size: 12px;">🔒</span> VIP';
+badge.innerHTML = '<svg class="ic" style="color:#FFD700;"><use href="#i-lock"/></svg> VIP';
 card.appendChild(badge);
 }
 }
@@ -223,9 +223,8 @@ console.log("Пользователь закрыл окно подписки:", 
 });
 }
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false;
-// Для кнопки «🔊 Ещё раз»
+// Для кнопки «Ещё раз» — запоминаем последний обучающий звук
 let lastPlayedSound = null;
-// Звуки-эффекты, которые НЕ нужно запоминать для переслушивания
 const effectSounds = ['wrong.wav','correct.wav','color_correct.wav','f_yum.wav','molodec.wav','color_win.wav','f_win.wav','shapes_win.wav','g_win.wav','bs_win.wav','shape_correct.wav','color_intro.wav','f_intro.wav','shapes_intro.wav','wind_intro.wav','wind_good.wav','wind_more.wav','words_intro.wav','paint_clear.wav','paint_good.wav','paint_beautiful.wav','st_intro.wav','tg_quiet.wav'];
 let activeItem = null; let dragOffsetX = 0, dragOffsetY = 0; let matchedCount = 0;
 let currentPairIndex = 0; let bsActiveItemsCount = 0;
@@ -523,21 +522,21 @@ ui.style.width = '90%';
 ui.style.maxWidth = '400px';
 // Массив иконок для каждой сказки, чтобы кнопки были яркими
 const storyIcons = {
-'rain_walk': '🌧️',
-'fun_walk': '☀️',
-'red_hat': '🧶'
+'rain_walk': 'st_bg_1_norm.jpg',
+'fun_walk': 'st2_bg_1_norm.jpg',
+'red_hat': 'rh_bg_1_norm.jpg'
 };
 Object.entries(roomsData['story']).forEach(([storyId, storyData]) => {
 // Создаем контейнер-карточку для сказки
 const storyCard = document.createElement('div');
 storyCard.className = `story-menu-card story-card-${storyId}`;
 // Крупный значок сказки
-const icon = storyIcons[storyId] || '📖';
+const icon = storyIcons[storyId] || 'st_bg_start.jpg';
 storyCard.innerHTML = `
-<div class="story-card-icon">${icon}</div>
+<div class="story-card-icon"><img src="${icon}"></div>
 <div class="story-card-info">
 <div class="story-card-title">${storyData.title}</div>
-<div class="story-card-subtitle">Нажми, чтобы играть ▶️</div>
+<div class="story-card-subtitle">Нажми, чтобы играть <svg class="ic"><use href="#i-play"/></svg></div>
 </div>
 `;
 storyCard.onclick = () => {
@@ -644,14 +643,14 @@ function renderLearningCard() {
 const cards = roomsData[currentRoom];
 const card = cards[currentLearningIndex];
 const area = document.getElementById('learning-area');
-const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder">🖼️</div>`;
+const imageHtml = card.image ? `<img src="${card.image}">` : `<div class="placeholder"></div>`;
 let soundModeHTML = '';
 let currentSoundToPlay = '';
 if (currentRoom === 'animals') {
-soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Названия" : "🔊 Звуки"}</div>`;
+soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)"><svg class="ic"><use href="#i-repeat"/></svg> ${playNamesMode ? "Названия" : "Звуки"}</div>`;
 currentSoundToPlay = playNamesMode ? 'n' + card.sound : card.sound;
 } else if (currentRoom === 'letters') {
-soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)">🔄 ${playNamesMode ? "🗣️ Буквы" : "🔊 Звуки"}</div>`;
+soundModeHTML = `<div class="sound-mode-switch" onclick="toggleSoundMode(event)"><svg class="ic"><use href="#i-repeat"/></svg> ${playNamesMode ? "Буквы" : "Звуки"}</div>`;
 const prefix = playNamesMode ? 'n_b_' : 's_b_';
 currentSoundToPlay = prefix + card.id + '.wav';
 } else if (currentRoom === 'shapes') {
@@ -659,7 +658,11 @@ currentSoundToPlay = card.sound;
 } else {
 currentSoundToPlay = card.sound;
 }
-area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать 🔊</div><div class="slider-controls"><div class="nav-btn" onclick="prevLearningCard()">⬅️</div><div class="nav-btn" onclick="nextLearningCard()">➡️</div></div>`;
+area.innerHTML = `${soundModeHTML}<div class="large-card" onclick="playSound('${currentSoundToPlay}')">${imageHtml}<div>${card.text}</div></div><div class="tap-hint">Нажми, чтобы услышать <svg class="ic"><use href="#i-speaker"/></svg></div>
+<div class="slider-controls">
+<div class="nav-btn" onclick="prevLearningCard()"><svg class="ic"><use href="#i-left"/></svg></div>
+<div class="nav-btn" onclick="nextLearningCard()"><svg class="ic"><use href="#i-right"/></svg></div>
+</div></div>`;
 if (currentSoundToPlay) playSound(currentSoundToPlay);
 }
 function prevLearningCard() {
@@ -1233,7 +1236,7 @@ function startNewQuizRound() { const allCards = [...roomsData[currentRoom]]; shu
 function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'); quizArea.innerHTML = ''; quizCards.forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'quiz-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => handleQuizClick(card.id); quizArea.appendChild(cardDiv); }); }
 function handleQuizClick(actionId) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
 function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
-function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerText = "🛑 Выключить"; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerText = "🎓 Игра"; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
+function updateQuizToggleUI() { const btn = document.getElementById('quizToggle'); if (isQuizMode) { btn.innerHTML = '<svg class="ic"><use href="#i-stop"/></svg> Выключить'; btn.style.backgroundColor = "#95D5B2"; btn.style.color = "#FFFFFF"; } else { btn.innerHTML = '<svg class="ic"><use href="#i-game"/></svg> Игра'; btn.style.backgroundColor = "#FFFFFF"; btn.style.color = "var(--text-color)"; } }
 let activeAudios = [];
 function playSound(soundFile) {
 if (soundFile) {
@@ -1456,9 +1459,9 @@ menu.style.display = 'flex';
 menu.innerHTML = '';
 
 const cats = {
-'vegetables': { icon: '🥒', label: 'Овощи', border: '#4CAF50' },
-'fruits':     { icon: '🍎', label: 'Фрукты', border: '#FF9800' },
-'food':       { icon: '🍽️', label: 'Вкусняшки', border: '#FFD166' }
+'vegetables': { icon: 'tg_ogurcy.png', label: 'Овощи', border: '#4CAF50' },
+'fruits':     { icon: 'tg_banan.png', label: 'Фрукты', border: '#FF9800' },
+'food':       { icon: 'tg_kasha.png', label: 'Вкусняшки', border: '#FFD166' }
 };
 
 Object.entries(cats).forEach(([key, c]) => {
@@ -1466,10 +1469,10 @@ const card = document.createElement('div');
 card.className = 'story-menu-card';
 card.style.borderColor = c.border;
 card.innerHTML = `
-<div class="story-card-icon">${c.icon}</div>
+<div class="story-card-icon"><img src="${c.icon}"></div>
 <div class="story-card-info">
 <div class="story-card-title">${c.label}</div>
-<div class="story-card-subtitle">6 скороговорок ▶️</div>
+<div class="story-card-subtitle">6 скороговорок <svg class="ic"><use href="#i-play"/></svg></div>
 </div>`;
 card.onclick = () => {
 safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
@@ -1627,11 +1630,11 @@ function updateTongueMicBtn() {
 const btn = document.getElementById('tongue-mic-btn');
 if (!btn) return;
 if (tongueMicState === 'recording') {
-btn.style.background = '#FF6B6B'; btn.style.color = '#FFFFFF'; btn.innerText = '🔴 Говори!';
+btn.style.background = '#FF6B6B'; btn.style.color = '#FFFFFF'; btn.innerHTML = '<svg class="ic"><use href="#i-rec"/></svg> Говори!';
 } else if (tongueMicState === 'recorded') {
-btn.style.background = '#8CC084'; btn.style.color = '#FFFFFF'; btn.innerText = '▶️ Послушать себя';
+btn.style.background = '#8CC084'; btn.style.color = '#FFFFFF'; btn.innerHTML = '<svg class="ic"><use href="#i-play"/></svg> Послушать себя';
 } else {
-btn.style.background = '#FFD166'; btn.style.color = '#5C5552'; btn.innerText = '🎤 Утя слушает';
+btn.style.background = '#FFD166'; btn.style.color = '#5C5552'; btn.innerHTML = '<svg class="ic"><use href="#i-mic"/></svg> Утя слушает';
 }
 }
 
