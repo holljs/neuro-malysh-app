@@ -407,6 +407,7 @@ return;
 }
 }
 currentRoom = roomId; isQuizMode = false; currentLearningIndex = 0;
+document.getElementById('replayBtn').style.display = ''; // Кнопка «Ещё раз» видна по умолчанию
 document.getElementById('quiz-area').classList.remove('active');
 document.getElementById('game-area').classList.remove('active');
 document.getElementById('bs-area').classList.remove('active');
@@ -483,6 +484,7 @@ setupStoryIntro();
 }
 else if (roomId === 'music') {   // <--- ПРАВИЛЬНОЕ МЕСТО
 document.getElementById('quizToggle').style.display = 'none';
+document.getElementById('replayBtn').style.display = 'none'; // В пианино кнопка не нужна
 const area = document.getElementById('music-area');
 if (area) area.style.display = 'flex';
 setupMusicRoom();
