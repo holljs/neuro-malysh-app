@@ -390,9 +390,10 @@ body {
 }
 
 /* Индивидуальные сочные рамки для каждой сказки */
-.story-card-rain_walk { border-color: #A3C9D9; } /* Голубая для дождика */
-.story-card-fun_walk { border-color: #FFD166; }  /* Желтая для солнца */
-.story-card-red_hat { border-color: #FF9F1C; }   /* Оранжевая для Шапочки */
+.story-card-rain_walk { border-color: #A3C9D9; }
+.story-card-fun_walk { border-color: #FFD166; }
+.story-card-red_hat { border-color: #FF9F1C; }
+.story-card-utya_kolobok { border-color: #4CAF50; }
 /* --- SVG-ИКОНКИ ВМЕСТО ЭМОДЗИ --- */
 .ic {
 width: 1.1em;
