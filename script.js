@@ -367,6 +367,17 @@ steps: [
 'animals': [{ id: 'кошка', text: 'Кошка', sound: 'a1.wav', image: 'a1.jpg' }, { id: 'собака', text: 'Собака', sound: 'a2.wav', image: 'a2.jpg' }, { id: 'корова', text: 'Корова', sound: 'a3.wav', image: 'a3.jpg' }, { id: 'лошадь', text: 'Лошадь', sound: 'a4.wav', image: 'a4.jpg' }, { id: 'овца', text: 'Овца', sound: 'a5.wav', image: 'a5.jpg' }, { id: 'свинья', text: 'Свинья', sound: 'a6.wav', image: 'a6.jpg' }, { id: 'коза', text: 'Коза', sound: 'a7.wav', image: 'a7.jpg' }, { id: 'волк', text: 'Волк', sound: 'a8.wav', image: 'a8.jpg' }, { id: 'гусь', text: 'Гусь', sound: 'a9.wav', image: 'a9.jpg' }, { id: 'лягушка', text: 'Лягушка', sound: 'a10.wav', image: 'a10.jpg' }, { id: 'лев', text: 'Лев', sound: 'a11.wav', image: 'a11.jpg' }, { id: 'тигр', text: 'Тигр', sound: 'a12.wav', image: 'a12.jpg' }, { id: 'лиса', text: 'Лиса', sound: 'a16.wav', image: 'a16.jpg' }, { id: 'ежик', text: 'Ёжик', sound: 'a17.wav', image: 'a17.jpg' }, { id: 'курица', text: 'Курица', sound: 'a18.wav', image: 'a18.jpg' }, { id: 'петушок', text: 'Петушок', sound: 'a19.wav', image: 'a19.jpg' }, { id: 'ворона', text: 'Ворона', sound: 'a20.wav', image: 'a20.jpg' }, { id: 'ослик', text: 'Ослик', sound: 'a21.wav', image: 'a21.jpg' }, { id: 'сова', text: 'Сова', sound: 'a22.wav', image: 'a22.jpg' }, { id: 'мышка', text: 'Мышка', sound: 'a24.wav', image: 'a24.jpg' }],
 'letters': [{ id: 'a', text: 'А', image: 'b_a.png' }, { id: 'b', text: 'Б', image: 'b_b.png' }, { id: 'v', text: 'В', image: 'b_v.png' }, { id: 'g', text: 'Г', image: 'b_g.png' }, { id: 'd', text: 'Д', image: 'b_d.png' }, { id: 'e', text: 'Е', image: 'b_e.png' }, { id: 'yo', text: 'Ё', image: 'b_yo.png' }, { id: 'zh', text: 'Ж', image: 'b_zh.png' }, { id: 'z', text: 'З', image: 'b_z.png' }, { id: 'i', text: 'И', image: 'b_i.png' }, { id: 'y', text: 'Й', image: 'b_y.png' }, { id: 'k', text: 'К', image: 'b_k.png' }, { id: 'l', text: 'Л', image: 'b_l.png' }, { id: 'm', text: 'М', image: 'b_m.png' }, { id: 'n', text: 'Н', image: 'b_n.png' }, { id: 'o', text: 'О', image: 'b_o.png' }, { id: 'p', text: 'П', image: 'b_p.png' }, { id: 'r', text: 'Р', image: 'b_r.png' }, { id: 's', text: 'С', image: 'b_s.png' }, { id: 't', text: 'Т', image: 'b_t.png' }, { id: 'u', text: 'У', image: 'b_u.png' }, { id: 'f', text: 'Ф', image: 'b_f.png' }, { id: 'h', text: 'Х', image: 'b_h.png' }, { id: 'ts', text: 'Ц', image: 'b_ts.png' }, { id: 'ch', text: 'Ч', image: 'b_ch.png' }, { id: 'sh', text: 'Ш', image: 'b_sh.png' }, { id: 'sch', text: 'Щ', image: 'b_sch.png' }, { id: 'tv', text: 'Ъ', image: 'b_tv.png' }, { id: 'ы', text: 'Ы', image: 'b_ы.png' }, { id: 'myag', text: 'Ь', image: 'b_myag.png' }, { id: 'e_ob', text: 'Э', image: 'b_e_ob.png' }, { id: 'yu', text: 'Ю', image: 'b_yu.png' }, { id: 'ya', text: 'Я', image: 'b_ya.png' }],
 'numbers': [{ id: '1', text: 'Один', sound: '1.wav', image: '1.jpg' }, { id: '2', text: 'Два', sound: '2.wav', image: '2.jpg' }, { id: '3', text: 'Три', sound: '3.wav', image: '3.jpg' }, { id: '4', text: 'Четыре', sound: '4.wav', image: '4.jpg' }, { id: '5', text: 'Пять', sound: '5.wav', image: '5.jpg' }, { id: '6', text: 'Шесть', sound: '6.wav', image: '6.jpg' }, { id: '7', text: 'Семь', sound: '7.wav', image: '7.jpg' }, { id: '8', text: 'Восемь', sound: '8.wav', image: '8.jpg' }, { id: '9', text: 'Девять', sound: '9.wav', image: '9.jpg' }, { id: '10', text: 'Десять', sound: '10.wav', image: '10.jpg' }],
+'garden': [
+{ level: 1, count: 1, bg: 'garden_bg_1.png', item: 'garden_item_1.png', sound: 'g_level1.wav' },
+{ level: 2, count: 2, bg: 'garden_bg_2.png', item: 'garden_item_2.png', sound: 'g_level2.wav' },
+{ level: 3, count: 3, bg: 'garden_bg_3.png', item: 'garden_item_3.png', sound: 'g_level3.wav' },
+{ level: 4, count: 4, bg: 'garden_bg_4.png', item: 'garden_item_4.png', sound: 'g_level4.wav' },
+{ level: 5, count: 5, bg: 'garden_bg_5.png', item: 'garden_item_5.png', sound: 'g_level5.wav' },
+{ level: 6, count: 6, bg: 'garden_bg_6.png', item: 'garden_item_6.png', sound: 'g_level6.wav' },
+{ level: 7, count: 7, bg: 'garden_bg_7.png', item: 'garden_item_7.png', sound: 'g_level7.wav' },
+{ level: 8, count: 8, bg: 'garden_bg_8.png', item: 'garden_item_8.png', sound: 'g_level8.wav' },
+{ level: 9, count: 9, bg: 'garden_bg_9.png', item: 'garden_item_9.png', sound: 'g_level9.wav' }
+],
 'actions': [
 { id: 'dance', text: 'Танцует', sound: 'act_dance.wav', image: 'act_dance.gif' },
 { id: 'jump', text: 'Прыгает', sound: 'act_jump.wav', image: 'act_jump.gif' },
@@ -1004,9 +1015,8 @@ img.className = 'target-item';
 img.setAttribute('data-id', 'veg');
 img.style.filter = 'brightness(0)';
 img.style.WebkitFilter = 'brightness(0)';
-img.style.opacity = '0.5';
+img.style.opacity = '0.35';
 img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
-img.style.margin = '5px';
 targetZone.appendChild(img);
 }
 for(let i=0; i < gardenTargetCount; i++) {
@@ -1015,7 +1025,6 @@ img.src = levelData.item;
 img.className = 'draggable-item';
 img.setAttribute('data-id', 'veg');
 img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
-img.style.margin = '5px';
 img.ondragstart = () => false;
 img.addEventListener('pointerdown', onDragStart);
 dragZone.appendChild(img);
@@ -1123,10 +1132,13 @@ dragOffsetX = e.clientX - rect.left;
 dragOffsetY = e.clientY - rect.top;
 activeItem.style.width = rect.width + 'px';
 activeItem.style.height = rect.height + 'px';
+activeItem.dataset.w = rect.width;
+activeItem.dataset.h = rect.height;
 }
 activeItem.classList.add('dragging');
 activeItem.style.position = 'fixed';
 activeItem.style.zIndex = '1000';
+activeItem.style.touchAction = 'none';
 activeItem.style.left = (e.clientX - dragOffsetX) + 'px';
 activeItem.style.top = (e.clientY - dragOffsetY) + 'px';
 if (currentRoom === 'big_small' && activeItem) {
@@ -1163,6 +1175,8 @@ activeItem.style.transition = 'all 0.2s ease-out';
 activeItem.style.position = 'absolute';
 activeItem.style.left = '0';
 activeItem.style.top = '0';
+activeItem.style.width = '100%';
+activeItem.style.height = '100%';
 activeItem.style.transform = 'scale(1)';
 board.appendChild(activeItem);
 const levelData = roomsData['words'][currentWordsLevel];
@@ -1205,6 +1219,17 @@ break;
 }
 }
 activeItem.style.display = '';
+// Огород: если палец был чуть мимо — сажаем в ближайшую свободную лунку
+if (!target && currentRoom === 'garden') {
+let best = null; let bestDist = 70;
+document.querySelectorAll('#garden-targets .target-item').forEach(t => {
+if (t.classList.contains('matched')) return;
+const r = t.getBoundingClientRect();
+const d = Math.hypot(r.left + r.width / 2 - centerX, r.top + r.height / 2 - centerY);
+if (d < bestDist) { bestDist = d; best = t; }
+});
+target = best;
+}
 if (currentRoom === 'big_small') {
 if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
 safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
@@ -1263,8 +1288,8 @@ activeItem.style.transition = 'all 0.3s ease';
 activeItem.style.position = '';
 activeItem.style.left = '';
 activeItem.style.top = '';
-activeItem.style.width = '';
-activeItem.style.height = '';
+activeItem.style.width = (activeItem.dataset.w ? activeItem.dataset.w + 'px' : '');
+activeItem.style.height = (activeItem.dataset.h ? activeItem.dataset.h + 'px' : '');
 setTimeout(() => {
 if (activeItem) activeItem.style.transition = '';
 }, 300);
@@ -1272,6 +1297,7 @@ activeItem = null;
 }
 document.addEventListener('pointermove', onDragMove);
 document.addEventListener('pointerup', onDragEnd);
+document.addEventListener('pointercancel', onDragEnd);
 function startNewQuizRound() { const allCards = [...roomsData[currentRoom]]; shuffleArray(allCards); quizCards = allCards.slice(0, 4); const randomTarget = quizCards[Math.floor(Math.random() * quizCards.length)]; expectedCardId = randomTarget.id; renderQuizGrid(); if (currentRoom === 'letters') playSound(`q_b_${randomTarget.id}.wav`); else if (randomTarget.sound) { const soundFilename = randomTarget.sound.split('/').pop(); const fileBase = soundFilename.substring(0, soundFilename.lastIndexOf('.')); playSound(`q${fileBase}.wav`); } }
 function renderQuizGrid() { const quizArea = document.getElementById('quiz-area'); quizArea.innerHTML = ''; quizCards.forEach(card => { const cardDiv = document.createElement('div'); cardDiv.className = 'quiz-card'; cardDiv.innerHTML = `<img src="${card.image}"><div>${card.text}</div>`; cardDiv.onclick = () => handleQuizClick(card.id); quizArea.appendChild(cardDiv); }); }
 function handleQuizClick(actionId) { safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {}); if (actionId === expectedCardId) { playSound('correct.wav'); setTimeout(startNewQuizRound, 1500); } else { playSound('wrong.wav'); } }
