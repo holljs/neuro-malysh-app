@@ -1009,15 +1009,20 @@ document.getElementById('garden-area').style.backgroundPosition = 'center top';
 playSound(levelData.sound);
 const itemSize = gardenTargetCount > 5 ? '65px' : '85px';
 for(let i=0; i < gardenTargetCount; i++) {
-const img = document.createElement('img');
-img.src = levelData.item;
-img.className = 'target-item';
-img.setAttribute('data-id', 'veg');
-img.style.filter = 'brightness(0)';
-img.style.WebkitFilter = 'brightness(0)';
-img.style.opacity = '0.35';
-img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = 'contain';
-targetZone.appendChild(img);
+const hole = document.createElement('div');
+hole.className = 'target-item';
+hole.setAttribute('data-id', 'veg');
+hole.style.width = itemSize; hole.style.height = itemSize;
+hole.style.borderRadius = '50%';
+hole.style.background = 'radial-gradient(ellipse at center, rgba(93,64,28,0.45) 0%, rgba(93,64,28,0.28) 55%, rgba(93,64,28,0) 100%)';
+hole.style.display = 'flex'; hole.style.alignItems = 'center'; hole.style.justifyContent = 'center';
+const veg = document.createElement('img');
+veg.src = levelData.item;
+veg.style.width = '100%'; veg.style.height = '100%'; veg.style.objectFit = 'contain';
+veg.style.opacity = '0';
+veg.style.pointerEvents = 'none';
+hole.appendChild(veg);
+targetZone.appendChild(hole);
 }
 for(let i=0; i < gardenTargetCount; i++) {
 const img = document.createElement('img');
@@ -1029,6 +1034,20 @@ img.ondragstart = () => false;
 img.addEventListener('pointerdown', onDragStart);
 dragZone.appendChild(img);
 }
+}
+function prevGarden() {
+stopAllAudio();
+safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+currentGardenLevel--;
+if (currentGardenLevel < 1) currentGardenLevel = 9;
+setupGardenGame();
+}
+function nextGarden() {
+stopAllAudio();
+safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+currentGardenLevel++;
+if (currentGardenLevel > 9) currentGardenLevel = 1;
+setupGardenGame();
 }
 function setupDragGame() {
 const dragZone = document.getElementById('drag-zone');
@@ -1262,9 +1281,9 @@ setTimeout(() => playSound(animalSound), 1000);
 } else if (currentRoom === 'shapes') {
 playSound('shape_correct.wav');
 } else if (currentRoom === 'garden') {
-target.style.filter = 'none';
-target.style.WebkitFilter = 'none';
-target.style.opacity = '1';
+const veg = target.querySelector('img');
+if (veg) veg.style.opacity = '1';
+target.style.background = 'none'; // лунка исчезает — овощ посажен!
 playSound((matchedCount + 1) + '.wav');
 }
 matchedCount++;
