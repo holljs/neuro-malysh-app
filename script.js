@@ -1035,6 +1035,7 @@ img.addEventListener('pointerdown', onDragStart);
 dragZone.appendChild(img);
 }
 }
+
 function prevGarden() {
 stopAllAudio();
 safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
@@ -1049,6 +1050,7 @@ currentGardenLevel++;
 if (currentGardenLevel > 9) currentGardenLevel = 1;
 setupGardenGame();
 }
+
 function setupDragGame() {
 const dragZone = document.getElementById('drag-zone');
 const targetZone = document.getElementById('target-zone');
@@ -1129,6 +1131,22 @@ const items = [bigImg, smallImg];
 shuffleArray(items);
 items.forEach(img => dragZone.appendChild(img));
 }
+
+function prevBigSmall() {
+stopAllAudio();
+safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+currentPairIndex--;
+if (currentPairIndex < 0) currentPairIndex = roomsData['big_small'].length - 1;
+setupBigSmallGame();
+}
+function nextBigSmall() {
+stopAllAudio();
+safeVkSend("VKWebAppTapticImpactOccurred", {"style": "light"}).catch(() => {});
+currentPairIndex++;
+if (currentPairIndex >= roomsData['big_small'].length) currentPairIndex = 0;
+setupBigSmallGame();
+}
+
 function onDragStart(e) {
 if (!e.target.classList.contains('draggable-item') || e.target.classList.contains('matched')) return;
 e.preventDefault();
