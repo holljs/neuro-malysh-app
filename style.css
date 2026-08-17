@@ -393,6 +393,18 @@ body {
 .story-card-rain_walk { border-color: #A3C9D9; } /* Голубая для дождика */
 .story-card-fun_walk { border-color: #FFD166; }  /* Желтая для солнца */
 .story-card-red_hat { border-color: #FF9F1C; }   /* Оранжевая для Шапочки */
+/* --- SVG-ИКОНКИ ВМЕСТО ЭМОДЗИ --- */
+.ic {
+width: 1.1em;
+height: 1.1em;
+fill: currentColor;
+vertical-align: -0.18em;
+margin-right: 5px;
+}
+.nav-btn .ic { width: 26px; height: 26px; margin-right: 0; }
+.nav-btn { color: #FF9F1C; }
+.story-card-icon img { width: 52px; height: 52px; object-fit: cover; border-radius: 14px; }
+.cat-tongue { background-color: #F3E5F5; }
 
 /* --- SVG-ИКОНКИ ВМЕСТО ЭМОДЗИ --- */
 .ic {
