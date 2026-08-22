@@ -131,7 +131,7 @@ card.style.opacity = '1';
 card.style.opacity = '0.85';
 const badge = document.createElement('div');
 badge.className = 'vip-badge';
-badge.innerHTML = '<svg class="ic" style="color:#FFD700;"><use href="#i-lock"/></svg> VIP';
+badge.innerHTML = '<svg class="ic"><use href="#i-lock"/></svg> VIP';
 card.appendChild(badge);
 }
 }
