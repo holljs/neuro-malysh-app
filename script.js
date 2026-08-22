@@ -71,31 +71,29 @@ return false;
 }
 async function applyLocks() {
 const banner = document.getElementById('vip-bonus-banner');
-// Если уже есть премиум — скрываем
-if (userHasPremium) {
-if (banner) banner.style.display = 'none';
-return;
-}
-// Проверяем локально (быстро)
+
+// 1) Баннер бонуса — только если нет премиума и бонус ещё НЕ получали
+let bonusClaimed = false;
+if (!userHasPremium) {
 if (localStorage.getItem('hide_vip_banner') === 'true') {
-if (banner) banner.style.display = 'none';
-return;
-}
-// Проверяем на сервере (надёжно)
+bonusClaimed = true;
+} else {
 try {
 const userInfo = await safeVkSend('VKWebAppGetUserInfo');
 const response = await fetch(`${SERVER_URL}/api/malysh/bonus_status/${userInfo.id}`);
 const data = await response.json();
 if (data.claimed) {
-if (banner) banner.style.display = 'none';
+bonusClaimed = true;
 localStorage.setItem('hide_vip_banner', 'true');
-return;
 }
 } catch (e) {
 console.error("Ошибка проверки бонуса:", e);
 }
-// Если дошли сюда — показываем баннер
-if (banner) banner.style.display = 'block';
+}
+}
+if (banner) banner.style.display = (!userHasPremium && !bonusClaimed) ? 'block' : 'none';
+
+// 2) ЗАМОЧКИ рисуем ВСЕГДА, если нет премиума — независимо от бонуса!
 const roomMapping = {
 'big_small': '.cat-bs',
 'shapes': '.cat-shapes',
