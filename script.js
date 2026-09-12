@@ -1004,6 +1004,7 @@ const targetZone = document.getElementById('garden-targets');
 const dragZone = document.getElementById('garden-drags');
 targetZone.innerHTML = ''; dragZone.innerHTML = '';
 matchedCount = 0;
+
 const levelData = roomsData['garden'].find(l => l.level === currentGardenLevel);
 if (!levelData) {
 playSound('bs_win.wav');
@@ -1031,16 +1032,12 @@ hole.style.background = 'rgba(255,255,255,0.7)';
 hole.style.border = '3px dashed #8B5A2B';
 hole.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
 hole.style.display = 'flex'; hole.style.alignItems = 'center'; hole.style.justifyContent = 'center';
-const veg = document.createElement('img');
-veg.src = levelData.item;
-veg.style.width = '80%'; veg.style.height = '80%'; veg.style.objectFit = 'contain';
-veg.style.opacity = '0.3';
-veg.style.pointerEvents = 'none';
-hole.appendChild(veg);
-targetZone.appendChild(hole);
-}
-veg.style.pointerEvents = 'none';
-hole.appendChild(veg);
+const vegImg = document.createElement('img');
+vegImg.src = levelData.item;
+vegImg.style.width = '80%'; vegImg.style.height = '80%'; vegImg.style.objectFit = 'contain';
+vegImg.style.opacity = '0.3';
+vegImg.style.pointerEvents = 'none';
+hole.appendChild(vegImg);
 targetZone.appendChild(hole);
 }
 for(let i=0; i < gardenTargetCount; i++) {
@@ -1052,6 +1049,7 @@ img.style.width = itemSize; img.style.height = itemSize; img.style.objectFit = '
 img.ondragstart = () => false;
 img.addEventListener('pointerdown', onDragStart);
 dragZone.appendChild(img);
+}
 }
 
 function prevGarden() {
