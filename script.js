@@ -1127,6 +1127,7 @@ targetZone.appendChild(img);
 });
 }
 function setupBigSmallGame() {
+stopAllAudio();
 document.getElementById('bs-drag-zone').innerHTML = '';
 const allPairs = roomsData['big_small'];
 if (currentPairIndex >= allPairs.length || currentPairIndex < 0) {
@@ -1199,7 +1200,7 @@ activeItem.style.left = (e.clientX - dragOffsetX) + 'px';
 activeItem.style.top = (e.clientY - dragOffsetY) + 'px';
 if (currentRoom === 'big_small' && activeItem) {
 const currentSound = activeItem.getAttribute('data-sound');
-if (currentSound) playSound(currentSound);
+if (currentSound) { stopAllAudio(); playSound(currentSound); }
 }
 }
 function onDragMove(e) {
@@ -1289,6 +1290,7 @@ target = best;
 if (currentRoom === 'big_small') {
 if (target && target.getAttribute('data-size') === activeItem.getAttribute('data-size')) {
 safeVkSend("VKWebAppTapticImpactOccurred", {"style": "medium"}).catch(() => {});
+stopAllAudio();
 activeItem.style.display = 'none';
 playSound('color_correct.wav');
 bsActiveItemsCount--;
