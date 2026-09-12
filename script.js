@@ -1053,7 +1053,6 @@ img.ondragstart = () => false;
 img.addEventListener('pointerdown', onDragStart);
 dragZone.appendChild(img);
 }
-}
 
 function prevGarden() {
 stopAllAudio();
