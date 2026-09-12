@@ -1318,7 +1318,7 @@ playSound('f_yum.wav');
 setTimeout(() => playSound(animalSound), 1000);
 } else if (currentRoom === 'shapes') {
 playSound('shape_correct.wav');
-else if (currentRoom === 'garden') {
+} else if (currentRoom === 'garden') {
 const veg = target.querySelector('img');
 if (veg) veg.style.opacity = '1';
 target.style.border = '3px solid #7CB342';
