@@ -1025,13 +1025,20 @@ const hole = document.createElement('div');
 hole.className = 'target-item';
 hole.setAttribute('data-id', 'veg');
 hole.style.width = itemSize; hole.style.height = itemSize;
-hole.style.borderRadius = '50%';
-hole.style.background = 'radial-gradient(ellipse at center, rgba(93,64,28,0.45) 0%, rgba(93,64,28,0.28) 55%, rgba(93,64,28,0) 100%)';
+hole.style.boxSizing = 'border-box';
+hole.style.borderRadius = '18px';
+hole.style.background = 'rgba(255,255,255,0.7)';
+hole.style.border = '3px dashed #8B5A2B';
+hole.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
 hole.style.display = 'flex'; hole.style.alignItems = 'center'; hole.style.justifyContent = 'center';
 const veg = document.createElement('img');
 veg.src = levelData.item;
-veg.style.width = '100%'; veg.style.height = '100%'; veg.style.objectFit = 'contain';
-veg.style.opacity = '0';
+veg.style.width = '80%'; veg.style.height = '80%'; veg.style.objectFit = 'contain';
+veg.style.opacity = '0.3';
+veg.style.pointerEvents = 'none';
+hole.appendChild(veg);
+targetZone.appendChild(hole);
+}
 veg.style.pointerEvents = 'none';
 hole.appendChild(veg);
 targetZone.appendChild(hole);
@@ -1310,10 +1317,11 @@ playSound('f_yum.wav');
 setTimeout(() => playSound(animalSound), 1000);
 } else if (currentRoom === 'shapes') {
 playSound('shape_correct.wav');
-} else if (currentRoom === 'garden') {
+else if (currentRoom === 'garden') {
 const veg = target.querySelector('img');
 if (veg) veg.style.opacity = '1';
-target.style.background = 'none'; // лунка исчезает — овощ посажен!
+target.style.border = '3px solid #7CB342';
+target.style.background = 'rgba(255,255,255,0.95)';
 playSound((matchedCount + 1) + '.wav');
 }
 matchedCount++;
