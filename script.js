@@ -51,7 +51,7 @@ async function isPremiumActive() {
 try {
 const userInfo = await safeVkSend('VKWebAppGetUserInfo');
 const vkSignParams = getVkSignParams();
-const response = await fetch(`${SERVER_URL}/api/user/${userInfo.id}`, {
+const response = await fetch(`${SERVER_URL}/api/kids/status/${userInfo.id}`, {
 method: 'GET',
 headers: {
 'x-vk-sign': vkSignParams,
