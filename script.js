@@ -75,20 +75,14 @@ const banner = document.getElementById('vip-bonus-banner');
 // 1) Баннер бонуса — только если нет премиума и бонус ещё НЕ получали
 let bonusClaimed = false;
 if (!userHasPremium) {
-if (localStorage.getItem('hide_vip_banner') === 'true') {
-bonusClaimed = true;
-} else {
 try {
-const userInfo = await safeVkSend('VKWebAppGetUserInfo');
-const response = await fetch(`${SERVER_URL}/api/malysh/bonus_status/${userInfo.id}`);
-const data = await response.json();
-if (data.claimed) {
-bonusClaimed = true;
-localStorage.setItem('hide_vip_banner', 'true');
-}
+  const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+  const response = await fetch(`${SERVER_URL}/api/malysh/bonus_status/${userInfo.id}`);
+  const data = await response.json();
+  bonusClaimed = !!data.claimed;
 } catch (e) {
-console.error("Ошибка проверки бонуса:", e);
-}
+  console.error("Ошибка проверки бонуса:", e);
+  bonusClaimed = false;
 }
 }
 if (banner) banner.style.display = (!userHasPremium && !bonusClaimed) ? 'block' : 'none';
