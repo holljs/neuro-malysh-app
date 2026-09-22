@@ -192,27 +192,31 @@ alert("Не удалось связаться с сервером оплаты."
 }
 }
 function subscribeToGroup() {
-safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
-const groupId = 78549529;
-safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
-.then(async data => {
-if (data.result) {
-const userInfo = await safeVkSend('VKWebAppGetUserInfo');
-// Записываем пользователя в файл на сервере
-await fetch(`${SERVER_URL}/api/malysh/claim_bonus`, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json', 'x-bot-token': 'SuperSecret_987654321_Token' },
-body: JSON.stringify({ user_id: userInfo.id })
-});
-const banner = document.getElementById('vip-bonus-banner');
-if (banner) banner.style.display = 'none';
-localStorage.setItem('hide_vip_banner', 'true');
-openModal('bonus-success-modal');
-}
-})
-.catch(error => {
-console.log("Пользователь закрыл окно подписки:", error);
-});
+  safeVkSend("VKWebAppTapticImpactOccurred", {"style": "heavy"}).catch(() => {});
+  const groupId = 78549529;
+  safeVkSend("VKWebAppAllowMessagesFromGroup", {"group_id": groupId})
+    .then(async data => {
+      if (data.result) {
+        const userInfo = await safeVkSend('VKWebAppGetUserInfo');
+        await fetch(`${SERVER_URL}/api/malysh/claim_bonus`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-bot-token': 'SuperSecret_987654321_Token' },
+          body: JSON.stringify({ user_id: userInfo.id })
+        });
+        const banner = document.getElementById('vip-bonus-banner');
+        if (banner) banner.style.display = 'none';
+        // ❌ УДАЛИ: localStorage.setItem('hide_vip_banner', 'true');
+        
+        // ✅ Обновим статус премиума и замочки сразу
+        await isPremiumActive();  // перезапросим статус с сервера
+        
+        // ✅ Покажем модалку УСПЕХА (без "напиши боту")
+        openModal('bonus-success-modal');
+      }
+    })
+    .catch(error => {
+      console.log("Пользователь закрыл окно подписки:", error);
+    });
 }
 let currentRoom = ''; let isQuizMode = false; let expectedCardId = null; let currentLearningIndex = 0; let quizCards = []; let playNamesMode = false;
 // Для кнопки «Ещё раз» — запоминаем последний обучающий звук
